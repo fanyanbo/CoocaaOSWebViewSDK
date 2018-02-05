@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.coocaa.powerWebview" version="2.0.0" xmlns="http://www.w3.org/ns/widgets">
+    <name>Hello Cordova</name>
+    <description>
+        Coocaa Co. Power Webview Adaptor to Cordova Webview.
+    </description>
+    <author email="rico.lv@qq.com" href="http://www.coocaa.com">
+        Coocaa Software Team
+    </author>
+    <content src="http://beta.webapp.skysrt.com/webappdemo/index.html" />
+    <access origin="*" />
+    <preference name="loglevel" value="DEBUG" />
+    <preference name="Fullscreen" value="true" />
+    
+    <feature name="Whitelist">
+        <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
+        <param name="onload" value="true" />
+    </feature>
+    <allow-navigation href="*" />
+    <allow-navigation href="http://*/*" />
+	<allow-navigation href="https://*/*" />
+    <!--  <allow-navigation href="http://172.*/*" />
+    <allow-navigation href="http://*.skysrt.*/*" />-->
+    <feature name="CoocaaOSApi">
+        <param name="android-package" value="com.coocaa.cordova.plugin.CoocaaOSApi" />
+    </feature>
+    <feature name="DynamicPluginLoader">
+        <param name="android-package" value="com.coocaa.cordova.plugin.DynamicPluginLoader" />
+    </feature>
+    <feature name="startApp">
+        <param name="android-package" value="com.lampa.startapp.startApp" />
+    </feature>
+    <feature name="broadcaster">
+        <param name="android-package" value="org.bsc.cordova.CDVBroadcaster" />
+    </feature>
+</widget>

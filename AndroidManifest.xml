@@ -1,0 +1,27 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.coocaa.systemwebview"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="17"
+        android:targetSdkVersion="23" />
+
+    <application
+        android:allowBackup="true" 
+        android:hardwareAccelerated="true">
+        
+        <activity
+            android:name="com.coocaa.sky.ccapi.MActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden|locale|touchscreen|navigation|screenLayout|uiMode|screenSize|locale"
+            android:launchMode="singleTask"
+            android:theme="@style/AppBaseTheme3" >
+            <intent-filter>
+                <action android:name="coocaa.intent.action.pay" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+    </application>
+
+</manifest>
