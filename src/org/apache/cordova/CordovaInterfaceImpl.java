@@ -29,6 +29,7 @@ import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
 
+import org.coocaa.webview.CoocaaOSConnecter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -58,6 +59,7 @@ public class CordovaInterfaceImpl implements CordovaInterface {
 
     @Override
 	public void setPluginImlListener(CordovaPlugin plugin) {
+    	Log.i("WebViewSDK","CordovaInterfaceImpl setPluginImlListener");
     	((CordovaBaseActivity)this.activity).setPlugin(plugin);
 	}
 
@@ -67,6 +69,7 @@ public class CordovaInterfaceImpl implements CordovaInterface {
 
     public CordovaInterfaceImpl(Activity activity, ExecutorService threadPool) {
         this.activity = activity;
+    //	this.context = context;
         this.threadPool = threadPool;
     }
     
@@ -83,11 +86,24 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     }
     
     private CordovaInterfaceListener mCordovaListener;
+    private CoocaaOSConnecter mCoocaaOSConnecter;
     //set Listener
     public void setCordovaInterfaceListener(CordovaInterfaceListener corListener)
     {
     	mCordovaListener = corListener;
     }
+    
+	@Override
+	public void setCoocaaOSConnecter(CoocaaOSConnecter connecter) {
+		// TODO Auto-generated method stub
+		mCoocaaOSConnecter = connecter;
+	}
+	
+	@Override
+	public CoocaaOSConnecter getCoocaaOSConnecter() {
+		// TODO Auto-generated method stub
+		return mCoocaaOSConnecter;
+	}
 
     @Override
     public void startActivityForResult(CordovaPlugin command, Intent intent, int requestCode) {
@@ -113,6 +129,11 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     public Activity getActivity() {
         return activity;
     }
+    
+//    @Override
+//    public Context getContext() {
+//    	return context;
+//    }
 
     @Override
     public Object onMessage(String id, Object data) {
