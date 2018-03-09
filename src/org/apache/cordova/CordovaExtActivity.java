@@ -219,7 +219,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        }
 	        
 	//        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);        
-	//        mMachineName = SkySystemProperties.getProperty("ro.product.name");
+	        mMachineName = SkySystemProperties.getProperty("ro.product.name");
 	        Log.i(TAG,"CordovaExtActivity onCreate SystemWebviewSDK version = " + SystemWebViewSDK.versionName);
 	        
 	        mainLayout = new CordovaMainLayout(this);
