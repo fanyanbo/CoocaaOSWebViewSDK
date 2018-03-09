@@ -143,8 +143,6 @@ public class CordovaExtWebView extends FrameLayout
 						
 						if(mLoadingView!=null)
 							mLoadingView.dismissLoading();
-						
-						showErrorPage(ERROR_SIGNALWEAK);
 					}
 
 					@Override
