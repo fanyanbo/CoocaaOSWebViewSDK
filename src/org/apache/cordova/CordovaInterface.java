@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.Intent;
 
 import org.apache.cordova.CordovaPlugin;
+import org.coocaa.webview.CoocaaOSConnecter;
 
 import java.util.concurrent.ExecutorService;
 
@@ -55,6 +56,9 @@ public interface CordovaInterface {
      */
     public abstract Activity getActivity();
     
+    
+   // public abstract Context getContext();
+    
 
     /**
      * Called when a message is sent to plugin.
@@ -86,5 +90,9 @@ public interface CordovaInterface {
     public boolean hasPermission(String permission);
     
     public void setPluginImlListener(CordovaPlugin plugin);
+    
+    public void setCoocaaOSConnecter(CoocaaOSConnecter connecter);
+    
+    public CoocaaOSConnecter getCoocaaOSConnecter();
 
 }

@@ -65,6 +65,7 @@ import org.apache.cordova.CordovaExtActivity;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.coocaa.webview.CoocaaOSConnecter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -115,6 +116,7 @@ public class CoocaaOSApi extends CordovaPlugin
 
     private Context mContext;
     private CoocaaOSApiListener mCoocaaListener;
+    private CoocaaOSConnecter mCoocaaOSConnecter = null;
 
     private volatile boolean isCmdBindSuccess = false;
 
@@ -137,9 +139,12 @@ public class CoocaaOSApi extends CordovaPlugin
         Log.v(TAG, TAG + ": initialization");
         super.initialize(cordova, webView);
         mContext = cordova.getActivity();
-
-        Log.v("WebViewSDK", TAG + "CoocaaOSApi initialization");
-        cordova.setPluginImlListener(this);  
+   //     mContext= cordova.getContext();
+        
+        mCoocaaOSConnecter = cordova.getCoocaaOSConnecter();
+        if(mCoocaaOSConnecter != null) isCmdBindSuccess = true;
+        Log.v("WebViewSDK", "CoocaaOSApi initialization");
+//        cordova.setPluginImlListener(this);  
              
         if (mCallbackBC == null)
         	mCallbackBC = new CallbackBroadcastReceiver();
@@ -951,27 +956,44 @@ public class CoocaaOSApi extends CordovaPlugin
         }
         else if (GET_DEVICE_INFO.equals(action))
         {
-            if(mCoocaaListener!=null)
-            {
-                this.cordova.getThreadPool().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        JSONObject successobj = mCoocaaListener.getDeviceInfo();
-                        if(successobj!=null)
-                        {
-                            callbackContext.success(successobj);
-                        }
-                        else
-                        {
-                            callbackContext.error("error occurs when called getDeviceInfo");
-                        }
-                    }
-                });
-            }
-            else
-            {
-                callbackContext.error("mCoocaaListener is not ready!");
-            }
+        	if(mCoocaaOSConnecter != null) {
+        		Log.v("WebViewSDK", "------------>getDeviceInfo myTid() = " + android.os.Process.myTid());
+            	String result = mCoocaaOSConnecter.getDeviceInfo();
+            	Log.v("WebViewSDK", "------------>getDeviceInfo = " + result);
+            	if(result == null) {
+            		callbackContext.error("error occurs when called getDeviceInfo");
+            	} 
+            	else {
+            		try {
+            			callbackContext.success(new JSONObject(result));
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            	}
+            	
+        	}
+//            if(mCoocaaListener!=null)
+//            {
+//                this.cordova.getThreadPool().execute(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        JSONObject successobj = mCoocaaListener.getDeviceInfo();
+//                        if(successobj!=null)
+//                        {
+//                            callbackContext.success(successobj);
+//                        }
+//                        else
+//                        {
+//                            callbackContext.error("error occurs when called getDeviceInfo");
+//                        }
+//                    }
+//                });
+//            }
+//            else
+//            {
+//                callbackContext.error("mCoocaaListener is not ready!");
+//            }
             return true;
         }
         else if(GET_MOVIEPLATFORM_INFO.equals(action))
@@ -1173,15 +1195,41 @@ public class CoocaaOSApi extends CordovaPlugin
         }
         else if(IS_NET_CONNECTED.equals(action))
         {
-            if(mCoocaaListener!=null)
+//            if(mCoocaaListener!=null)
+//            {
+//                this.cordova.getThreadPool().execute(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        JSONObject successobj = mCoocaaListener.isNetConnected();
+//                        if(successobj!=null)
+//                        {
+//                            callbackContext.success(successobj);
+//                        }
+//                        else
+//                        {
+//                            callbackContext.error("error occurs when called isNetConnected");
+//                        }
+//                    }
+//                });
+//            }
+//            else
+//            {
+//                callbackContext.error("mCoocaaListener is not ready!");
+//            }
+            if(mCoocaaOSConnecter!=null)
             {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
-                        JSONObject successobj = mCoocaaListener.isNetConnected();
-                        if(successobj!=null)
+                        String successStr = mCoocaaOSConnecter.isNetConnected();
+                        if(successStr!=null)
                         {
-                            callbackContext.success(successobj);
+                            try {
+								callbackContext.success(new JSONObject(successStr));
+							} catch (JSONException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
                         }
                         else
                         {
