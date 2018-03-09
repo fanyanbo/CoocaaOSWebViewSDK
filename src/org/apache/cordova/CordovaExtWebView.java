@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.apache.cordova.CordovaExtActivity.CordovaWebViewListener;
 import org.apache.cordova.CordovaInterfaceImpl.CordovaInterfaceListener;
-import org.coocaa.webview.CoocaaOSConnecter;
 
 import com.coocaa.systemwebview.R;
 import com.skyworth.ui.api.SkyWithBGLoadingView;
@@ -55,16 +54,8 @@ public class CordovaExtWebView extends FrameLayout
     private final int ERROR_DISCONNECT = 1;
     private final int ERROR_SIGNALWEAK = 2;
     private long mEndTime = 0, mStartTime = 0;
-    
-    public CordovaExtWebViewListener mListener = null;
-    
-    public interface CordovaExtWebViewListener
-    {
-    	public void onPageStarted(String url);
-    	public void onPageFinished(String url);
-    	public void onPageError(int errorCode, String description, String failingUrl);
-    	public void onProgressChanged(int process);
-    }
+	
+    public CordovaWebViewListener mListener = null;
     
 	public CordovaExtWebView(Context context) {
 		super(context);
@@ -163,7 +154,7 @@ public class CordovaExtWebView extends FrameLayout
 	    init();   
 	}
 	
-	public void setListener(CordovaExtWebViewListener listener)
+	public void setListener(CordovaWebViewListener listener)
 	{
 		Log.i(TAG,"CordovaWebView----->setListener");
 		mListener = listener;
@@ -201,10 +192,6 @@ public class CordovaExtWebView extends FrameLayout
     
     protected CordovaInterfaceImpl makeCordovaInterface() {    	
         return new CordovaInterfaceImpl((Activity)mContext);
-    }
-    
-    public void setCoocaaOSConnecter(CoocaaOSConnecter connecter) {
-    	cordovaInterface.setCoocaaOSConnecter(connecter);
     }
 
     protected void init() {
