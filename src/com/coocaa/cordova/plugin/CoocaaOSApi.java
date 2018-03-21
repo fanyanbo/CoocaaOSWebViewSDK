@@ -69,6 +69,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -1486,15 +1487,24 @@ public class CoocaaOSApi extends CordovaPlugin
     	}
     }
 
-    public static void broadCastCommonChanged(JSONObject myObject)
+    public static void broadCastCommonChanged(Map<String,String> map)
     {
-        if(myObject!=null)
-        {
-            final Intent intent = new Intent(BROADCAST_COMMON_CHANGED);
-            Bundle b = new Bundle();
-            b.putString("userdata", myObject.toString());
-            intent.putExtras(b);
-            LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
+        if(map!=null) {
+            try {
+                JSONObject myObject = new JSONObject();
+                Set<Map.Entry<String, String>> entryseSet = map.entrySet();
+                for (Map.Entry<String, String> entry:entryseSet) {
+                    myObject.put(entry.getKey(),entry.getValue());
+                }
+                final Intent intent = new Intent(BROADCAST_COMMON_CHANGED);
+                Bundle b = new Bundle();
+                b.putString("userdata", myObject.toString());
+                intent.putExtras(b);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
+            } catch (JSONException e) {
+                Log.e("WebViewSDK", "CommonCallBack error:" + e.toString());
+                e.printStackTrace();
+            }
         }
     }
     
