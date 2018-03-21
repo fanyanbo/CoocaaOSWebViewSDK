@@ -61,7 +61,6 @@ import com.tianci.user.data.UserCmdDefine;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaBaseActivity;
-import org.apache.cordova.CordovaExtActivity;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
@@ -103,6 +102,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String BROADCAST_USBCHANGGED = "USB_CHANGGED";//u盘广播
     private static final String BROADCAST_USERCHANGGED = "USER_CHANGGED";//用户广播
     private static final String BROADCAST_PURCHASE = "PURCHASE_CALLBACK";//支付状态
+    private static final String BROADCAST_COMMON_CHANGED = "COMMON_CHANGED";//抽象出来的通用状态变化
     /***************************************新添加*******************************************/
     private static final String GET_MOVIEPLATFORM_INFO = "getMoviePlatformInfo";
     private static final String GET_APP_INFO = "getAppInfo";
@@ -113,7 +113,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String NOTIFY_JS_MESSAGE = "notifyJSMessage";
     private static final String NOTIFY_JS_LOG = "notifyJSLogInfo";
 
-    private Context mContext;
+    private static Context mContext;
     private CoocaaOSApiListener mCoocaaListener;
 
     private volatile boolean isCmdBindSuccess = false;
@@ -783,6 +783,8 @@ public class CoocaaOSApi extends CordovaPlugin
         	mContext.unregisterReceiver(mCallbackBC);
         if(mCoocaaListener != null)
         	mCoocaaListener = null;
+
+        mContext = null;
     }
     
     
@@ -1482,6 +1484,18 @@ public class CoocaaOSApi extends CordovaPlugin
     		intent.putExtras( b);
     		LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
     	}
+    }
+
+    public static void broadCastCommonChanged(JSONObject myObject)
+    {
+        if(myObject!=null)
+        {
+            final Intent intent = new Intent(BROADCAST_COMMON_CHANGED);
+            Bundle b = new Bundle();
+            b.putString("userdata", myObject.toString());
+            intent.putExtras(b);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
+        }
     }
     
 }

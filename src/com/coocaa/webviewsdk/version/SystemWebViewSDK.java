@@ -87,12 +87,16 @@ package com.coocaa.webviewsdk.version;
  * 1.替换错误页的图标
  * 2.替换MActivity的图标
  */
+/*version 2.3.10
+ * 1.增加动态设置全屏背景是否显示的接口
+ * 2.封装发送广播通知Web前端的接口
+ */
 
 public class SystemWebViewSDK {
 
-	public static final String versionName = "2.3.9";
+	public static final String versionName = "2.3.10";
 	
-	public static final int versionCode = 2030009;
+	public static final int versionCode = 2030010;
 	
 	private static int focusPosition = -1;
 	

@@ -447,6 +447,14 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 				mErrorView.setVisibility(View.GONE);
 			}
 		}
+
+		protected void setBackgroundPageShown(boolean value) {
+			if (value) {
+				if(mMainBgLayout != null) mMainBgLayout.setVisibility(View.VISIBLE);
+			}else {
+				if(mMainBgLayout != null) mMainBgLayout.setVisibility(View.INVISIBLE);
+			}
+		}
 		
 		protected void startLoading() {
 			if(mLoadingView!=null)
@@ -577,12 +585,13 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	                ViewGroup.LayoutParams.MATCH_PARENT));
 	        if(mainLayout == null)
 	        	mainLayout = new CordovaMainLayout(this);
-	        if(isNeedThemeBg){
-	        	mMainBgLayout = new BlurBgLayout(this);
-	        	mMainBgLayout.setPageType(BlurBgLayout.PAGETYPE.SECONDE_PAGE);
-	        	mMainBgLayout.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-	        	mainLayout.addView(mMainBgLayout);
-	        }
+
+			mMainBgLayout = new BlurBgLayout(this);
+			mMainBgLayout.setPageType(BlurBgLayout.PAGETYPE.SECONDE_PAGE);
+			mMainBgLayout.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+			mainLayout.addView(mMainBgLayout);
+			mMainBgLayout.setVisibility(View.INVISIBLE);
+			if(isNeedThemeBg) mMainBgLayout.setVisibility(View.VISIBLE);
 	        
 	        mainLayout.addView(appView.getView());
 	        
@@ -1066,10 +1075,11 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 			// TODO Auto-generated method stub
 			return super.onKeyDown(keyCode, event);
 		}
-	    
+
 		@Override
 		public boolean dispatchKeyEvent(KeyEvent event) {
 			// TODO Auto-generated method stub
+
 			if (appView != null && event.getAction() == KeyEvent.ACTION_DOWN){
 				int keyCode = 0;
 				if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP){
