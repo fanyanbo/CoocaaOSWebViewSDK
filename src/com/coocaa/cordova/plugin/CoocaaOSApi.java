@@ -117,6 +117,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String SET_FOCUS_POSITION = "setFocusPosition";
     private static final String NOTIFY_JS_MESSAGE = "notifyJSMessage";
     private static final String NOTIFY_JS_LOG = "notifyJSLogInfo";
+    private static final String NOTIFY_JS_LOG_EXTRA = "notifyJSLogInfoExtra";
 
     private Context mContext;
     private CoocaaOSApiListener mCoocaaListener;
@@ -852,31 +853,40 @@ public class CoocaaOSApi extends CordovaPlugin
         	String params = "";
         	JSONObject eventIdObj = args.getJSONObject(0);
         	JSONObject paramsObj = args.getJSONObject(1);
-            JSONObject typeObj = args.getJSONObject(2);
         	if(eventIdObj != null && paramsObj != null){
         		eventId = eventIdObj.getString("eventId");
         		params = paramsObj.getString("params");
         	}
-        	if(typeObj != null){
-                String type = typeObj.getString("type");
-                if("resume".equals(type)){
-                    Intent intent = new Intent("notify.js.log.resume");
-                    intent.putExtra("eventId", eventId);
-                    intent.putExtra("params", params);
-                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-                }else if("pause".equals(type)){
-                    Intent intent = new Intent("notify.js.log.pause");
-                    intent.putExtra("eventId", eventId);
-                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-                }
-            }else{
-                Intent intent = new Intent("notify.js.log");
+            Intent intent = new Intent("notify.js.log");
+            intent.putExtra("eventId", eventId);
+            intent.putExtra("params", params);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        	callbackContext.success();
+        	return true;
+        }
+        else if(NOTIFY_JS_LOG_EXTRA.equals(action))
+        {
+            String eventId = "",params = "",type = "";
+            JSONObject eventIdObj = args.getJSONObject(0);
+            JSONObject paramsObj = args.getJSONObject(1);
+            JSONObject typeObj = args.getJSONObject(2);
+            if(eventIdObj != null && paramsObj != null && typeObj != null){
+                eventId = eventIdObj.getString("eventId");
+                params = paramsObj.getString("params");
+                type = typeObj.getString("type");
+            }
+            if("resume".equals(type)){
+                Intent intent = new Intent("notify.js.log.resume");
                 intent.putExtra("eventId", eventId);
                 intent.putExtra("params", params);
                 LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            }else if("pause".equals(type)){
+                Intent intent = new Intent("notify.js.log.pause");
+                intent.putExtra("eventId", eventId);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
             }
-        	callbackContext.success();
-        	return true;
+            callbackContext.success();
+            return true;
         }
         else if(NOTIFY_JS_MESSAGE.equals(action))
         {

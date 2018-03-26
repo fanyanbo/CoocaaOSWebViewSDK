@@ -233,7 +233,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        
 	//        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);        
 	        mMachineName = SkySystemProperties.getProperty("ro.product.name");
-	        Log.i(TAG,"CordovaExtActivity onCreate SystemWebviewSDK version = " + SystemWebViewSDK.versionName);
+	        Log.i(TAG,"CordovaExtActivity onCreate SystemWebviewSDK version = " + SystemWebViewSDK.versionName + ",mMachineName = " + mMachineName);
 	        
 	        mainLayout = new CordovaMainLayout(this);
 	        mainLayout.setListener(this);
@@ -251,6 +251,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        IntentFilter filter = new IntentFilter();
 	        filter.addAction("notify.js.message");
 	        filter.addAction("notify.js.log");
+			filter.addAction("notify.js.log.resume");
+			filter.addAction("notify.js.log.pause");
 	        
 	        mLocalBroadcastManager.registerReceiver(mJsBC, filter);
 	        
