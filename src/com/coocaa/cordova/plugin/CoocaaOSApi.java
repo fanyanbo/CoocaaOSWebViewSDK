@@ -852,14 +852,29 @@ public class CoocaaOSApi extends CordovaPlugin
         	String params = "";
         	JSONObject eventIdObj = args.getJSONObject(0);
         	JSONObject paramsObj = args.getJSONObject(1);
+            JSONObject typeObj = args.getJSONObject(2);
         	if(eventIdObj != null && paramsObj != null){
         		eventId = eventIdObj.getString("eventId");
         		params = paramsObj.getString("params");
         	}
-        	Intent intent = new Intent("notify.js.log");
-        	intent.putExtra("eventId", eventId);
-        	intent.putExtra("params", params);
-        	LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        	if(typeObj != null){
+                String type = typeObj.getString("type");
+                if("resume".equals(type)){
+                    Intent intent = new Intent("notify.js.log.resume");
+                    intent.putExtra("eventId", eventId);
+                    intent.putExtra("params", params);
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+                }else if("pause".equals(type)){
+                    Intent intent = new Intent("notify.js.log.pause");
+                    intent.putExtra("eventId", eventId);
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+                }
+            }else{
+                Intent intent = new Intent("notify.js.log");
+                intent.putExtra("eventId", eventId);
+                intent.putExtra("params", params);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            }
         	callbackContext.success();
         	return true;
         }
