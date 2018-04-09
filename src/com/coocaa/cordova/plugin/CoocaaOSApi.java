@@ -27,6 +27,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
 import android.os.SystemProperties;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -69,8 +71,10 @@ import org.coocaa.webview.CoocaaOSConnecter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -104,15 +108,18 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String BROADCAST_USBCHANGGED = "USB_CHANGGED";//u盘广播
     private static final String BROADCAST_USERCHANGGED = "USER_CHANGGED";//用户广播
     private static final String BROADCAST_PURCHASE = "PURCHASE_CALLBACK";//支付状态
+    private static final String BROADCAST_COMMON_CHANGED = "COMMON_CHANGED";//抽象出来的通用状态变化
     /***************************************新添加*******************************************/
     private static final String GET_MOVIEPLATFORM_INFO = "getMoviePlatformInfo";
     private static final String GET_APP_INFO = "getAppInfo";
+    private static final String GET_SPACE_INFO = "getSpaceInfo";
     private static final String GET_PROPERTY_VALUE = "getPropertiesValue";
     private static final String GET_WEBVIEWSDK_INFO = "getWebViewSDKInfo";
     private static final String GET_CURRENT_THEME = "getCurTheme";
     private static final String SET_FOCUS_POSITION = "setFocusPosition";
     private static final String NOTIFY_JS_MESSAGE = "notifyJSMessage";
     private static final String NOTIFY_JS_LOG = "notifyJSLogInfo";
+    private static final String NOTIFY_JS_LOG_EXTRA = "notifyJSLogInfoExtra";
 
     private Context mContext;
     private CoocaaOSApiListener mCoocaaListener;
@@ -856,12 +863,36 @@ public class CoocaaOSApi extends CordovaPlugin
         		eventId = eventIdObj.getString("eventId");
         		params = paramsObj.getString("params");
         	}
-        	Intent intent = new Intent("notify.js.log");
-        	intent.putExtra("eventId", eventId);
-        	intent.putExtra("params", params);
-        	LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            Intent intent = new Intent("notify.js.log");
+            intent.putExtra("eventId", eventId);
+            intent.putExtra("params", params);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
         	callbackContext.success();
         	return true;
+        }
+        else if(NOTIFY_JS_LOG_EXTRA.equals(action))
+        {
+            String eventId = "",params = "",type = "";
+            JSONObject eventIdObj = args.getJSONObject(0);
+            JSONObject paramsObj = args.getJSONObject(1);
+            JSONObject typeObj = args.getJSONObject(2);
+            if(eventIdObj != null && paramsObj != null && typeObj != null){
+                eventId = eventIdObj.getString("eventId");
+                params = paramsObj.getString("params");
+                type = typeObj.getString("type");
+            }
+            if("resume".equals(type)){
+                Intent intent = new Intent("notify.js.log.resume");
+                intent.putExtra("eventId", eventId);
+                intent.putExtra("params", params);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            }else if("pause".equals(type)){
+                Intent intent = new Intent("notify.js.log.pause");
+                intent.putExtra("eventId", eventId);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            }
+            callbackContext.success();
+            return true;
         }
         else if(NOTIFY_JS_MESSAGE.equals(action))
         {
@@ -1461,6 +1492,29 @@ public class CoocaaOSApi extends CordovaPlugin
             });
         	return true;
         }
+        else if(GET_SPACE_INFO.equals(action))
+        {
+            try {
+                long totalSpace = 0L, freeSpace = 0L;
+                long blockSize = 0L, availableBlocks = 0L, totalBlocks = 0L;
+                File path = Environment.getDataDirectory();
+                StatFs stat = new StatFs(path.getPath());
+                blockSize = stat.getBlockSize();
+                availableBlocks = stat.getAvailableBlocks();
+                totalBlocks = stat.getBlockCount();
+                totalSpace = blockSize * totalBlocks;
+                freeSpace = blockSize * availableBlocks;
+                JSONObject result = new JSONObject();
+                result.put("totalSpace", totalSpace);
+                result.put("freeSpace", freeSpace);
+                callbackContext.success(result);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                callbackContext.error("error occurs when called getSpaceInfo");
+            }
+            return true;
+        }
         return false;
     }
 
@@ -1530,6 +1584,27 @@ public class CoocaaOSApi extends CordovaPlugin
     		intent.putExtras( b);
     		LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
     	}
+    }
+
+    public static void broadCastCommonChanged(Context context, Map<String,String> map)
+    {
+        if(map != null && context != null) {
+            try {
+                JSONObject myObject = new JSONObject();
+                Set<Map.Entry<String, String>> entryseSet = map.entrySet();
+                for (Map.Entry<String, String> entry:entryseSet) {
+                    myObject.put(entry.getKey(),entry.getValue());
+                }
+                final Intent intent = new Intent(BROADCAST_COMMON_CHANGED);
+                Bundle b = new Bundle();
+                b.putString("userdata", myObject.toString());
+                intent.putExtras(b);
+                LocalBroadcastManager.getInstance(context).sendBroadcastSync(intent);
+            } catch (JSONException e) {
+                Log.e("WebViewSDK", "CommonCallBack error:" + e.toString());
+                e.printStackTrace();
+            }
+        }
     }
     
 }

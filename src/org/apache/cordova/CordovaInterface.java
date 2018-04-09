@@ -56,9 +56,6 @@ public interface CordovaInterface {
      */
     public abstract Activity getActivity();
     
-    
-   // public abstract Context getContext();
-    
 
     /**
      * Called when a message is sent to plugin.

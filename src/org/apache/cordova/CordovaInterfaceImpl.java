@@ -69,7 +69,6 @@ public class CordovaInterfaceImpl implements CordovaInterface {
 
     public CordovaInterfaceImpl(Activity activity, ExecutorService threadPool) {
         this.activity = activity;
-    //	this.context = context;
         this.threadPool = threadPool;
     }
     
@@ -129,11 +128,6 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     public Activity getActivity() {
         return activity;
     }
-    
-//    @Override
-//    public Context getContext() {
-//    	return context;
-//    }
 
     @Override
     public Object onMessage(String id, Object data) {
