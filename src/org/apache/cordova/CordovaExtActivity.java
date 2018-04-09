@@ -111,9 +111,9 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    protected String mOriginalUrl = null;
 	    private long mEndTime = 0, mStartTime = 0;
 	    
-	    public CordovaWebViewListener mWebViewListener = null;
-	    public CordovaWebPageListener mWebPageListener = null;
-	    public CordovaErrorPageListener mErrorPageListener = null;
+	    private CordovaWebViewListener mWebViewListener = null;
+	    private CordovaWebPageListener mWebPageListener = null;
+	    private CordovaErrorPageListener mErrorPageListener = null;
 	    private JsBroadcastReceiver mJsBC = null;
 	    LocalBroadcastManager mLocalBroadcastManager;
 

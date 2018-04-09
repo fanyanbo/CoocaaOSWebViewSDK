@@ -90,6 +90,8 @@ package com.coocaa.webviewsdk.version;
 /*version 2.3.10
  * 1.增加动态设置全屏背景是否显示的接口
  * 2.封装发送广播通知Web前端的接口
+ * 3.完善提交日志接口
+ * 4.第二次加载url时，不重复加载插件
  */
 
 public class SystemWebViewSDK {
