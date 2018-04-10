@@ -5,19 +5,27 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.os.SystemProperties;
 import android.util.Log;
 
+import com.coocaa.cordova.plugin.CoocaaOSApi;
 import com.coocaa.cordova.plugin.CoocaaUserInfoParser;
 import com.skyworth.framework.skysdk.ipc.SkyApplication;
+import com.skyworth.framework.skysdk.util.SkyJSONUtil;
+import com.skyworth.framework.skysdk.util.SkyObjectByteSerialzie;
 import com.tianci.net.api.NetApiForCommon;
+import com.tianci.net.command.TCNetworkBroadcast;
 import com.tianci.net.data.SkyIpInfo;
+import com.tianci.net.define.NetworkDefs;
 import com.tianci.system.api.TCSystemService;
+import com.tianci.system.command.TCSystemDefs;
 import com.tianci.system.data.TCInfoSetData;
 import com.tianci.system.data.TCSetData;
 import com.tianci.system.define.SkyConfigDefs;
 import com.tianci.system.define.TCEnvKey;
 import com.tianci.user.api.SkyUserApi;
+import com.tianci.user.data.UserCmdDefine;
 
 public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
     private TCSystemService systemApi;
@@ -36,7 +44,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
     	}
     }
 	@Override
-	public String hasCoocaaUserLogin() {
+	public String hasUserLogin() {
 		// TODO Auto-generated method stub
 		if (userApi != null) {
 			boolean isLogin = userApi.hasLogin();
@@ -53,6 +61,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 
 	@Override
 	public String getUserInfo() {
+        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getUserInfo");
 		// TODO Auto-generated method stub
 		if (userApi != null) {
 			Map<String, Object> userInfo = userApi.getAccoutInfo();
@@ -66,7 +75,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getDeviceInfo() {
 		// TODO Auto-generated method stub
-		Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getDeviceInfo = " + systemApi);
+		Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getDeviceInfo");
 		if (systemApi != null) {
 			// 屏幕尺寸
 			TCSetData pannelSetData = systemApi
@@ -186,7 +195,8 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 
 	@Override
 	public String isNetConnected() {
-		// TODO Auto-generated method stub
+
+        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl isNetConnected");
         if(netApi != null)
         {
             boolean isConnect = netApi.isConnect();
@@ -203,7 +213,8 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 
 	@Override
 	public String getNetType() {
-		// TODO Auto-generated method stub
+
+        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getNetType");
 		if (netApi != null) {
 			String netType = netApi.getNetType();
 			if (netType != null) {
@@ -221,7 +232,8 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 
 	@Override
 	public String getIpInfo() {
-		// TODO Auto-generated method stub
+
+        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getIpInfo");
 		if (netApi != null) {
 			SkyIpInfo ipInfo = netApi.getIpInfo();
 			if (ipInfo != null) {
@@ -244,7 +256,8 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 
 	@Override
 	public String getDeviceLocation() {
-		// TODO Auto-generated method stub
+
+        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getDeviceLocation");
 		if (systemApi != null) {
 			TCSetData locationData = systemApi
 					.getSetData(TCEnvKey.SKY_SYSTEM_ENV_LOCATION);
@@ -267,8 +280,23 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	}
 
 	@Override
+	public String getLoginUserInfo() {
+
+        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getLoginUserInfo");
+        if (userApi != null) {
+            Map<String, Object> userInfo = userApi.getAccoutInfo();
+            if (userInfo != null && userInfo.size() > 0) {
+                String jsonString = SkyJSONUtil.getInstance().compile(userInfo);
+                return jsonString;
+            }
+        }
+        return null;
+	}
+
+	@Override
 	public String getUserAccessToken() {
-		// TODO Auto-generated method stub
+
+        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getUserAccessToken");
 		if (userApi != null) {
 			String token = userApi.getToken("ACCESS");
 			if (token != null) {
@@ -282,5 +310,58 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void startQQAcount() {
+
+        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl startQQAcount");
+        if(userApi != null) {
+            userApi.loginByType(SkyUserApi.AccountType.qq);
+        }
+		return;
+	}
+
+	@Override
+	public byte[] onHandler(Context context, String fromtarget, String cmd, byte[] body) {
+
+        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl onHandler fromtarget = " + fromtarget + ",cmd = " + cmd);
+		if(context == null) return new byte[0];
+		if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_MOUNTED //外接设备接入
+				.toString().equals(cmd)) {
+			String path = SkyObjectByteSerialzie.toObject(body, String.class);
+			CoocaaOSApi.broadCastUsbChangged(context, true, path == null ? "" : path);
+		} else if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_REMOVED //外接设备拔出
+				.toString().equals(cmd)) {
+			String path = SkyObjectByteSerialzie.toObject(body, String.class);
+			CoocaaOSApi.broadCastUsbChangged(context, false, path == null ? "" : path);
+		} else if (TCNetworkBroadcast.TC_NETWORK_BROADCAST_NET_ETH_EVENT
+				.toString().equals(cmd)) {
+			NetworkDefs.EthEvent ethEvnet = SkyObjectByteSerialzie.toObject(body, NetworkDefs.EthEvent.class);
+			if (ethEvnet != null) {
+				JSONObject mJson = CoocaaOSApi.getEthEventString("ethnet", ethEvnet);
+				if (mJson != null) {
+					CoocaaOSApi.broadCastNetChangged(context,mJson);
+				}
+			}
+		} else if (TCNetworkBroadcast.TC_NETWORK_BROADCAST_NET_WIFI_EVENT
+				.toString().equals(cmd)) {
+			NetworkDefs.WifiEvent wifiEvent = SkyObjectByteSerialzie.toObject(body, NetworkDefs.WifiEvent.class);
+			switch (wifiEvent) {
+				case EVENT_WIFI_CONNECT_SUCCEEDED:
+				case EVENT_WIFI_CONNECT_DISCONNECTED:
+					JSONObject mJson = CoocaaOSApi.getWifiEventString("wifi", wifiEvent);
+					if (mJson != null) {
+						CoocaaOSApi.broadCastNetChangged(context,mJson);
+					}
+					break;
+				default:
+					break;
+			}
+		} else if (UserCmdDefine.ACCOUNT_CHANGED.toString().equals(cmd)) {
+			CoocaaOSApi.broadCastUesrChangged(context);
+		}
+
+		return new byte[0];
 	}
 }

@@ -86,8 +86,6 @@ public interface CordovaInterface {
      */
     public boolean hasPermission(String permission);
     
-    public void setPluginImlListener(CordovaPlugin plugin);
-    
     public void setCoocaaOSConnecter(CoocaaOSConnecter connecter);
     
     public CoocaaOSConnecter getCoocaaOSConnecter();

@@ -93,12 +93,15 @@ package com.coocaa.webviewsdk.version;
  * 3.完善提交日志接口
  * 4.第二次加载url时，不重复加载插件
  */
+/*version 2.4.0
+ * 1.封装view
+ */
 
 public class SystemWebViewSDK {
 
-	public static final String versionName = "2.3.10";
+	public static final String versionName = "2.4.10";
 	
-	public static final int versionCode = 2030010;
+	public static final int versionCode = 2040010;
 	
 	private static int focusPosition = -1;
 	

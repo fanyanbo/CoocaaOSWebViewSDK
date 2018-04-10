@@ -1,12 +1,14 @@
 package org.coocaa.webview;
 
+import android.content.Context;
+
 public interface CoocaaOSConnecter {
 	/**
      * 当前用户是否登录
      *
      * @return 如果无或错误则返回null
      */
-    String hasCoocaaUserLogin();
+    String hasUserLogin();
 
 	/**
      * 获取用户信息
@@ -51,9 +53,25 @@ public interface CoocaaOSConnecter {
     String getDeviceLocation();
 
     /**
+     * 获取用户的登录信息
+     *
+     * @return
+     */
+    String getLoginUserInfo();
+
+    /**
      * 获取用户的登录token
      *
      * @return
      */
     String getUserAccessToken();
+
+    /**
+     * 启动登录
+     *
+     * @return
+     */
+    void startQQAcount();
+
+    byte[] onHandler(Context context, String fromtarget, String cmd, byte[] body);
 }

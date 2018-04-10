@@ -113,7 +113,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    private long mEndTime = 0, mStartTime = 0;
 	    
 	    private CordovaWebViewListener mWebViewListener = null;
-	    private CordovaWebPageListener mWebPageListener = null;
+	    private CordovaWebViewDataListener mWebViewDataListener = null;
 	    private CordovaErrorPageListener mErrorPageListener = null;
 	    private JsBroadcastReceiver mJsBC = null;
 	    LocalBroadcastManager mLocalBroadcastManager;
@@ -125,7 +125,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    	public void onPageError(int errorCode, String description, String failingUrl);
 	    }
 	    
-	    public interface CordovaWebPageListener
+	    public interface CordovaWebViewDataListener
 	    {
 	    	public void notifyMessage(String data);
 	    	public void notifyLogInfo(String eventId, Map<String,String> map);
@@ -156,32 +156,32 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 							   String value = jsonObject.getString(key);
 							   map.put(key, value);
 							}
-							if(mWebPageListener != null ){
+							if(mWebViewDataListener != null ){
 								if("notify.js.log.resume".equals(intent.getAction()))
-									mWebPageListener.notifyPageResume(eventId,map);
+									mWebViewDataListener.notifyPageResume(eventId,map);
 								else
-									mWebPageListener.notifyLogInfo(eventId,map);
+									mWebViewDataListener.notifyLogInfo(eventId,map);
 							}
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}else{
-						if(mWebPageListener != null){
+						if(mWebViewDataListener != null){
 							if("notify.js.log.resume".equals(intent.getAction()))
-								mWebPageListener.notifyPageResume(eventId,null);
+								mWebViewDataListener.notifyPageResume(eventId,null);
 							else
-								mWebPageListener.notifyLogInfo(eventId,null);
+								mWebViewDataListener.notifyLogInfo(eventId,null);
 						}
 					}
 				}else if("notify.js.message".equals(intent.getAction())){
 					String data = intent.getStringExtra("key");
-					if(mWebPageListener != null)
-			        	mWebPageListener.notifyMessage(data);
+					if(mWebViewDataListener != null)
+						mWebViewDataListener.notifyMessage(data);
 				}else if("notify.js.log.pause".equals(intent.getAction())){
 					String eventId = intent.getStringExtra("eventId");
-					if(eventId != null && mWebPageListener != null)
-						mWebPageListener.notifyPagePause(eventId);
+					if(eventId != null && mWebViewDataListener != null)
+						mWebViewDataListener.notifyPagePause(eventId);
 				}
 			}
 	    }
@@ -190,8 +190,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    	this.mWebViewListener = listener;
 	    }
 	    
-	    public void setCordovaWebPageListener(CordovaWebPageListener listener) {
-	    	this.mWebPageListener = listener;
+	    public void setCordovaWebViewDataListener(CordovaWebViewDataListener listener) {
+	    	this.mWebViewDataListener = listener;
 	    }
 	    
 	    public void setCordovaErrorPageListener(CordovaErrorPageListener listener) {

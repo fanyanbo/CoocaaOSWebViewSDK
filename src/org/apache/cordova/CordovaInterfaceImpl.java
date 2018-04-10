@@ -57,12 +57,6 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     protected boolean activityWasDestroyed = false;
     protected Bundle savedPluginState;
 
-    @Override
-	public void setPluginImlListener(CordovaPlugin plugin) {
-    	Log.i("WebViewSDK","CordovaInterfaceImpl setPluginImlListener");
-    	((CordovaBaseActivity)this.activity).setPlugin(plugin);
-	}
-
 	public CordovaInterfaceImpl(Activity activity) {
         this(activity, Executors.newCachedThreadPool());
     }
