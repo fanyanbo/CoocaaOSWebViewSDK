@@ -138,7 +138,6 @@
     private FrameLayout mMainLayout = null;
     private CordovaExtWebView mCoocaaWebView = null;
     private SkyApplication.SkyCmdConnectorListener listener = null;
-    private final static String mTag = "WebViewSDK";
 
     public void onCreate(Bundle savedInstanceState) {
 
@@ -254,7 +253,7 @@
 
 
      > loadUrl介绍
- > -- 
+
  > * public void loadUrl(String url)<br/>
 <!-- 加载web页面，不带系统背景，采用默认的错误页面背景，错误页上有“去连网”或“刷新试试”按钮 -->
  > * loadUrl(String url, boolean isNeedBg)<br/>
@@ -264,76 +263,64 @@
  > * public void loadUrl(String url, boolean isNeedBg, boolean isNeedBtn, FrameLayout errorPageBg)<br/>
 <!-- 加载web页面，第二个参数决定是否带系统背景，第三个参数决定是否在错误页上显示“去连网”或“刷新试试”按钮，第四个参数决定是否采用默认的错误页面背景 -->
 
-     > CordovaWebViewListener接口介绍
- > -- 
- > * public void onPageStarted(String url);<br/>
-<!-- web页面开始加载的消息回调 -->
- > * public void onPageFinished(String url);<br/>
-<!-- web页面完成加载的消息回调 -->
- > * public void onPageError(int errorCode, String description, String failingUrl);<br/>
-<!-- web页面加载错误时的消息回调  -->
-
-     > CordovaWebPageListener接口介绍
- > -- 
- > * public void notifyMessage(String data);<br/>
- <!-- 来自Web页面的消息通知 -->
- > * public void notifyLogInfo(String eventId, Map<String,String> map);<br/>
- <!-- 来自Web页面的日志信息 -->
-
 - **代码示例**
 
 ```
-public class TestActivity extends CordovaExtActivity implements CordovaWebViewListener, CordovaWebPageListener
-{	
-	
-	public void onCreate(Bundle savedInstanceState){
+public class WebViewActivity extends CordovaExtActivity
+        implements CordovaExtActivity.CordovaWebViewListener, CordovaExtActivity.CordovaWebViewDataListener, CordovaExtActivity.CordovaErrorPageListener {
+
+    private String mDefaultUrl = "http://beta.webapp.skysrt.com/fyb/webapp/index.html";
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+
+        setCordovaWebViewListener(this);
+        setCordovaWebViewDataListener(this);
+        setCordovaErrorPageListener(this);
+
+        LOG.setLogLevel(LOG.VERBOSE);
+        setWebViewDisplayPolicy(1);
+        setCacheMode(1);
 
         super.onCreate(savedInstanceState);
-
-        SkyThemeEngine.getInstance().registerActivity(this);
-
-        this.setCordovaWebViewListener(this);
-        this.setCordovaWebPageListener(this);  
-        LOG.setLogLevel(LOG.VERBOSE);
-
-		Log.i("fyb","SystemWebViewSDK versionCode:" + SystemWebViewSDK.getVersionCode());
-        
-        String url = getIntent().getStringExtra("url");	
-		loadUrl(url);
     }
 
-	@Override
-	public void onPageStarted(String url) {
-		Log.i("fyb","onPageStarted url = " + url);
-	}
+    @Override
+    public void onSuperCmdInit() {
+        loadUrl(mDefaultUrl);
+    }
 
-	@Override
-	public void onPageFinished(String url) {
-		Log.i("fyb","onPageFinished url = " + url);	
-	}
+    @Override
+    public void onPageStarted(String url) {
+    }
 
-	@Override
-	public void onPageError(int errorCode, String description, String failingUrl) {
-		Log.i("fyb","onPageError url = " + failingUrl);
-	}
+    @Override
+    public void onPageFinished(String url) {
+    }
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();		
-		Log.i("fyb","onDestroy");		
-		SkyThemeEngine.getInstance().unRegisterActivity(this);
-	}
+    @Override
+    public void onPageError(int errorCode, String description, String failingUrl) {
+    }
 
-	@Override
-	public void notifyMessage(String data) {
-		Log.i("fyb","notifyJsMessage data = " + data);
-	}
+    @Override
+    public void notifyMessage(String data) {
+    }
 
-	@Override
-	public void notifyLogInfo(String eventId, Map<String, String> map) {
-		Log.i("fyb","notifyLogInfo eventId = " + eventId);
-		Log.i("fyb","notifyLogInfo map = " + map);
-	}
+    @Override
+    public void notifyLogInfo(String eventId, Map<String, String> map) {
+    }
+
+    @Override
+    public void notifyPageResume(String pageName, Map<String, String> map) {
+    }
+
+    @Override
+    public void notifyPagePause(String pageName) {
+    }
+
+    @Override
+    public void handleUI(String value) {
+    }
 }
 ```
 
