@@ -45,10 +45,9 @@
 > * `<uses-permission android:name="android.permission.INTERNET"/>` <br/>
 
 - **创建对象**
-> * CordovaExtWebView mCoocaaWebView = new CordovaExtWebView(this); <br/>
+> * `CordovaExtWebView mCoocaaWebView = new CordovaExtWebView(this)` <br/>
 
 - **常用方法**
-
 <table>
   <tr>
     <th width=10%, bgcolor=yellow >参数</th>
