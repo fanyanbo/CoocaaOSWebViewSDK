@@ -42,7 +42,7 @@
 #### 基本使用
 
 - **配置网络权限**
-> * <uses-permission android:name="android.permission.INTERNET"/> <br/>
+> * `<uses-permission android:name="android.permission.INTERNET"/>` <br/>
 
 - **创建对象**
 > * CordovaExtWebView mCoocaaWebView = new CordovaExtWebView(this); <br/>
