@@ -11,9 +11,9 @@
  
 >  v2.4.0 【历史版本描述参见master分支README.md】
 > * 对Android App提供View的集成方式<br/>
-
-- **Licensing**
- > 此SDK为酷开系统的一部分
+ 
+ - **使用到的第三方库/版本/LICENSE说明**
+ > 此SDK为酷开系统的一部分, 采用了Cordova框架，基于原始Cordova框架之上做了修改，原始Cordova框架遵循 Apache License Version 2.0 开放源代码授权协议。
 
 - **联系方式**
  > 樊彦博  电子邮件：fanyanbo@skyworth.com
@@ -51,8 +51,7 @@
  > * public void notifyLogInfo(String eventId, Map<String,String> map);<br/>
  <!-- 来自Web页面的日志信息 -->
 
-- **使用到的第三方库/版本／LICENSE说明**
- > 采用了Cordova框架，基于原始Cordova框架之上做了修改，原始Cordova框架遵循 Apache License Version 2.0 开放源代码授权协议。
+
 
 - **集成及使用方式(默认支持Windows，请写出对应平台的集成方式(windows/linux/mac))**
  > 如果你的安卓应用需要使用到SystemWebViewSDK：<br/><br/>
