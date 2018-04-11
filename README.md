@@ -9,7 +9,7 @@
 
 - **版本描述**
  
->  v2.4.0 【历史版本描述参见master分支README.md】
+>  **v2.4.0** 【历史版本描述参见master分支README.md】
 > * 对Android App提供View的集成方式<br/>
  
  - **使用到的第三方库/版本/LICENSE说明**
