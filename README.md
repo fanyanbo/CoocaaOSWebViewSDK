@@ -136,7 +136,6 @@
 
     private String mDefaultUrl = "http://beta.webapp.skysrt.com/fyb/webapp/index.html";
     private FrameLayout mMainLayout = null;
-    private SkyWithBGLoadingView mLoadingView = null;
     private CordovaExtWebView mCoocaaWebView = null;
     private SkyApplication.SkyCmdConnectorListener listener = null;
     private final static String mTag = "WebViewSDK";
@@ -150,83 +149,12 @@
         initUI();
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) { //web页面加载后将接收不到事件回调
-
-        Log.i(mTag, "onKeyDown keyCode = " + keyCode + ",event = " + event.getAction() + ",tid = " + android.os.Process.myTid());
-        switch (event.getKeyCode()) {
-            case KeyEvent.KEYCODE_1:
-                mCoocaaWebView.loadUrl("http://beta.webapp.skysrt.com/appstore/webxtest/test7/test.html");
-                break;
-            case KeyEvent.KEYCODE_2:
-                mCoocaaWebView.loadUrl("http://beta.webapp.skysrt.com/lxw/ceshi/nativeinfo2/index.html");
-                break;
-            case KeyEvent.KEYCODE_3:
-                mCoocaaWebView.loadUrl("http://beta.webapp.skysrt.com/lxw/guide2/index.html");
-                break;
-            case KeyEvent.KEYCODE_4:
-                mCoocaaWebView.loadUrl("http://beta.webapp.skysrt.com/lxw/ceshi/nfc2/index.html");
-                break;
-            case KeyEvent.KEYCODE_5:
-                mCoocaaWebView.loadUrl("http://beta.webapp.skysrt.com/games/old/log/index.html ");
-                break;
-            case KeyEvent.KEYCODE_6:
-                Log.i(mTag,"getStatus = " + mCoocaaWebView.getStatus());
-                break;
-            case KeyEvent.KEYCODE_7:
-                Log.i(mTag,"getProgress = " + mCoocaaWebView.getPageLoadingProgress());
-                break;
-            case KeyEvent.KEYCODE_9:
-                mCoocaaWebView.loadUrl(mDefaultUrl);
-                break;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-
-        if (event.getAction() == 1) {
-            Log.i(mTag, "dispatchKeyEvent keyCode = " + event.getKeyCode() + ",tid = " + android.os.Process.myTid());
-            switch (event.getKeyCode()) {
-                case KeyEvent.KEYCODE_1:
-                    mCoocaaWebView.loadUrl("http://beta.webapp.skysrt.com/appstore/webxtest/test7/test.html");
-                    break;
-                case KeyEvent.KEYCODE_2:
-                    mCoocaaWebView.loadUrl("http://beta.webapp.skysrt.com/lxw/ceshi/nativeinfo2/index.html");
-                    break;
-                case KeyEvent.KEYCODE_3:
-                    mCoocaaWebView.loadUrl("http://beta.webapp.skysrt.com/lxw/guide2/index.html");
-                    break;
-                case KeyEvent.KEYCODE_4:
-                    mCoocaaWebView.loadUrl("http://beta.webapp.skysrt.com/lxw/ceshi/nfc2/index.html");
-                    break;
-                case KeyEvent.KEYCODE_5:
-                    mCoocaaWebView.loadUrl("http://beta.webapp.skysrt.com/games/old/log/index.html ");
-                    break;
-                case KeyEvent.KEYCODE_6:
-                    Log.i(mTag,"getStatus = " + mCoocaaWebView.getStatus());
-                    break;
-                case KeyEvent.KEYCODE_7:
-                    Log.i(mTag,"getProgress = " + mCoocaaWebView.getPageLoadingProgress());
-                    break;
-                case KeyEvent.KEYCODE_9:
-                    mCoocaaWebView.loadUrl(mDefaultUrl);
-                    break;
-            }
-        }
-        return super.dispatchKeyEvent(event);
-    }
-
     private void initUI() {
 
-        Log.i(mTag,"CordovaExtWebViewActivity initUI threadId = " + android.os.Process.myTid());
-
         mMainLayout = new FrameLayout(this);
-
         mCoocaaWebView = new CordovaExtWebView(this);
         mCoocaaWebView.setBackgroundColor(Color.BLACK);
-        FrameLayout.LayoutParams mWebViewLp = new FrameLayout.LayoutParams(SkyScreenParams.getInstence(this).getResolutionValue(1800), FrameLayout.LayoutParams.MATCH_PARENT);
+        FrameLayout.LayoutParams mWebViewLp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         mWebViewLp.gravity = Gravity.CENTER_HORIZONTAL;
         if(listener != null)
             mCoocaaWebView.setCoocaaOSConnecter(new CoocaaOSConnecterDefaultImpl(listener));
@@ -278,16 +206,8 @@
         });
         mMainLayout.addView(mCoocaaWebView,mWebViewLp);
 
-        mLoadingView = new SkyWithBGLoadingView(this);
-        FrameLayout.LayoutParams loading_p = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,FrameLayout.LayoutParams.WRAP_CONTENT);
-        loading_p.gravity = Gravity.CENTER;
-        mLoadingView.setLayoutParams(loading_p);
-        mLoadingView.setScaleW_H(SkyScreenParams.getInstence(this).getResolutionValue(120),SkyScreenParams.getInstence(this).getResolutionValue(120));
-        mMainLayout.addView(mLoadingView);
-
         FrameLayout.LayoutParams mainLp = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-        mMainLayout.setBackgroundColor(Color.DKGRAY);
         setContentView(mMainLayout,mainLp);
     }
 
@@ -325,7 +245,6 @@
 
     @Override
     public void onCmdConnectorInit() {
-
         Log.i(mTag,"CordovaExtWebViewActivity onCmdConnectorInit threadId = " + android.os.Process.myTid());
         listener = this;
     }
@@ -364,8 +283,12 @@
     public byte[] requestStartToForground(String fromtarget, String cmd, byte[] body) {
         return new byte[0];
     }
-}
- 
+} 
+
+```
+
+### 以Activity的方式进行集成
+
  > 1. 新建Activity，继承自 CordovaExtActivity <br/>
  > 2. 在新建的Activity onCreate中调用loadUrl方法即可加载相应Web页面 <br/>
 
