@@ -65,58 +65,70 @@
     <td> 调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现 </td>
     <td> 在调用loadUrl前进行设置  </td>
   <tr>
-    <td bgcolor=rgb(0,10,0)>-r </td>
-    <td> reverse order while sorting </td>
-    <td>  逆序排列 </td>
+    <td bgcolor=rgb(0,10,0)>setThemeBg </td>
+    <td> view是否显示主题背景 </td>
+    <td>  在loadUrl前进行设置 </td>
   </tr>
   <tr>
-    <td bgcolor=#eeeeee> -l </td>
-    <td> use a long listing format  </td>
-    <td> 以长列表方式显示（显示出文件/文件夹详细信息）  </td>
+    <td bgcolor=#eeeeee> getStatus </td>
+    <td> 获取组件当前状态  </td>
+    <td> 0：无加载，1：正在加载web页面，2：加载成功，3：加载失败  </td>
   </tr>
   <tr>
-    <td bgcolor=#00FF00>-t </td>
-    <td> sort by modification time </td>
-    <td> 按照修改时间排序（默认最近被修改的文件/文件夹排在最前面） </td>
+    <td bgcolor=#00FF00>getPageLoadingProgress </td>
+    <td> 获取当前页面加载进度 </td>
+    <td> 取值范围0~100 </td>
   <tr>
-    <td bgcolor=rgb(0,10,0)>-r </td>
-    <td> reverse order while sorting </td>
-    <td>  逆序排列 </td>
+    <td bgcolor=rgb(0,10,0)>setCacheMode </td>
+    <td> 设置缓存模式 </td>
+    <td>  在loadUrl前进行设置（0:no-cache,1:default,2:cache_only,3:cache_else_network） </td>
   </tr>
   <tr>
-    <td bgcolor=#eeeeee> -l </td>
-    <td> use a long listing format  </td>
-    <td> 以长列表方式显示（显示出文件/文件夹详细信息）  </td>
+    <td bgcolor=#eeeeee> setUserAgentMode </td>
+    <td> 设置用户代理模式 </td>
+    <td> 在loadUrl前进行设置（0:Android,1:IE9,2:IPad）  </td>
   </tr>
   <tr>
-    <td bgcolor=#00FF00>-t </td>
-    <td> sort by modification time </td>
-    <td> 按照修改时间排序（默认最近被修改的文件/文件夹排在最前面） </td>
+    <td bgcolor=#00FF00>setWebViewDisplayPolicy </td>
+    <td> 设置view显示策略 </td>
+    <td> 在loadUrl前进行设置（0:100%-display,1:always-display </td>
   <tr>
-    <td bgcolor=rgb(0,10,0)>-r </td>
-    <td> reverse order while sorting </td>
-    <td>  逆序排列 </td>
+    <td bgcolor=rgb(0,10,0)>onPause </td>
+    <td> 同Android Activity生命周期 </td>
+    <td>  建议在Activity生命周期回调中调用对应的方法，否则web前端无法监听到相应事件 </td>
+  </tr>
+  <tr>
+    <td bgcolor=rgb(0,10,0)>onResume </td>
+    <td> 同上 </td>
+    <td>  同上 </td>
+  </tr>
+  <tr>
+    <td bgcolor=rgb(0,10,0)>onStart </td>
+    <td> 同上 </td>
+    <td>  同上 </td>
+  </tr>
+  <tr>
+    <td bgcolor=rgb(0,10,0)>onStop </td>
+    <td> 同上 </td>
+    <td>  同上 </td>
+  </tr>
+  <tr>
+    <td bgcolor=rgb(0,10,0)>onDestroy </td>
+    <td> 同上，进行释放处理 </td>
+    <td> 同上，请务必调用 </td>
+  </tr>
+  <tr>
+    <td bgcolor=rgb(0,10,0)>setCordovaExtWebViewListener </td>
+    <td> 可监听web页面加载开始，加载进度，加载结束，加载错误的事件 </td>
+    <td>  </td>
+  </tr>
+  <tr>
+    <td bgcolor=rgb(0,10,0)>setCordovaExtWebViewDataListener </td>
+    <td> 可监听消息传递，日志提交的事件 </td>
+    <td>  </td>
   </tr>
 </table>
 
-
-| 方法 | 功能说明  | 备注 | 
-| - | - | - | 
-| void loadUrl(String url) | 加载链接地址url| 网络和本地url均支持，可在线程中调用 | 
-| void setCoocaaOSConnecter(CoocaaOSConnecter connecter) | 调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现 | 在调用loadUrl前进行设置 | 
-| void setThemeBg(boolean value) | view是否显示主题背景 | 在loadUrl前进行设置 |
-| int getStatus() | 获取组件当前状态 | 0：无加载，1：正在加载web页面，2：加载成功，3：加载失败 |
-| int getPageLoadingProgress() | 获取当前页面加载进度 | 取值范围0~100 |
-| void setCacheMode(int value) | 设置缓存模式 | 在loadUrl前进行设置（0:no-cache,1:default,2:cache_only,3:cache_else_network） |
-| void setUserAgentMode(int value) | 设置用户代理模式 | 在loadUrl前进行设置（0:Android,1:IE9,2:IPad） |
-| void setWebViewDisplayPolicy(int value) | 设置view显示策略 | 在loadUrl前进行设置（0:100%-display,1:always-display） |
-| void onPause() | 同Android Activity生命周期 | 建议在Activity生命周期回调中调用对应的方法，否则web前端无法监听到相应事件 |
-| void onResume() | 同上 | 同上 |
-| void onStart() | 同上 | 同上 |
-| void onStop() | 同上 | 同上 |
-| void onDestroy() | 同上，进行释放处理 | 同上，请务必调用 |
-| void setCordovaExtWebViewListener(CordovaExtWebViewListener listener) | 可监听web页面加载开始，加载进度，加载结束，加载错误的事件 |  |
-| void setCordovaExtWebViewDataListener(CordovaExtWebViewDataListener listener) | 可监听消息传递，日志提交的事件 |  |
 
 > 代码示例
 
