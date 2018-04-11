@@ -129,7 +129,7 @@
 </table>
 
 
-> 代码示例
+- **代码示例**
 
 ```
  public class CordovaExtWebViewActivity extends SkyActivity {
