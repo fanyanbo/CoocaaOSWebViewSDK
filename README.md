@@ -60,25 +60,19 @@
 | - | - | - | 
 | void loadUrl(String url) | 加载链接地址url| 网络和本地url均支持，可在线程中调用 | 
 | void setCoocaaOSConnecter(CoocaaOSConnecter connecter) | 调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现 | 在调用loadUrl前进行设置 | 
-| void setThemeBg(boolean value) | Slytherin | 90 |
-
-
-void loadUrl(String url): 加载链接地址url，网络和本地url均支持
-void setCoocaaOSConnecter(CoocaaOSConnecter connecter)：在loadUrl前进行设置，调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现
-void setThemeBg(boolean value)：在loadUrl前进行设置，view是否显示主题背景
-int getStatus()：获取组件当前状态（0：无加载，1：正在加载web页面，2：加载成功，3：加载失败）
-int getPageLoadingProgress()：获取当前加载进度（取值范围0~100）
-void setCacheMode(int value)：设置缓存模式，在loadUrl前进行设置（0:no-cache,1:default,2:cache_only,3:cache_else_network）
-void setUserAgentMode(int value)：设置用户代理模式，在loadUrl前进行设置（0:Android,1:IE9,2:IPad）
-void setWebViewDisplayPolicy(int value)：设置view显示策略，在loadUrl前进行设置（0:100%-display,1:always-display）
-void onPause()：同Android Activity生命周期，建议在Activity生命周期回调中调用对应的方法，否则web前端无法监听到相应事件
-void onResume()：同上
-void onStart()：同上
-void onStop()：同上
-void onDestroy()：进行一些释放处理，请务必调用
-void setCordovaExtWebViewListener(CordovaExtWebViewListener listener)：设置监听，可监听web页面加载开始，加载进度，加载结束，加载错误的事件
-void setCordovaExtWebViewDataListener(CordovaExtWebViewDataListener listener)：设置监听，可监听消息传递，日志提交的事件
-
+| void setThemeBg(boolean value) | view是否显示主题背景 | 在loadUrl前进行设置 |
+| int getStatus() | 获取组件当前状态 | 0：无加载，1：正在加载web页面，2：加载成功，3：加载失败 |
+| int getPageLoadingProgress() | 获取当前页面加载进度 | 取值范围0~100 |
+| void setCacheMode(int value) | 设置缓存模式 | 在loadUrl前进行设置（0:no-cache,1:default,2:cache_only,3:cache_else_network） |
+| void setUserAgentMode(int value) | 设置用户代理模式 | 在loadUrl前进行设置（0:Android,1:IE9,2:IPad） |
+| void setWebViewDisplayPolicy(int value) | 设置view显示策略 | 在loadUrl前进行设置（0:100%-display,1:always-display） |
+| void onPause() | 同Android Activity生命周期 | 建议在Activity生命周期回调中调用对应的方法，否则web前端无法监听到相应事件 |
+| void onResume() | 同上 | 同上 |
+| void onStart() | 同上 | 同上 |
+| void onStop() | 同上 | 同上 |
+| void onDestroy() | 同上，进行释放处理 | 同上，请务必调用 |
+| void setCordovaExtWebViewListener(CordovaExtWebViewListener listener) | 可监听web页面加载开始，加载进度，加载结束，加载错误的事件 |  |
+| void setCordovaExtWebViewDataListener(CordovaExtWebViewDataListener listener) | 可监听消息传递，日志提交的事件 |  |
 
 > 代码示例
 
