@@ -40,11 +40,15 @@
 * `创建view对象后，当不再使用时需显式调用方法进行释放` <br/>
 
 #### 基本使用
-* 配置网络权限
-<uses-permission android:name="android.permission.INTERNET"/>
-* 创建对象	
-CordovaExtWebView mCoocaaWebView = new CordovaExtWebView(this);
-* 常用方法
+
+- **配置网络权限**
+> * <uses-permission android:name="android.permission.INTERNET"/> <br/>
+
+- **创建对象**
+> * CordovaExtWebView mCoocaaWebView = new CordovaExtWebView(this); <br/>
+
+- **常用方法**
+
 void loadUrl(String url): 加载链接地址url，网络和本地url均支持
 void setCoocaaOSConnecter(CoocaaOSConnecter connecter)：在loadUrl前进行设置，调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现
 void setThemeBg(boolean value)：在loadUrl前进行设置，view是否显示主题背景
