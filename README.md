@@ -20,12 +20,12 @@
 
 - **API文档** (`该文档供Web前端开发参考，Android App集成该SDK的文档请见下面说明`)
 
-> * 提供获取酷开系统相关信息的能力（如ip信息，设备信息，定位信息，账户信息，app信息等) <br/>
-> * 提供提交日志信息到酷开大数据后台的能力（自定义事件，页面曝光时长）<br/>
-> * 提供发送自定义消息到Android Native的能力 <br/>
-> * 提供监听通用状态变化的能力（播放状态、网络状态、外接设备插拔状态等）<br/>
-> * 提供监听特殊键值按键的能力 (返回键、主页键等）<br/>
-> * 提供监听特殊事件发生的能力 (监听Android Activity生命周期的resume和pause事件) <br/>
+> * 1.提供获取酷开系统相关信息的能力（如ip信息，设备信息，定位信息，账户信息，app信息等) <br/>
+> * 2.提供提交日志信息到酷开大数据后台的能力（自定义事件，页面曝光时长）<br/>
+> * 3.提供发送自定义消息到Android Native的能力 <br/>
+> * 4.提供监听通用状态变化的能力（播放状态、网络状态、外接设备插拔状态等）<br/>
+> * 5.提供监听特殊键值按键的能力 (返回键、主页键等）<br/>
+> * 6.提供监听特殊事件发生的能力 (监听Android Activity生命周期的resume和pause事件) <br/>
 
 > ``Web前端集成和调用说明请详见:`` [文档链接](http://www.baidu.com/)
 
@@ -34,10 +34,10 @@
 
 ### 以View的方式进行集成
 
-* `提供该集成方式的目的是能够进行预加载，在隐藏加载好web页面，在需要的时候显示，以改善用户体验` 
-* `只支持在Activity环境中使用，暂不支持在dialog环境中使用` <br/>
-* `Android App需基于酷开系统ipc通信框架，否则web前端无法对接到酷开系统能力，仅能展示纯H5页面` <br/>
-* `创建view对象后，当不再使用时需显式调用方法进行释放` <br/>
+* `1.提供该集成方式的目的是能够进行预加载，在隐藏加载好web页面，在需要的时候显示，以改善用户体验` 
+* `2.只支持在Activity环境中使用，暂不支持在dialog环境中使用` <br/>
+* `3.Android App需基于酷开系统ipc通信框架，否则web前端无法对接到酷开系统能力，仅能展示纯H5页面` <br/>
+* `4.创建view对象后，当不再使用时需显式调用方法进行释放` <br/>
 
 #### 基本使用
 
@@ -143,10 +143,10 @@
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
-        Log.i(mTag, "CordovaExtWebViewActivity onCreate threadId = " + android.os.Process.myTid());
-
+	
         initUI();
+	
+	mCoocaaWebView.loadUrl(mDefaultUrl);
     }
 
     private void initUI() {
@@ -163,45 +163,36 @@
 
             @Override
             public void onPageStarted(String url) {
-                Log.i(mTag,"mCoocaaWebView onPageStarted url = " + url);
             }
 
             @Override
             public void onPageFinished(String url) {
-                Log.i(mTag,"mCoocaaWebView onPageFinished url = " + url);
             }
 
             @Override
             public void onPageError(int errorCode, String description, String failingUrl) {
-                Log.i(mTag,"mCoocaaWebView onReceivedError url = " + failingUrl + ",description = " + description);
             }
 
             @Override
             public void onProgressChanged(int process) {
-                Log.i(mTag,"mCoocaaWebView onProgressChanged process = " + process);
             }
         });
 
         mCoocaaWebView.setCordovaExtWebViewDataListener(new CordovaExtWebView.CordovaExtWebViewDataListener() {
             @Override
             public void notifyMessage(String data) {
-
             }
 
             @Override
             public void notifyLogInfo(String eventId, Map<String, String> map) {
-                Log.i(mTag,"notifyLogInfo eventId = " + eventId);
-                Log.i(mTag,"notifyLogInfo map = " + map);
             }
 
             @Override
             public void notifyPageResume(String pageName, Map<String, String> map) {
-
             }
 
             @Override
             public void notifyPagePause(String pageName) {
-
             }
         });
         mMainLayout.addView(mCoocaaWebView,mWebViewLp);
@@ -214,7 +205,6 @@
     @Override
     protected void onPause() {
         super.onPause();
-
         if(mCoocaaWebView != null)
             mCoocaaWebView.onPause();
     }
@@ -222,7 +212,6 @@
     @Override
     public void onResume() {
         super.onResume();
-
         if(mCoocaaWebView != null)
             mCoocaaWebView.onResume();
     }
@@ -230,7 +219,6 @@
     @Override
     protected void onStart() {
         super.onStart();
-
         if(mCoocaaWebView != null)
             mCoocaaWebView.onStart();
     }
@@ -238,14 +226,12 @@
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         if(mCoocaaWebView != null)
             mCoocaaWebView.onDestroy();
     }
 
     @Override
     public void onCmdConnectorInit() {
-        Log.i(mTag,"CordovaExtWebViewActivity onCmdConnectorInit threadId = " + android.os.Process.myTid());
         listener = this;
     }
 
@@ -254,35 +240,7 @@
         return new byte[0];
     }
 
-    @Override
-    public void onResult(String fromtarget, String cmd, byte[] body) {
-
-    }
-
-    @Override
-    public byte[] requestPause(String fromtarget, String cmd, byte[] body) {
-        return new byte[0];
-    }
-
-    @Override
-    public byte[] requestResume(String fromtarget, String cmd, byte[] body) {
-        return new byte[0];
-    }
-
-    @Override
-    public byte[] requestRelease(String fromtarget, String cmd, byte[] body) {
-        return new byte[0];
-    }
-
-    @Override
-    public byte[] requestStartToVisible(String fromtarget, String cmd, byte[] body) {
-        return new byte[0];
-    }
-
-    @Override
-    public byte[] requestStartToForground(String fromtarget, String cmd, byte[] body) {
-        return new byte[0];
-    }
+    //其余省略
 } 
 
 ```
