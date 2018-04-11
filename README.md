@@ -50,8 +50,8 @@
 - **常用方法**
 <table>
   <tr>
-    <th width=10%, bgcolor=yellow >参数</th>
-    <th width=40%, bgcolor=yellow>详细解释</th>
+    <th width=10%, bgcolor=yellow >方法</th>
+    <th width=40%, bgcolor=yellow>功能说明</th>
     <th width="50%", bgcolor=yellow>备注</th>
   </tr>
   <tr>
