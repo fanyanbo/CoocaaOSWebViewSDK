@@ -252,17 +252,27 @@
 > * Android App集成酷开系统ipc通信框架 <br/>
 > * 具备和View集成相同的能力<br/>
 
-
-     > loadUrl介绍
-
- > * public void loadUrl(String url)<br/>
-:加载web页面，不带系统背景，采用默认的错误页面背景，错误页上有“去连网”或“刷新试试”按钮
- > * loadUrl(String url, boolean isNeedBg)<br/>
-;加载web页面，第二个参数决定是否带系统背景，采用默认的错误页面背景，错误页上有“去连网”或“刷新试试”按钮
- > * public void loadUrl(String url, FrameLayout errorPageBg)<br/>
-；加载web页面，不带系统背景，第二个参数决定是否采用默认的错误页面背景，错误页上有“去连网”或“刷新试试”按钮 -->
- > * public void loadUrl(String url, boolean isNeedBg, boolean isNeedBtn, FrameLayout errorPageBg)<br/>
-<!-- 加载web页面，第二个参数决定是否带系统背景，第三个参数决定是否在错误页上显示“去连网”或“刷新试试”按钮，第四个参数决定是否采用默认的错误页面背景 -->
+<table>
+  <tr>
+    <th width=40%, bgcolor=yellow > </th>
+    <th width=60%, bgcolor=yellow>说明</th>
+  </tr>
+  <tr>
+    <td bgcolor=#eeeeee>loadUrl(String url)</td>
+    <td>不带系统背景，采用默认的错误页面背景，错误页上有“去连网”或“刷新试试”按钮 </td>
+  </tr>
+  <tr>
+    <td bgcolor=#00FF00>loadUrl(String url, boolean isNeedBg)</td>
+    <td>第二个参数决定是否带系统背景，采用默认的错误页面背景，错误页上有“去连网”或“刷新试试”按钮</td>
+  <tr>
+    <td bgcolor=rgb(0,10,0)>loadUrl(String url, FrameLayout errorPageBg)</td>
+    <td>不带系统背景，第二个参数决定是否采用默认的错误页面背景，错误页上有“去连网”或“刷新试试”按钮</td>
+  </tr>
+  <tr>
+    <td bgcolor=#eeeeee>loadUrl(String url, boolean isNeedBg, boolean isNeedBtn, FrameLayout errorPageBg)</td>
+    <td>第二个参数决定是否带系统背景，第三个参数决定是否在错误页上显示“去连网”或“刷新试试”按钮，第四个参数决定是否采用默认的错误页面背景 </td>
+  </tr>
+</table>
 
 - **代码示例**
 
