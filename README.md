@@ -30,21 +30,21 @@
 > ``Web前端集成和调用说明请详见:`` [文档链接](http://www.baidu.com/)
 
 
-### Android App集成文档
+## Android App集成文档
 
-- 以View的方式进行集成
+### 以View的方式进行集成
 
-* `提供该集成方式的目的是能够进行预加载，改善用户体验` 
+* `提供该集成方式的目的是能够进行预加载，在隐藏加载好web页面，在需要的时候显示，以改善用户体验` 
 * `只支持在Activity环境中使用，暂不支持在dialog环境中使用` <br/>
-* `Android App需基于酷开系统ipc通信框架，否则web前端开发无法对接到酷开系统，只能展示纯H5页面` <br/>
-* `创建view对象后，当不再使用时需显式调用方式进行释放` <br/>
+* `Android App需基于酷开系统ipc通信框架，否则web前端无法对接到酷开系统能力，仅能展示纯H5页面` <br/>
+* `创建view对象后，当不再使用时需显式调用方法进行释放` <br/>
 
-基本使用
-//配置网络权限
+#### 基本使用
+* 配置网络权限
 <uses-permission android:name="android.permission.INTERNET"/>
-//创建对象	
+* 创建对象	
 CordovaExtWebView mCoocaaWebView = new CordovaExtWebView(this);
-//常用方法
+* 常用方法
 void loadUrl(String url): 加载链接地址url，网络和本地url均支持
 void setCoocaaOSConnecter(CoocaaOSConnecter connecter)：在loadUrl前进行设置，调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现
 void setThemeBg(boolean value)：在loadUrl前进行设置，view是否显示主题背景
