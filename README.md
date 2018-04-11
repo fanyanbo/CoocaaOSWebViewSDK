@@ -1,7 +1,7 @@
 # CoocaaOSWebViewSDK【feature-20180309分支】
 
 - **概述**
- > 该SDK是基于Apache Cordova WebApp开源框架进行的一层封装，并扩展了若干个功能插件深度对接酷开系统，将酷开系统的能力提供给Web使用，是基于酷开系统的Web前端开发的核心支撑组件。
+ > 该SDK是基于Apache Cordova WebApp开源框架进行的一层封装，并扩展了若干个功能插件深度对接酷开系统，将酷开系统的能力提供给Web使用，它是基于酷开系统Web前端开发的核心支撑组件。
 
 - **功能描述**
  > Android App集成该SDK后具备展示web页面的能力，同时Web前端页面能够通过该SDK深度对接到酷开系统，使用酷开系统提供的各项能力，从而能够开发基于酷开系统的功能强大的混合应用。
@@ -48,6 +48,12 @@
 > * CordovaExtWebView mCoocaaWebView = new CordovaExtWebView(this); <br/>
 
 - **常用方法**
+
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
 
 void loadUrl(String url): 加载链接地址url，网络和本地url均支持
 void setCoocaaOSConnecter(CoocaaOSConnecter connecter)：在loadUrl前进行设置，调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现
