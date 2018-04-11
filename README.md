@@ -27,7 +27,7 @@
 > * 提供监听特殊键值按键的能力 (返回键、主页键等）<br/>
 > * 提供监听特殊事件发生的能力 (监听Android Activity生命周期的resume和pause事件) <br/>
 
-> ``Web前端集成和调用说明请详见链接文档``
+> ``Web前端集成和调用说明请详见文档:`` [链接](http://www.baidu.com/" 百度一下"){:target="_blank"}  
 
 - **Android App集成文档**
  > 使用方法：<br/>
