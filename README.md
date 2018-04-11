@@ -31,8 +31,35 @@
 
 - **Android App集成文档**
 
-### 以View的方式进行集成：
+### 以View的方式进行集成说明
+
+`提供该集成方式的目的是能够进行预加载，改善用户体验` <br/>
 `只支持在Activity环境中使用，暂不支持在dialog环境中使用` <br/>
+`Android App需基于酷开系统ipc通信框架，否则web前端开发无法对接到酷开系统，只能展示纯H5页面` <br/>
+`创建view对象后，当不再使用时需显式调用方式进行释放` <br/>
+
+基本使用
+//配置网络权限
+<uses-permission android:name="android.permission.INTERNET"/>
+//创建对象	
+CordovaExtWebView mCoocaaWebView = new CordovaExtWebView(this);
+//常用方法
+void loadUrl(String url): 加载链接地址url，网络和本地url均支持
+void setCoocaaOSConnecter(CoocaaOSConnecter connecter)：在loadUrl前进行设置，调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现
+void setThemeBg(boolean value)：在loadUrl前进行设置，view是否显示主题背景
+int getStatus()：获取组件当前状态（0：无加载，1：正在加载web页面，2：加载成功，3：加载失败）
+int getPageLoadingProgress()：获取当前加载进度（取值范围0~100）
+void setCacheMode(int value)：设置缓存模式，在loadUrl前进行设置（0:no-cache,1:default,2:cache_only,3:cache_else_network）
+void setUserAgentMode(int value)：设置用户代理模式，在loadUrl前进行设置（0:Android,1:IE9,2:IPad）
+void setWebViewDisplayPolicy(int value)：设置view显示策略，在loadUrl前进行设置（0:100%-display,1:always-display）
+void onPause()：同Android Activity生命周期，建议在Activity生命周期回调中调用对应的方法，否则web前端无法监听到相应事件
+void onResume()：同上
+void onStart()：同上
+void onStop()：同上
+void onDestroy()：进行一些释放处理，请务必调用
+void setCordovaExtWebViewListener(CordovaExtWebViewListener listener)：设置监听，可监听web页面加载开始，加载进度，加载结束，加载错误的事件
+void setCordovaExtWebViewDataListener(CordovaExtWebViewDataListener listener)：设置监听，可监听消息传递，日志提交的事件
+
 
 > 代码示例
 
