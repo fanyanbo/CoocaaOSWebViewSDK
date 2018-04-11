@@ -18,14 +18,14 @@
 - **联系方式**
  > 樊彦博  电子邮件：fanyanbo@skyworth.com
 
-- **API文档** (`该文档供Web前端开发参考，Android App集成该SDK的文档请见下面说明`)
+### Api文档 (`该文档供Web前端开发参考，Android App集成该SDK的文档请见下面说明`)
 
-> * 1.提供获取酷开系统相关信息的能力（如ip信息，设备信息，定位信息，账户信息，app信息等) <br/>
-> * 2.提供提交日志信息到酷开大数据后台的能力（自定义事件，页面曝光时长）<br/>
-> * 3.提供发送自定义消息到Android Native的能力 <br/>
-> * 4.提供监听通用状态变化的能力（播放状态、网络状态、外接设备插拔状态等）<br/>
-> * 5.提供监听特殊键值按键的能力 (返回键、主页键等）<br/>
-> * 6.提供监听特殊事件发生的能力 (监听Android Activity生命周期的resume和pause事件) <br/>
+> * 提供获取酷开系统相关信息的能力（如ip信息，设备信息，定位信息，账户信息，app信息等) <br/>
+> * 提供提交日志信息到酷开大数据后台的能力（自定义事件，页面曝光时长）<br/>
+> * 提供发送自定义消息到Android Native的能力 <br/>
+> * 提供监听通用状态变化的能力（播放状态、网络状态、外接设备插拔状态等）<br/>
+> * 提供监听特殊键值按键的能力 (返回键、主页键等）<br/>
+> * 提供监听特殊事件发生的能力 (监听Android Activity生命周期的resume和pause事件) <br/>
 
 > ``Web前端集成和调用说明请详见:`` [文档链接](http://www.baidu.com/)
 
@@ -34,10 +34,10 @@
 
 ### 以View的方式进行集成
 
-* `1.提供该集成方式的目的是能够进行预加载，在隐藏加载好web页面，在需要的时候显示，以改善用户体验` 
-* `2.只支持在Activity环境中使用，暂不支持在dialog环境中使用` <br/>
-* `3.Android App需基于酷开系统ipc通信框架，否则web前端无法对接到酷开系统能力，仅能展示纯H5页面` <br/>
-* `4.创建view对象后，当不再使用时需显式调用方法进行释放` <br/>
+* `提供该集成方式的目的是能够进行预加载，在隐藏加载好web页面，在需要的时候显示，以改善用户体验` 
+* `只支持在Activity环境中使用，暂不支持在dialog环境中使用` <br/>
+* `Android App需基于酷开系统ipc通信框架，否则web前端无法对接到酷开系统能力，仅能展示纯H5页面` <br/>
+* `创建view对象后，当不再使用时需显式调用方法进行释放` <br/>
 
 #### 基本使用
 
@@ -247,8 +247,11 @@
 
 ### 以Activity的方式进行集成
 
- > 1. 新建Activity，继承自 CordovaExtActivity <br/>
- > 2. 在新建的Activity onCreate中调用loadUrl方法即可加载相应Web页面 <br/>
+> * 新建Activity，继承自 CordovaExtActivity <br/>
+> * 在新建的Activity onCreate中调用loadUrl方法即可加载相应Web页面 <br/>
+> * Android App集成酷开系统ipc通信框架 <br/>
+> * 具备和View集成相同的能力<br/>
+
 
      > loadUrl介绍
  > -- 
@@ -277,18 +280,7 @@
  > * public void notifyLogInfo(String eventId, Map<String,String> map);<br/>
  <!-- 来自Web页面的日志信息 -->
 
-
-
-- **集成及使用方式(默认支持Windows，请写出对应平台的集成方式(windows/linux/mac))**
- > 如果你的安卓应用需要使用到SystemWebViewSDK：<br/><br/>
- > 1. 请集成Framework\SkyAndroidLibrary\SystemWebViewSDK里面的工程，该工程是一个Android Library工程。<br/><br/>
- > 2. 需要依赖 Framework\SkyJavaLibrary\SystemWebViewSDKExtra\6.0 下的Java Jar工程，这个工程是用来解决一些不同安卓版本上在服务器上编译问题而设立的，自己编译时，请直接采用6.0的版本即可。<br/><br/>
- > 3. SystemWebViewSDK另外需要依赖以下SDK，请添加：SkySDK，CommonUISDK，SystemServiceSDK，UserServiceSDK，SkyThemeSDK，SystemWebViewSDKExtra。<br/><br/>
-
-- **其他**
- > 无 
-
-代码示例
+- **代码示例**
 
 ```
 public class TestActivity extends CordovaExtActivity implements CordovaWebViewListener, CordovaWebPageListener
@@ -344,3 +336,12 @@ public class TestActivity extends CordovaExtActivity implements CordovaWebViewLi
 	}
 }
 ```
+
+- **集成及使用方式(默认支持Windows，请写出对应平台的集成方式(windows/linux/mac))**
+ > 如果你的安卓应用需要使用到SystemWebViewSDK：<br/><br/>
+ > 1. 请集成Framework\SkyAndroidLibrary\SystemWebViewSDK里面的工程，该工程是一个Android Library工程。<br/><br/>
+ > 2. 需要依赖 Framework\SkyJavaLibrary\SystemWebViewSDKExtra\6.0 下的Java Jar工程，这个工程是用来解决一些不同安卓版本上在服务器上编译问题而设立的，自己编译时，请直接采用6.0的版本即可。<br/><br/>
+ > 3. SystemWebViewSDK另外需要依赖以下SDK，请添加：SkySDK，CommonUISDK，SystemServiceSDK，UserServiceSDK，SkyThemeSDK，SystemWebViewSDKExtra。<br/><br/>
+
+- **其他**
+ > 无 
