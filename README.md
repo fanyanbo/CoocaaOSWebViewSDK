@@ -55,6 +55,14 @@
 | void setCoocaaOSConnecter(CoocaaOSConnecter connecter)     | 调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现     |在调用loadUrl前进行设置 |
 | zebra stripes | are neat      |    $1 |
 
+
+| 方法 | 功能说明  | 备注 | 
+| - | - | - | 
+| void loadUrl(String url) | 加载链接地址url| 网络和本地url均支持，可在线程中调用 | 
+| void setCoocaaOSConnecter(CoocaaOSConnecter connecter) | 调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现 | 在调用loadUrl前进行设置 | 
+| void setThemeBg(boolean value) | Slytherin | 90 |
+
+
 void loadUrl(String url): 加载链接地址url，网络和本地url均支持
 void setCoocaaOSConnecter(CoocaaOSConnecter connecter)：在loadUrl前进行设置，调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现
 void setThemeBg(boolean value)：在loadUrl前进行设置，view是否显示主题背景
