@@ -1,63 +1,16 @@
-# CoocaaOSWebViewSDK
+# CoocaaOSWebViewSDK【feature-20180309分支】
 
 - **概述**
- > SystemWebViewSDK，它封装了Cordova WebApp框架，并扩展功能插件深度对接到酷开系统，依赖该SDK的Android App具备Web JS与酷开系统 Native相互通信的能力，从而能够开发出基于酷开系统的功能强大的混合应用。
+ > 该SDK是基于Apache Cordova WebApp开源框架进行的一层封装，并扩展了若干个功能插件深度对接酷开系统，将酷开系统的能力提供给Web使用，是基于酷开系统的Web前端开发的核心支撑组件。
 
 - **功能描述**
- > SystemWebViewSDK，它允许Web页面访问和使用酷开系统的原生接口的功能；实现Web页面与酷开系统的无缝对接。
+ > Android App集成该SDK后具备展示web页面的能力，同时Web前端页面能够通过该SDK深度对接到酷开系统，使用酷开系统提供的各项能力，从而能够开发基于酷开系统的功能强大的混合应用。
+ > 该SDK对于Android App使用而言，提供了Activity和View两种集成方式。
 
 - **版本描述**
  
-     > v1.0.0 
-     > * 初始版本
-     > <br/>
-     
-     > v2.0.0 
-     > * fix bug<br/>
-     > * android-21版本及以上，http和https混合访问受限制的问题<br/>
-     > * apk release模式下，访问https受限制的问题<br/>
-     > <br/>
-
-     > v2.1.0 
-     > * 随酷开系统6.0增加主题<br/>
-     > <br/>
-
-     > v2.2.0 
-     > * 增加获取影视信息接口<br/>
-     > * 增加获取应用圈信息接口<br/>
-     > * 增加获取主题接口<br/>
-     > * 增加获取WebViewSDK信息接口<br/>
-     > * 增加设置web页面焦点边界位置的接口<br/>
-     > <br/>
-
-     > v2.2.1 
-     > * 增加404错误页面通知<br/>
-     > * 增加消息通知接口<br/>
-     > <br/>
-
-     > v2.2.3 
-     > * 修复调用酷开商城详情页失败的问题， 参数默认都解析成String<br/>
-     > * 整合支付模块,注：web启动支付页面的参数有调整<br/>
-     > * 在web页面下响应遥控器蓝牙按键<br/>
-     > * 集成通过Android通道提交web页面log<br/>
-     > * webview水平方向不支持滚动条<br/>
-     > <br/>
-
-     > v2.2.4-v2.2.8
-     > * 解决多页面跳转闪背景的问题<br/>
-     > * url为空时，显示自定义错误页面<br/>
-     > * 加载url资源时增加不同的缓存模式<br/>
-     > * 在框架中增加监听主页按键的逻辑，可以实现屏蔽主页键<br/>
-     > * 在web页面下响应菜单长按键<br/>
-     > * 修复loading状态下webview信息显示的问题<br/>
-     > * 优化当不支持系统主题时url拼接的问题<br/>
-     > * 增加UI操作通知接口<br/>
-     > * 按返回键时，分别发送keydown和keyup事件到web页面<br/>
-     > <br/>
-
-     > v2.3.0
-     > * 重构了ipc通信的初始化过程<br/>
-     > * 更新了支付相关代码<br/>
+>  v2.4.0 【历史版本描述参见master分支README.md】
+> * 对Android App提供View的集成方式<br/>
 
 - **Licensing**
  > 此SDK为酷开系统的一部分
