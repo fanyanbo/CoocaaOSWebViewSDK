@@ -49,9 +49,9 @@
 
 - **常用方法**
 
-| Tables        | Are           | Cool  |
+| 方法        	| 功能说明           		| 备注  |
 | ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
+| void loadUrl(String url)      | 加载链接地址url | 网络和本地url均支持，可在线程中调用 |
 | col 2 is      | centered      |   $12 |
 | zebra stripes | are neat      |    $1 |
 
