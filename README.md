@@ -49,10 +49,10 @@
 
 - **常用方法**
 
-| 方法        	| 功能说明           		| 备注  |
+|方法        	|功能说明           			|备注 		 |
 | ------------- |:-------------:| -----:|
 | void loadUrl(String url)      | 加载链接地址url | 网络和本地url均支持，可在线程中调用 |
-| col 2 is      | centered      |   $12 |
+| void setCoocaaOSConnecter(CoocaaOSConnecter connecter)     | 调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现     |在调用loadUrl前进行设置 |
 | zebra stripes | are neat      |    $1 |
 
 void loadUrl(String url): 加载链接地址url，网络和本地url均支持
