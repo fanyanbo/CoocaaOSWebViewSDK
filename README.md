@@ -38,6 +38,7 @@
 * `只支持在Activity环境中使用，暂不支持在dialog环境中使用` <br/>
 * `Android App需基于酷开系统ipc通信框架，否则web前端无法对接到酷开系统能力，仅能展示纯H5页面` <br/>
 * `创建view对象后，当不再使用时需显式调用方法进行释放` <br/>
+* `在Api文档一节中描述了若干能力给到web端使用，Android App在集成的过程中请参照下面示例代码，否则会遗漏某些能力的实现` <br/>
 
 #### 基本使用
 
@@ -137,6 +138,7 @@
     private String mDefaultUrl = "http://beta.webapp.skysrt.com/fyb/webapp/index.html";
     private FrameLayout mMainLayout = null;
     private CordovaExtWebView mCoocaaWebView = null;
+    private CoocaaOSConnecter mCoocaaOSConnecter = null;
     private SkyApplication.SkyCmdConnectorListener listener = null;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -155,8 +157,10 @@
         mCoocaaWebView.setBackgroundColor(Color.BLACK);
         FrameLayout.LayoutParams mWebViewLp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         mWebViewLp.gravity = Gravity.CENTER_HORIZONTAL;
-        if(listener != null)
-            mCoocaaWebView.setCoocaaOSConnecter(new CoocaaOSConnecterDefaultImpl(listener));
+        if(listener != null){
+            mCoocaaOSConnecter = new CoocaaOSConnecterDefaultImpl(listener);
+            mCoocaaWebView.setCoocaaOSConnecter(mCoocaaOSConnecter);
+        }
 
         mCoocaaWebView.setCordovaExtWebViewListener(new CordovaExtWebView.CordovaExtWebViewListener() {
 
@@ -234,9 +238,10 @@
         listener = this;
     }
 
-    @Override
+    //如果不传递给CoocaaOSConnecter实例对象，web前端将无法接收到酷开系统的相关状态变化，如U盘插拔事件，网络插拔事件等
+    @Override
     public byte[] onHandler(String fromtarget, String cmd, byte[] body) {
-        return new byte[0];
+        return mCoocaaOSConnecter.onHandler(this,fromtarget,cmd,body);
     }
 
     //其余省略
@@ -337,9 +342,10 @@ public class WebViewActivity extends CordovaExtActivity
 
 - **集成及使用方式(默认支持Windows，请写出对应平台的集成方式(windows/linux/mac))**
  > 如果你的安卓应用需要使用到SystemWebViewSDK：<br/><br/>
- > 1. 请集成Framework\SkyAndroidLibrary\SystemWebViewSDK里面的工程，该工程是一个Android Library工程。<br/><br/>
- > 2. 需要依赖 Framework\SkyJavaLibrary\SystemWebViewSDKExtra\6.0 下的Java Jar工程，这个工程是用来解决一些不同安卓版本上在服务器上编译问题而设立的，自己编译时，请直接采用6.0的版本即可。<br/><br/>
- > 3. SystemWebViewSDK另外需要依赖以下SDK，请添加：SkySDK，CommonUISDK，SystemServiceSDK，UserServiceSDK，SkyThemeSDK，SystemWebViewSDKExtra。<br/><br/>
+ > 1. 如果是系统应用请集成Framework\SkyAndroidLibrary\SystemWebViewSDK里面的工程，该工程是一个Android Library工程。在SDK裁剪了一些功能，也暂不支持view的集成<br/><br/>
+ > 2. 如果是独立应用，需要依赖 gogs/Web-X/SystemWebViewSDK工程<br/><br/>
+ > 3. SystemWebViewSDK依赖SystemWebViewSDKExtra Java Jar工程，它分了4.4 5.0 6.0几个版本，是用来解决在不同安卓版本上系统自动编译的问题，自己编译时，请直接采用6.0的版本即可。<br/><br/>
+ > 3. 在工程配置中SystemWebViewSDK需要依赖SkySDK，CommonUISDK，SystemServiceSDK，UserServiceSDK，SkyThemeSDK，SystemWebViewSDKExtra等sdk<br/><br/>
 
 - **其他**
  > 无 
