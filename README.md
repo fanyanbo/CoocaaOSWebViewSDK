@@ -18,8 +18,9 @@
 - **联系方式**
  > 樊彦博  电子邮件：fanyanbo@skyworth.com
 
-### Api文档 (`该文档供Web前端开发参考，Android App集成该SDK的文档请见下面说明`)
+### Api文档 (`该文档供Web前端开发参考使用，Android App集成该SDK的说明请见下文`)
 
+* 该SDK提供给Web端的具体能力如下：
 > * 提供获取酷开系统相关信息的能力（如ip信息，设备信息，定位信息，账户信息，app信息等) <br/>
 > * 提供提交日志信息到酷开大数据后台的能力（自定义事件，页面曝光时长）<br/>
 > * 提供发送自定义消息到Android Native的能力 <br/>
@@ -27,7 +28,8 @@
 > * 提供监听特殊键值按键的能力 (返回键、主页键等）<br/>
 > * 提供监听特殊事件发生的能力 (监听Android Activity生命周期的resume和pause事件) <br/>
 
-> ``Web前端集成和调用说明请详见:`` [文档链接](http://www.baidu.com/)
+> ``Web前端集成和功能使用文档:`` [链接地址](https://github.com/xavier0509/webDocument/blob/master/web--fis.md)
+> ``Web前端打包与发布文档:`` [链接地址](http://www.baidu.com/)
 
 
 ## Android App集成文档
