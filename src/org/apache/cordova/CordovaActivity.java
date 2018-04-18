@@ -270,7 +270,12 @@ public class CordovaActivity extends CordovaBaseActivity{
 					return;
 				}
 			}
-			
+
+			@Override
+			public void onReceivedSslError(int errorCode, String failingUrl) {
+
+			}
+
 			@Override
 			public void onPageStarted(String url) {
 				

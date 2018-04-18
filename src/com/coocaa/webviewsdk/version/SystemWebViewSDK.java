@@ -96,12 +96,18 @@ package com.coocaa.webviewsdk.version;
 /*version 2.4.0
  * 1.封装view
  */
+/*version 2.4.1
+ * 1.增加onPageSslError的事件回调
+ */
+/*version 2.4.2
+ * 1.增加网络断开事件监听
+ */
 
 public class SystemWebViewSDK {
 
-	public static final String versionName = "2.4.10";
+	public static final String versionName = "2.4.2";
 	
-	public static final int versionCode = 2040010;
+	public static final int versionCode = 204002;
 	
 	private static int focusPosition = -1;
 	

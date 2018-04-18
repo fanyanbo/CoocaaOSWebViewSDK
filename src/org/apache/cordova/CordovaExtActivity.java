@@ -33,6 +33,10 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -88,7 +92,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    protected String launchUrl;
 	    protected ArrayList<PluginEntry> pluginEntries;
 	    protected CordovaInterfaceImpl cordovaInterface;
-	    
+
+		private Context mContext;
 	    //protected FrameLayout mainLayout;
 	    protected CordovaMainLayout mainLayout;
 	    protected FrameLayout mErrorView = null;
@@ -116,6 +121,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    private CordovaWebViewDataListener mWebViewDataListener = null;
 	    private CordovaErrorPageListener mErrorPageListener = null;
 	    private JsBroadcastReceiver mJsBC = null;
+		private NetBroadcastReceiver mNetBC = null;
+
 	    LocalBroadcastManager mLocalBroadcastManager;
 
 	    public interface CordovaWebViewListener
@@ -123,6 +130,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    	public void onPageStarted(String url);
 	    	public void onPageFinished(String url);
 	    	public void onPageError(int errorCode, String description, String failingUrl);
+			public void onPageSslError(int errorCode, String failingUrl);
 	    }
 	    
 	    public interface CordovaWebViewDataListener
@@ -142,6 +150,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
+				Log.v(TAG, "JsBroadcastReceiver action = " + intent.getAction());
 				if("notify.js.log".equals(intent.getAction()) || "notify.js.log.resume".equals(intent.getAction())){
 					String eventId = intent.getStringExtra("eventId");
 					String params = intent.getStringExtra("params");
@@ -185,6 +194,30 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 				}
 			}
 	    }
+
+		private class NetBroadcastReceiver extends BroadcastReceiver {
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				Log.v(TAG, "NetBroadcastReceiver action = " + intent.getAction());
+				if(ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())){
+					if(!isNetConnected(mContext)) {
+						if(mWebViewListener != null)
+							mWebViewListener.onPageError(-101, "net disconnected!", mLoadingUrl);
+					}
+				}
+			}
+
+			public boolean isNetConnected(Context context) {
+				ConnectivityManager connectivityManager = (ConnectivityManager) context
+						.getSystemService(Context.CONNECTIVITY_SERVICE);
+				NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+				if (info != null && info.isAvailable() && info.isConnected()) {
+					return true;
+				} else
+					return false;
+			}
+		}
 	    
 	    public void setCordovaWebViewListener(CordovaWebViewListener listener) {
 	    	this.mWebViewListener = listener;
@@ -205,6 +238,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        LOG.i(TAG, "Apache Cordova native platform version " + CordovaWebView.CORDOVA_VERSION + " is starting");
 	        LOG.d(TAG, "CordovaActivity.onCreate()");
 
+			mContext = this;
 	        // need to activate preferences before super.onCreate to avoid "requestFeature() must be called before adding content" exception
 	        loadConfig();
 	        if (!preferences.getBoolean("ShowTitle", false)) {
@@ -239,17 +273,19 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        mainLayout = new CordovaMainLayout(this);
 	        mainLayout.setListener(this);
 
-	        if (mJsBC == null)
-	        	mJsBC = new JsBroadcastReceiver();
+	        if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
 	        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
-	        
 	        IntentFilter filter = new IntentFilter();
 	        filter.addAction("notify.js.message");
 	        filter.addAction("notify.js.log");
 			filter.addAction("notify.js.log.resume");
 			filter.addAction("notify.js.log.pause");
-	        
 	        mLocalBroadcastManager.registerReceiver(mJsBC, filter);
+
+			if (mNetBC == null) mNetBC = new NetBroadcastReceiver();
+			IntentFilter netfilter = new IntentFilter();
+			netfilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+			registerReceiver(mNetBC, netfilter);
 	        
 	        cordovaInterface.setCordovaInterfaceListener(new CordovaInterfaceListener() {
 				
@@ -311,7 +347,15 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 				public void onProgressChanged(int process) {
 					Log.v(TAG, "onProgressChanged process == " +process);			
 				}
-				
+
+				@Override
+				public void onReceivedSslError(int errorCode, String failingUrl) {
+					Log.v(TAG, "onReceivedSslError errorCode = " + errorCode + ",failingUrl = " + failingUrl);
+
+					if(mWebViewListener != null)
+						mWebViewListener.onPageSslError(errorCode, failingUrl);
+				}
+
 				@Override
 				public void onPageStarted(String url) {
 					Log.v(TAG, "onPageStarted url == " +url);
@@ -885,6 +929,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	       
 	        if(mJsBC != null)
 	        	LocalBroadcastManager.getInstance(this).unregisterReceiver(mJsBC);
+			if(mNetBC != null)
+				unregisterReceiver(mNetBC);
 	    }
 
 	    /**

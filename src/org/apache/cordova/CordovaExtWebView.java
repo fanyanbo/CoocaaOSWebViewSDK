@@ -85,6 +85,7 @@ public class CordovaExtWebView extends FrameLayout
     	public void onPageStarted(String url);
     	public void onPageFinished(String url);
     	public void onPageError(int errorCode, String description, String failingUrl);
+        public void onPageSslError(int errorCode, String failingUrl);
     	public void onProgressChanged(int process);
     }
 
@@ -206,9 +207,20 @@ public class CordovaExtWebView extends FrameLayout
 					}
 
 					@Override
+					public void onReceivedSslError(int errorCode, String failingUrl) {
+						Log.v(TAG, "onReceivedSslError errorCode = " + errorCode + ",failingUrl = " + failingUrl);
+
+                        if(mWebViewListener != null)
+                            mWebViewListener.onPageSslError(errorCode, failingUrl);
+					}
+
+					@Override
 					public void onProgressChanged(int process) {
 						Log.v(TAG,"CordovaWebView onProgressChanged process == "+ process);
 						mLoadingProgress = process;
+
+                        if(mWebViewListener != null)
+                            mWebViewListener.onProgressChanged(process);
 					}
 
 					@Override
@@ -244,7 +256,7 @@ public class CordovaExtWebView extends FrameLayout
 						if(mWebViewListener != null)
 							mWebViewListener.onPageFinished(url);
 						
-						if(mLoadingView!=null)
+						if(mLoadingView != null)
 							mLoadingView.dismissLoading();
 
 						appView.getView().setVisibility(View.VISIBLE);

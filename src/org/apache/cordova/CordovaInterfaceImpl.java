@@ -76,6 +76,7 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     	public void onReceivedTitle(String title);
     	public void onReceivedIcon(Bitmap icon);
     	public void onProgressChanged(int process);
+        public void onReceivedSslError(int errorCode, String failingUrl);
     }
     
     private CordovaInterfaceListener mCordovaListener;
@@ -237,6 +238,24 @@ public class CordovaInterfaceImpl implements CordovaInterface {
         		}
         		
 			}
+        }
+        else if("onReceivedSslError".equals(id)) {
+            if(mCordovaListener!=null)
+            {
+                if(data != null)
+                {
+                    JSONObject jsonObj = (JSONObject) data;
+
+                    try {
+                        String url = jsonObj.getString("url");
+                        int errorCode = jsonObj.getInt("errorCode");
+                        mCordovaListener.onReceivedSslError(errorCode, url);
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
         return null;
     }

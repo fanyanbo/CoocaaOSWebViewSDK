@@ -532,6 +532,18 @@ public class CordovaWebViewImpl implements CordovaWebView {
         }
 
         @Override
+        public void onReceivedSslError(int errorCode, String failingUrl) {
+            JSONObject data = new JSONObject();
+            try {
+                data.put("errorCode", errorCode);
+                data.put("url", failingUrl);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            pluginManager.postMessage("onReceivedSslError", data);
+        }
+
+        @Override
         public void onPageFinishedLoading(String url) {
             LOG.d(TAG, "onPageFinished(" + url + ")");
 
