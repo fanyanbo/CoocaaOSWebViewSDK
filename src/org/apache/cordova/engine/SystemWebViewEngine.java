@@ -256,7 +256,7 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         /*if (Build.VERSION.SDK_INT >= 19) {
         	settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
 	    }*/
-
+        
         switch(loadUrlCacheMode){
         	case 1:
         		settings.setCacheMode(WebSettings.LOAD_DEFAULT);

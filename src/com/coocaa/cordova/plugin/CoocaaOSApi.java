@@ -39,7 +39,9 @@ import com.coocaa.x.xforothersdk.provider.db.table.download.TableDownload;
 import com.coocaa.x.xforothersdk.provider.db.table.download.TableDownload.TableDownloadMonitor;
 
 import com.skyworth.framework.skycommondefine.SkyworthBroadcastKey;
+import com.skyworth.framework.skysdk.ipc.SkyApplication;
 import com.skyworth.framework.skysdk.ipc.SkyApplication.SkyCmdConnectorListener;
+import com.skyworth.framework.skysdk.ipc.SkyCmdURI;
 import com.skyworth.framework.skysdk.util.SkyObjectByteSerialzie;
 import com.skyworth.theme.SkyThemeEngine;
 import com.skyworth.theme.ThemeColorSeriesEnum;
@@ -70,6 +72,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -88,6 +91,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String PAUSE_APP_TASK = "pauseDownloadTask";//暂停应用下载
     private static final String DELETE_APP_TASK = "deleteDownloadTask";//删除下载任务
     private static final String HAS_USER_LOGIN = "hasCoocaaUserLogin";//当前用户是否登录
+    private static final String SET_USER_LOGINOUT = "setCoocaaUserLogout";//退出用户登录
     private static final String GET_USER_INFO = "getUserInfo";//获取用户信息;
     private static final String START_QQ_ACOUNT = "startQQAccount";//启动qq登录
     private static final String GET_DEVICE_INFO = "getDeviceInfo";//获取当前设备信息
@@ -405,8 +409,10 @@ public class CoocaaOSApi extends CordovaPlugin
         private TCSystemService systemApi;
         private NetApiForCommon netApi;
         private SkyUserApi userApi;
+        private SkyApplication.SkyCmdConnectorListener mListener;
         public CoocaaOSApiListener(SkyCmdConnectorListener listener)
         {
+            mListener = listener;
             systemApi = new TCSystemService(listener);
             netApi = new NetApiForCommon(listener);
             userApi = new SkyUserApi(listener);
@@ -435,6 +441,14 @@ public class CoocaaOSApi extends CordovaPlugin
             if(userApi!=null && isCmdBindSuccess)
             {
             	userApi.loginByType(AccountType.qq);
+            }
+        }
+
+        public void setUserLogout()
+        {
+            if(isCmdBindSuccess)
+            {
+                logoutSync();
             }
         }
         
@@ -752,6 +766,59 @@ public class CoocaaOSApi extends CordovaPlugin
             }
 
             return new byte[0];
+        }
+
+        /**
+         * 退出账户登录，同步操作
+         *
+         * @return
+         */
+        public boolean logoutSync()
+        {
+            byte[] resultBody = execCmd(UserCmdDefine.ACCOUNT_LOGOUT, null);
+            return getBooleanFromBytes(resultBody);
+        }
+
+        private boolean getBooleanFromBytes(byte[] byteResult)
+        {
+            if (byteResult != null && byteResult.length > 0)
+            {
+                Boolean result = SkyObjectByteSerialzie.toObject(byteResult, Boolean.class);
+                return result == null ? false : result;
+            }
+            return false;
+        }
+
+        private byte[] execCmd(String cmd, byte[] body)
+        {
+            if (mListener == null)
+                return null;
+
+            SkyCmdURI uri = getUserUri(cmd);
+            if (uri == null)
+            {
+                Log.e(TAG, "execCmd(), uri is null");
+                return null;
+            } else
+            {
+                return SkyApplication.getApplication().execCommand(mListener, uri, body);
+            }
+        }
+
+        private SkyCmdURI getUserUri(String cmd)
+        {
+            SkyCmdURI uri = null;
+            try
+            {
+                uri = new SkyCmdURI("tianci://com.tianci.user/com.tianci.user.UserService?cmd=" + cmd);
+            } catch (URISyntaxException e)
+            {
+                Log.e(TAG, "URISyntaxException = " + e.getMessage());
+            } catch (SkyCmdURI.SkyCmdPathErrorException e)
+            {
+                Log.e(TAG, "SkyCmdPathErrorException = " + e.getMessage());
+            }
+            return uri;
         }
     }
 
@@ -1328,21 +1395,39 @@ public class CoocaaOSApi extends CordovaPlugin
         }
         else if(START_QQ_ACOUNT.equals(action))
         {
-        	 if(mCoocaaListener!=null)
-             {
-                 this.cordova.getThreadPool().execute(new Runnable() {
-                     @Override
-                     public void run() {
+            if(mCoocaaListener!=null)
+            {
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
                         mCoocaaListener.startQQAcount();
                         callbackContext.success();
-                     }
-                 });
-             }
-             else
-             {
-                 callbackContext.error("mCoocaaListener is not ready!");
-             }
-             return true;
+                    }
+                });
+            }
+            else
+            {
+                callbackContext.error("mCoocaaListener is not ready!");
+            }
+            return true;
+        }
+        else if(SET_USER_LOGINOUT.equals(action))
+        {
+            if(mCoocaaListener!=null)
+            {
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCoocaaListener.setUserLogout();
+                        callbackContext.success();
+                    }
+                });
+            }
+            else
+            {
+                callbackContext.error("mCoocaaListener is not ready!");
+            }
+            return true;
         }
         else if(GET_USER_ACCESS_TOKEN.equals(action))
         {
