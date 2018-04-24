@@ -71,6 +71,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String PAUSE_APP_TASK = "pauseDownloadTask";//暂停应用下载
     private static final String DELETE_APP_TASK = "deleteDownloadTask";//删除下载任务
     private static final String HAS_USER_LOGIN = "hasCoocaaUserLogin";//当前用户是否登录
+    private static final String SET_USER_LOGINOUT = "setCoocaaUserLogout";//退出用户登录
     private static final String GET_USER_INFO = "getUserInfo";//获取用户信息;
     private static final String START_QQ_ACOUNT = "startQQAccount";//启动qq登录
     private static final String GET_DEVICE_INFO = "getDeviceInfo";//获取当前设备信息
@@ -516,6 +517,17 @@ public class CoocaaOSApi extends CordovaPlugin
         }
         else if(LAUNCH_ONLINE_MOVIE_PLAYER.equals(action))
         {
+            if (mCoocaaOSConnecter != null) {
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCoocaaOSConnecter.setUserLogout();
+                        callbackContext.success();
+                    }
+                });
+            } else {
+                callbackContext.error("mCoocaaListener is not ready!");
+            }
             return true;
         }
         else if (GET_USER_INFO.equals(action))
@@ -878,6 +890,20 @@ public class CoocaaOSApi extends CordovaPlugin
                         } else {
                             callbackContext.error("error occurs when called getUserAccessToken");
                         }
+                    }
+                });
+            } else {
+                callbackContext.error("mCoocaaListener is not ready!");
+            }
+            return true;
+        }
+        else if(SET_USER_LOGINOUT.equals(action)) {
+            if (mCoocaaOSConnecter != null) {
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                     mCoocaaOSConnecter.setUserLogout();
+                     callbackContext.success();
                     }
                 });
             } else {

@@ -1,5 +1,6 @@
 package org.coocaa.webview;
 
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.json.JSONException;
@@ -12,6 +13,7 @@ import android.util.Log;
 import com.coocaa.cordova.plugin.CoocaaOSApi;
 import com.coocaa.cordova.plugin.CoocaaUserInfoParser;
 import com.skyworth.framework.skysdk.ipc.SkyApplication;
+import com.skyworth.framework.skysdk.ipc.SkyCmdURI;
 import com.skyworth.framework.skysdk.util.SkyJSONUtil;
 import com.skyworth.framework.skysdk.util.SkyObjectByteSerialzie;
 import com.tianci.net.api.NetApiForCommon;
@@ -31,16 +33,19 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
     private TCSystemService systemApi;
     private NetApiForCommon netApi;
     private SkyUserApi userApi;
+	private SkyApplication.SkyCmdConnectorListener mListener;
+	private static final String TAG = "WebViewSDK";
 
     /**
      * @param listener 酷开系统ipc通信核心对象
      */
     public  CoocaaOSConnecterDefaultImpl(SkyApplication.SkyCmdConnectorListener listener) {
-    	Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl listener = " + listener);
+    	Log.i(TAG,"CoocaaOSConnecterDefaultImpl listener = " + listener);
     	if(listener != null) {
             systemApi = new TCSystemService(listener);
             netApi = new NetApiForCommon(listener);
             userApi = new SkyUserApi(listener);
+			mListener = listener;
     	}
     }
 	@Override
@@ -61,7 +66,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 
 	@Override
 	public String getUserInfo() {
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getUserInfo");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getUserInfo");
 		// TODO Auto-generated method stub
 		if (userApi != null) {
 			Map<String, Object> userInfo = userApi.getAccoutInfo();
@@ -75,7 +80,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getDeviceInfo() {
 		// TODO Auto-generated method stub
-		Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getDeviceInfo");
+		Log.i(TAG,"CoocaaOSConnecterDefaultImpl getDeviceInfo");
 		if (systemApi != null) {
 			// 屏幕尺寸
 			TCSetData pannelSetData = systemApi
@@ -196,7 +201,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String isNetConnected() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl isNetConnected");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl isNetConnected");
         if(netApi != null)
         {
             boolean isConnect = netApi.isConnect();
@@ -214,7 +219,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getNetType() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getNetType");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getNetType");
 		if (netApi != null) {
 			String netType = netApi.getNetType();
 			if (netType != null) {
@@ -233,7 +238,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getIpInfo() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getIpInfo");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getIpInfo");
 		if (netApi != null) {
 			SkyIpInfo ipInfo = netApi.getIpInfo();
 			if (ipInfo != null) {
@@ -257,7 +262,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getDeviceLocation() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getDeviceLocation");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getDeviceLocation");
 		if (systemApi != null) {
 			TCSetData locationData = systemApi
 					.getSetData(TCEnvKey.SKY_SYSTEM_ENV_LOCATION);
@@ -282,7 +287,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getLoginUserInfo() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getLoginUserInfo");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getLoginUserInfo");
         if (userApi != null) {
             Map<String, Object> userInfo = userApi.getAccoutInfo();
             if (userInfo != null && userInfo.size() > 0) {
@@ -296,7 +301,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getUserAccessToken() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getUserAccessToken");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getUserAccessToken");
 		if (userApi != null) {
 			String token = userApi.getToken("ACCESS");
 			if (token != null) {
@@ -315,7 +320,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public void startQQAcount() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl startQQAcount");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl startQQAcount");
         if(userApi != null) {
             userApi.loginByType(SkyUserApi.AccountType.qq);
         }
@@ -323,9 +328,16 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	}
 
 	@Override
+	public void setUserLogout() {
+		Log.i(TAG,"CoocaaOSConnecterDefaultImpl setUserLogout");
+		boolean ret = logoutSync();
+		Log.i(TAG,"ret = " + ret);
+	}
+
+	@Override
 	public byte[] onHandler(Context context, String fromtarget, String cmd, byte[] body) {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl onHandler fromtarget = " + fromtarget + ",cmd = " + cmd);
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl onHandler fromtarget = " + fromtarget + ",cmd = " + cmd);
 		if(context == null) return new byte[0];
 		if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_MOUNTED //外接设备接入
 				.toString().equals(cmd)) {
@@ -363,5 +375,59 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 		}
 
 		return new byte[0];
+	}
+
+
+	/**
+	 * 退出账户登录，同步操作
+	 *
+	 * @return
+	 */
+	public boolean logoutSync()
+	{
+		byte[] resultBody = execCmd(UserCmdDefine.ACCOUNT_LOGOUT, null);
+		return getBooleanFromBytes(resultBody);
+	}
+
+	private boolean getBooleanFromBytes(byte[] byteResult)
+	{
+		if (byteResult != null && byteResult.length > 0)
+		{
+			Boolean result = SkyObjectByteSerialzie.toObject(byteResult, Boolean.class);
+			return result == null ? false : result;
+		}
+		return false;
+	}
+
+	private byte[] execCmd(String cmd, byte[] body)
+	{
+		if (mListener == null)
+			return null;
+
+		SkyCmdURI uri = getUserUri(cmd);
+		if (uri == null)
+		{
+			Log.e(TAG, "execCmd(), uri is null");
+			return null;
+		} else
+		{
+			return SkyApplication.getApplication().execCommand(mListener, uri, body);
+		}
+	}
+
+	private SkyCmdURI getUserUri(String cmd)
+	{
+		SkyCmdURI uri = null;
+		try
+		{
+			uri = new SkyCmdURI("tianci://com.tianci.user/com.tianci.user.UserService?cmd=" + cmd);
+		} catch (URISyntaxException e)
+		{
+			Log.e(TAG, "URISyntaxException = " + e.getMessage());
+		} catch (SkyCmdURI.SkyCmdPathErrorException e)
+		{
+			Log.e(TAG, "SkyCmdPathErrorException = " + e.getMessage());
+		}
+		return uri;
 	}
 }

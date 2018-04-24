@@ -73,5 +73,12 @@ public interface CoocaaOSConnecter {
      */
     void startQQAcount();
 
+    /**
+     * 退出登录
+     *
+     * @return
+     */
+    void setUserLogout();
+
     byte[] onHandler(Context context, String fromtarget, String cmd, byte[] body);
 }

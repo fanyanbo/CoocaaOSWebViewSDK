@@ -276,6 +276,9 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         //Fix COOCAA-TV
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
+
+        //cookie
+        if(cookieManager != null) cookieManager.setCookiesEnabled(true);
     }
 
     @TargetApi(19)

@@ -150,7 +150,6 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				Log.v(TAG, "JsBroadcastReceiver action = " + intent.getAction());
 				if("notify.js.log".equals(intent.getAction()) || "notify.js.log.resume".equals(intent.getAction())){
 					String eventId = intent.getStringExtra("eventId");
 					String params = intent.getStringExtra("params");

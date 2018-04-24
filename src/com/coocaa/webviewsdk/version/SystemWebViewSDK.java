@@ -107,7 +107,7 @@ public class SystemWebViewSDK {
 
 	public static final String versionName = "2.4.2";
 	
-	public static final int versionCode = 204002;
+	public static final int versionCode = 2040002;
 	
 	private static int focusPosition = -1;
 	
