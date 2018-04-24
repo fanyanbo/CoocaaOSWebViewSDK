@@ -28,7 +28,7 @@
 > * 提供监听特殊键值按键的能力 (返回键、主页键等）<br/>
 > * 提供监听特殊事件发生的能力 (监听Android Activity生命周期的resume和pause事件) <br/>
 
-> ``Web前端集成和功能使用文档:`` [链接地址](https://github.com/xavier0509/webDocument/blob/master/web--fis.md) <br/>
+> ``Web前端集成和功能使用文档:`` [链接地址](https://github.com/xavier0509/webDocument/blob/master/web%E6%8E%A5%E5%8F%A3%E9%9B%86%E6%88%90%E8%B0%83%E7%94%A8.md) <br/>
 > ``Web前端打包与发布文档:`` [链接地址](https://github.com/xavier0509/webDocument/blob/master/web--fis.md)
 
 
