@@ -34,6 +34,35 @@
 
 ## Android App集成文档
 
+### 无论是以继承Activity的方式还是用View的方式，Android App一定要集成酷开系统IPC通讯框架，否则该SDK无法正常加载需要与酷开系统进行通信的页面
+- **继承Activity的方式**
+* `项目工程依赖SkySDK` 
+* `继承SkyApplication` <br/>
+* `修改AndroidManifest.xml文件` <br/>
+- **代码示例**
+```
+//MainApplication.java文件
+public class MainApplication extends SkyApplication{
+
+    private static final String mTag = "WebViewSDK";
+
+    @Override
+    public void onCreate() {
+        // TODO Auto-generated method stub
+        super.onCreate();
+        Log.i(mTag,"MainApplication onCreate");
+    }
+}
+
+//AndroidManifest.xml文件，仅修改android:name的名称
+    <application
+        android:name=".MainApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+	
+    ...
+```
+
 ### 以View的方式进行集成
 
 * `提供该集成方式的目的是能够进行预加载，在隐藏加载好web页面，在需要的时候显示，以改善用户体验` 
