@@ -32,6 +32,10 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -87,7 +91,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    protected String launchUrl;
 	    protected ArrayList<PluginEntry> pluginEntries;
 	    protected CordovaInterfaceImpl cordovaInterface;
-	    
+
+		private Context mContext;
 	    //protected FrameLayout mainLayout;
 	    protected CordovaMainLayout mainLayout;
 	    protected FrameLayout mErrorView = null;
@@ -111,10 +116,12 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    protected String mOriginalUrl = null;
 	    private long mEndTime = 0, mStartTime = 0;
 	    
-	    public CordovaWebViewListener mWebViewListener = null;
-	    public CordovaWebPageListener mWebPageListener = null;
-	    public CordovaErrorPageListener mErrorPageListener = null;
+	    private CordovaWebViewListener mWebViewListener = null;
+	    private CordovaWebPageListener mWebPageListener = null;
+	    private CordovaErrorPageListener mErrorPageListener = null;
 	    private JsBroadcastReceiver mJsBC = null;
+		private NetBroadcastReceiver mNetBC = null;
+
 	    LocalBroadcastManager mLocalBroadcastManager;
 
 	    public interface CordovaWebViewListener
@@ -128,6 +135,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    {
 	    	public void notifyMessage(String data);
 	    	public void notifyLogInfo(String eventId, Map<String,String> map);
+			public void notifyPageResume(String eventId, Map<String,String> map);
+			public void notifyPagePause(String eventId);
 	    }
 	    
 	    public interface CordovaErrorPageListener
@@ -139,9 +148,10 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				if("notify.js.log".equals(intent.getAction())){
+				if("notify.js.log".equals(intent.getAction()) || "notify.js.log.resume".equals(intent.getAction())){
 					String eventId = intent.getStringExtra("eventId");
 					String params = intent.getStringExtra("params");
+					if(eventId == null) return;
 					if(params != null && !"".equals(params)){
 						try {
 							JSONObject jsonObject = new JSONObject(params);
@@ -152,8 +162,11 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 							   String value = jsonObject.getString(key);
 							   map.put(key, value);
 							}
-							if(mWebPageListener != null){
-								mWebPageListener.notifyLogInfo(eventId,map);
+							if(mWebPageListener != null ){
+								if("notify.js.log.resume".equals(intent.getAction()))
+									mWebPageListener.notifyPageResume(eventId,map);
+								else
+									mWebPageListener.notifyLogInfo(eventId,map);
 							}
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
@@ -161,16 +174,47 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 						}
 					}else{
 						if(mWebPageListener != null){
-							mWebPageListener.notifyLogInfo(eventId,null);
+							if("notify.js.log.resume".equals(intent.getAction()))
+								mWebPageListener.notifyPageResume(eventId,null);
+							else
+								mWebPageListener.notifyLogInfo(eventId,null);
 						}
 					}
 				}else if("notify.js.message".equals(intent.getAction())){
 					String data = intent.getStringExtra("key");
 					if(mWebPageListener != null)
 			        	mWebPageListener.notifyMessage(data);
+				}else if("notify.js.log.pause".equals(intent.getAction())){
+					String eventId = intent.getStringExtra("eventId");
+					if(eventId != null && mWebPageListener != null)
+						mWebPageListener.notifyPagePause(eventId);
 				}
 			}
 	    }
+
+		private class NetBroadcastReceiver extends BroadcastReceiver {
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				Log.v(TAG, "NetBroadcastReceiver action = " + intent.getAction());
+				if(ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())){
+					if(!isNetConnected(mContext)) {
+						if(mWebViewListener != null)
+							mWebViewListener.onPageError(-101, "net disconnected!", mLoadingUrl);
+					}
+				}
+			}
+
+			public boolean isNetConnected(Context context) {
+				ConnectivityManager connectivityManager = (ConnectivityManager) context
+						.getSystemService(Context.CONNECTIVITY_SERVICE);
+				NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+				if (info != null && info.isAvailable() && info.isConnected()) {
+					return true;
+				} else
+					return false;
+			}
+		}
 	    
 	    public void setCordovaWebViewListener(CordovaWebViewListener listener) {
 	    	this.mWebViewListener = listener;
@@ -191,6 +235,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        LOG.i(TAG, "Apache Cordova native platform version " + CordovaWebView.CORDOVA_VERSION + " is starting");
 	        LOG.d(TAG, "CordovaActivity.onCreate()");
 
+			mContext = this;
 	        // need to activate preferences before super.onCreate to avoid "requestFeature() must be called before adding content" exception
 	        loadConfig();
 	        if (!preferences.getBoolean("ShowTitle", false)) {
@@ -219,8 +264,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        }
 	        
 	//        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);        
-	//        mMachineName = SkySystemProperties.getProperty("ro.product.name");
-	        Log.i(TAG,"CordovaExtActivity onCreate SystemWebviewSDK version = " + SystemWebViewSDK.versionName);
+	        mMachineName = SkySystemProperties.getProperty("ro.product.name");
+	        Log.i(TAG,"CordovaExtActivity onCreate SystemWebviewSDK version = " + SystemWebViewSDK.versionName + ",mMachineName = " + mMachineName);
 	        
 	        mainLayout = new CordovaMainLayout(this);
 	        mainLayout.setListener(this);
@@ -231,15 +276,19 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        startLoading();
 	        setContentView(mainLayout);
 
-	        if (mJsBC == null)
-	        	mJsBC = new JsBroadcastReceiver();
+	        if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
 	        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
-	        
 	        IntentFilter filter = new IntentFilter();
 	        filter.addAction("notify.js.message");
 	        filter.addAction("notify.js.log");
-	        
+			filter.addAction("notify.js.log.resume");
+			filter.addAction("notify.js.log.pause");
 	        mLocalBroadcastManager.registerReceiver(mJsBC, filter);
+
+			if (mNetBC == null) mNetBC = new NetBroadcastReceiver();
+			IntentFilter netfilter = new IntentFilter();
+			netfilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+			registerReceiver(mNetBC, netfilter);
 	        
 	        cordovaInterface.setCordovaInterfaceListener(new CordovaInterfaceListener() {
 				
@@ -447,6 +496,14 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 				mErrorView.setVisibility(View.GONE);
 			}
 		}
+
+		protected void setBackgroundPageShown(boolean value) {
+			if (value) {
+				if(mMainBgLayout != null) mMainBgLayout.setVisibility(View.VISIBLE);
+			}else {
+				if(mMainBgLayout != null) mMainBgLayout.setVisibility(View.INVISIBLE);
+			}
+		}
 		
 		protected void startLoading() {
 			if(mLoadingView!=null)
@@ -577,12 +634,13 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	                ViewGroup.LayoutParams.MATCH_PARENT));
 	        if(mainLayout == null)
 	        	mainLayout = new CordovaMainLayout(this);
-	        if(isNeedThemeBg){
-	        	mMainBgLayout = new BlurBgLayout(this);
-	        	mMainBgLayout.setPageType(BlurBgLayout.PAGETYPE.SECONDE_PAGE);
-	        	mMainBgLayout.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-	        	mainLayout.addView(mMainBgLayout);
-	        }
+
+			mMainBgLayout = new BlurBgLayout(this);
+			mMainBgLayout.setPageType(BlurBgLayout.PAGETYPE.SECONDE_PAGE);
+			mMainBgLayout.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+			mainLayout.addView(mMainBgLayout);
+			mMainBgLayout.setVisibility(View.INVISIBLE);
+			if(isNeedThemeBg) mMainBgLayout.setVisibility(View.VISIBLE);
 	        
 	        mainLayout.addView(appView.getView());
 	        
@@ -858,6 +916,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	       
 	        if(mJsBC != null)
 	        	LocalBroadcastManager.getInstance(this).unregisterReceiver(mJsBC);
+			if(mNetBC != null)
+				unregisterReceiver(mNetBC);
 	    }
 
 	    /**
@@ -1066,10 +1126,11 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 			// TODO Auto-generated method stub
 			return super.onKeyDown(keyCode, event);
 		}
-	    
+
 		@Override
 		public boolean dispatchKeyEvent(KeyEvent event) {
 			// TODO Auto-generated method stub
+
 			if (appView != null && event.getAction() == KeyEvent.ACTION_DOWN){
 				int keyCode = 0;
 				if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP){

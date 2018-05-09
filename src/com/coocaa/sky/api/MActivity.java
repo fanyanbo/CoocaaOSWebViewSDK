@@ -208,8 +208,11 @@ public class MActivity extends BaseActivity {
             if (msg.what == 1) {
                 isOver = true;
                 Log.i("CCAPI", "fastPayment is created over!");
-                wb.getSettings().setBlockNetworkImage(false);
-                loadView.setVisibility(View.INVISIBLE);
+				if (wb != null)
+				{
+                    wb.getSettings().setBlockNetworkImage(false);
+                    loadView.setVisibility(View.INVISIBLE);
+				}
             }
         }
 

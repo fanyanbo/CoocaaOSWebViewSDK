@@ -27,6 +27,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
 import android.os.SystemProperties;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -37,7 +39,9 @@ import com.coocaa.x.xforothersdk.provider.db.table.download.TableDownload;
 import com.coocaa.x.xforothersdk.provider.db.table.download.TableDownload.TableDownloadMonitor;
 
 import com.skyworth.framework.skycommondefine.SkyworthBroadcastKey;
+import com.skyworth.framework.skysdk.ipc.SkyApplication;
 import com.skyworth.framework.skysdk.ipc.SkyApplication.SkyCmdConnectorListener;
+import com.skyworth.framework.skysdk.ipc.SkyCmdURI;
 import com.skyworth.framework.skysdk.util.SkyObjectByteSerialzie;
 import com.skyworth.theme.SkyThemeEngine;
 import com.skyworth.theme.ThemeColorSeriesEnum;
@@ -61,15 +65,17 @@ import com.tianci.user.data.UserCmdDefine;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaBaseActivity;
-import org.apache.cordova.CordovaExtActivity;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -85,6 +91,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String PAUSE_APP_TASK = "pauseDownloadTask";//暂停应用下载
     private static final String DELETE_APP_TASK = "deleteDownloadTask";//删除下载任务
     private static final String HAS_USER_LOGIN = "hasCoocaaUserLogin";//当前用户是否登录
+    private static final String SET_USER_LOGINOUT = "setCoocaaUserLogout";//退出用户登录
     private static final String GET_USER_INFO = "getUserInfo";//获取用户信息;
     private static final String START_QQ_ACOUNT = "startQQAccount";//启动qq登录
     private static final String GET_DEVICE_INFO = "getDeviceInfo";//获取当前设备信息
@@ -103,15 +110,18 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String BROADCAST_USBCHANGGED = "USB_CHANGGED";//u盘广播
     private static final String BROADCAST_USERCHANGGED = "USER_CHANGGED";//用户广播
     private static final String BROADCAST_PURCHASE = "PURCHASE_CALLBACK";//支付状态
+    private static final String BROADCAST_COMMON_CHANGED = "COMMON_CHANGED";//抽象出来的通用状态变化
     /***************************************新添加*******************************************/
     private static final String GET_MOVIEPLATFORM_INFO = "getMoviePlatformInfo";
     private static final String GET_APP_INFO = "getAppInfo";
+    private static final String GET_SPACE_INFO = "getSpaceInfo";
     private static final String GET_PROPERTY_VALUE = "getPropertiesValue";
     private static final String GET_WEBVIEWSDK_INFO = "getWebViewSDKInfo";
     private static final String GET_CURRENT_THEME = "getCurTheme";
     private static final String SET_FOCUS_POSITION = "setFocusPosition";
     private static final String NOTIFY_JS_MESSAGE = "notifyJSMessage";
     private static final String NOTIFY_JS_LOG = "notifyJSLogInfo";
+    private static final String NOTIFY_JS_LOG_EXTRA = "notifyJSLogInfoExtra";
 
     private Context mContext;
     private CoocaaOSApiListener mCoocaaListener;
@@ -399,8 +409,10 @@ public class CoocaaOSApi extends CordovaPlugin
         private TCSystemService systemApi;
         private NetApiForCommon netApi;
         private SkyUserApi userApi;
+        private SkyApplication.SkyCmdConnectorListener mListener;
         public CoocaaOSApiListener(SkyCmdConnectorListener listener)
         {
+            mListener = listener;
             systemApi = new TCSystemService(listener);
             netApi = new NetApiForCommon(listener);
             userApi = new SkyUserApi(listener);
@@ -429,6 +441,14 @@ public class CoocaaOSApi extends CordovaPlugin
             if(userApi!=null && isCmdBindSuccess)
             {
             	userApi.loginByType(AccountType.qq);
+            }
+        }
+
+        public void setUserLogout()
+        {
+            if(isCmdBindSuccess)
+            {
+                logoutSync();
             }
         }
         
@@ -747,6 +767,59 @@ public class CoocaaOSApi extends CordovaPlugin
 
             return new byte[0];
         }
+
+        /**
+         * 退出账户登录，同步操作
+         *
+         * @return
+         */
+        public boolean logoutSync()
+        {
+            byte[] resultBody = execCmd(UserCmdDefine.ACCOUNT_LOGOUT, null);
+            return getBooleanFromBytes(resultBody);
+        }
+
+        private boolean getBooleanFromBytes(byte[] byteResult)
+        {
+            if (byteResult != null && byteResult.length > 0)
+            {
+                Boolean result = SkyObjectByteSerialzie.toObject(byteResult, Boolean.class);
+                return result == null ? false : result;
+            }
+            return false;
+        }
+
+        private byte[] execCmd(String cmd, byte[] body)
+        {
+            if (mListener == null)
+                return null;
+
+            SkyCmdURI uri = getUserUri(cmd);
+            if (uri == null)
+            {
+                Log.e(TAG, "execCmd(), uri is null");
+                return null;
+            } else
+            {
+                return SkyApplication.getApplication().execCommand(mListener, uri, body);
+            }
+        }
+
+        private SkyCmdURI getUserUri(String cmd)
+        {
+            SkyCmdURI uri = null;
+            try
+            {
+                uri = new SkyCmdURI("tianci://com.tianci.user/com.tianci.user.UserService?cmd=" + cmd);
+            } catch (URISyntaxException e)
+            {
+                Log.e(TAG, "URISyntaxException = " + e.getMessage());
+            } catch (SkyCmdURI.SkyCmdPathErrorException e)
+            {
+                Log.e(TAG, "SkyCmdPathErrorException = " + e.getMessage());
+            }
+            return uri;
+        }
     }
 
     @Override
@@ -851,12 +924,36 @@ public class CoocaaOSApi extends CordovaPlugin
         		eventId = eventIdObj.getString("eventId");
         		params = paramsObj.getString("params");
         	}
-        	Intent intent = new Intent("notify.js.log");
-        	intent.putExtra("eventId", eventId);
-        	intent.putExtra("params", params);
-        	LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            Intent intent = new Intent("notify.js.log");
+            intent.putExtra("eventId", eventId);
+            intent.putExtra("params", params);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
         	callbackContext.success();
         	return true;
+        }
+        else if(NOTIFY_JS_LOG_EXTRA.equals(action))
+        {
+            String eventId = "",params = "",type = "";
+            JSONObject eventIdObj = args.getJSONObject(0);
+            JSONObject paramsObj = args.getJSONObject(1);
+            JSONObject typeObj = args.getJSONObject(2);
+            if(eventIdObj != null && paramsObj != null && typeObj != null){
+                eventId = eventIdObj.getString("eventId");
+                params = paramsObj.getString("params");
+                type = typeObj.getString("type");
+            }
+            if("resume".equals(type)){
+                Intent intent = new Intent("notify.js.log.resume");
+                intent.putExtra("eventId", eventId);
+                intent.putExtra("params", params);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            }else if("pause".equals(type)){
+                Intent intent = new Intent("notify.js.log.pause");
+                intent.putExtra("eventId", eventId);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            }
+            callbackContext.success();
+            return true;
         }
         else if(NOTIFY_JS_MESSAGE.equals(action))
         {
@@ -1298,21 +1395,39 @@ public class CoocaaOSApi extends CordovaPlugin
         }
         else if(START_QQ_ACOUNT.equals(action))
         {
-        	 if(mCoocaaListener!=null)
-             {
-                 this.cordova.getThreadPool().execute(new Runnable() {
-                     @Override
-                     public void run() {
+            if(mCoocaaListener!=null)
+            {
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
                         mCoocaaListener.startQQAcount();
                         callbackContext.success();
-                     }
-                 });
-             }
-             else
-             {
-                 callbackContext.error("mCoocaaListener is not ready!");
-             }
-             return true;
+                    }
+                });
+            }
+            else
+            {
+                callbackContext.error("mCoocaaListener is not ready!");
+            }
+            return true;
+        }
+        else if(SET_USER_LOGINOUT.equals(action))
+        {
+            if(mCoocaaListener!=null)
+            {
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCoocaaListener.setUserLogout();
+                        callbackContext.success();
+                    }
+                });
+            }
+            else
+            {
+                callbackContext.error("mCoocaaListener is not ready!");
+            }
+            return true;
         }
         else if(GET_USER_ACCESS_TOKEN.equals(action))
         {
@@ -1413,6 +1528,29 @@ public class CoocaaOSApi extends CordovaPlugin
             });
         	return true;
         }
+        else if(GET_SPACE_INFO.equals(action))
+        {
+            try {
+                long totalSpace = 0L, freeSpace = 0L;
+                long blockSize = 0L, availableBlocks = 0L, totalBlocks = 0L;
+                File path = Environment.getDataDirectory();
+                StatFs stat = new StatFs(path.getPath());
+                blockSize = stat.getBlockSize();
+                availableBlocks = stat.getAvailableBlocks();
+                totalBlocks = stat.getBlockCount();
+                totalSpace = blockSize * totalBlocks;
+                freeSpace = blockSize * availableBlocks;
+                JSONObject result = new JSONObject();
+                result.put("totalSpace", totalSpace);
+                result.put("freeSpace", freeSpace);
+                callbackContext.success(result);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                callbackContext.error("error occurs when called getSpaceInfo");
+            }
+            return true;
+        }
         return false;
     }
 
@@ -1482,6 +1620,27 @@ public class CoocaaOSApi extends CordovaPlugin
     		intent.putExtras( b);
     		LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
     	}
+    }
+
+    public static void broadCastCommonChanged(Context context, Map<String,String> map)
+    {
+        if(map != null && context != null) {
+            try {
+                JSONObject myObject = new JSONObject();
+                Set<Map.Entry<String, String>> entryseSet = map.entrySet();
+                for (Map.Entry<String, String> entry:entryseSet) {
+                    myObject.put(entry.getKey(),entry.getValue());
+                }
+                final Intent intent = new Intent(BROADCAST_COMMON_CHANGED);
+                Bundle b = new Bundle();
+                b.putString("userdata", myObject.toString());
+                intent.putExtras(b);
+                LocalBroadcastManager.getInstance(context).sendBroadcastSync(intent);
+            } catch (JSONException e) {
+                Log.e("WebViewSDK", "CommonCallBack error:" + e.toString());
+                e.printStackTrace();
+            }
+        }
     }
     
 }
