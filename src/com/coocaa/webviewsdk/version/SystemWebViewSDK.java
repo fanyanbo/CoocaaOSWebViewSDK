@@ -99,12 +99,15 @@ package com.coocaa.webviewsdk.version;
 /*version 2.3.12
  * 1.增加退出酷开账号登录的接口
  */
+/*version 2.5.0
+ * 1.增加提交活动任务数据接口
+ */
 
 public class SystemWebViewSDK {
 
-	public static final String versionName = "2.3.12";
+	public static final String versionName = "2.5.0";
 	
-	public static final int versionCode = 2030012;
+	public static final int versionCode = 2050000;
 	
 	private static int focusPosition = -1;
 	
