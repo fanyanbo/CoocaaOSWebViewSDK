@@ -11,6 +11,9 @@ import org.apache.cordova.CordovaMainLayout.OnThemeChangedListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.coocaa.promotion.SkyActivities;
+import com.coocaa.promotion.callback.ISubmitResultListener;
+import com.coocaa.promotion.data.ActiveMissionInfo;
 import com.coocaa.systemwebview.R;
 import com.coocaa.webviewsdk.version.SystemWebViewSDK;
 import com.skyworth.framework.skysdk.properties.SkySystemProperties;
@@ -188,6 +191,10 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 					String eventId = intent.getStringExtra("eventId");
 					if(eventId != null && mWebPageListener != null)
 						mWebPageListener.notifyPagePause(eventId);
+				}else if("notify.js.promotion.data".equals(intent.getAction())){
+					String headers = intent.getStringExtra("headers");
+					String params = intent.getStringExtra("params");
+					submitPromotionData(headers,params);
 				}
 			}
 	    }
@@ -283,6 +290,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        filter.addAction("notify.js.log");
 			filter.addAction("notify.js.log.resume");
 			filter.addAction("notify.js.log.pause");
+			filter.addAction("notify.js.promotion.data");
 	        mLocalBroadcastManager.registerReceiver(mJsBC, filter);
 
 			if (mNetBC == null) mNetBC = new NetBroadcastReceiver();
@@ -1161,6 +1169,61 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    		appView.loadUrlIntoView(getThemeUrl(url), false);
 		        appView.clearHistory();
 	    	}
+		}
+
+		protected void submitPromotionData(String headers, String params) {
+			Log.i("TEST",headers);
+			Log.i("TEST",params);
+			Map<String,String> mapParams = new HashMap<String,String>();
+			Map<String,String> mapHeaders = new HashMap<String,String>();
+			try {
+				JSONObject jsonParams = new JSONObject(params);
+				Iterator<String> paramKeys = jsonParams.keys();
+				while(paramKeys.hasNext()){
+					String key = paramKeys.next();
+					String value = jsonParams.getString(key);
+					Log.i("TEST","params key=" + key + ",value=" + value);
+					mapParams.put(key, value);
+				}
+			} catch (JSONException e) {
+					e.printStackTrace();
+			}
+			if(headers != null){
+				try {
+					JSONObject jsonHeaders = new JSONObject(headers);
+					Iterator<String> headerKeys = jsonHeaders.keys();
+					while(headerKeys.hasNext()){
+						String key = headerKeys.next();
+						String value = jsonHeaders.getString(key);
+						Log.i("TEST","headers key=" + key + ",value=" + value);
+						mapHeaders.put(key, value);
+					}
+					SkyActivities.onCore()
+								.withContext(getApplicationContext())
+								.withHeaders(mapHeaders)
+								.withParams(mapParams)
+								.withDebugMode(true)
+                                .withResultListener(new ISubmitResultListener() {
+                                    @Override
+                                    public void onSubmitResult(ActiveMissionInfo data) {
+                                        Log.i("TEST","------onSubmitResult");
+                                    }
+                                }).submit();
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}else{
+				SkyActivities.onCore()
+						.withContext(getApplicationContext())
+						.withParams(mapParams)
+						.withDebugMode(true)
+                        .withResultListener(new ISubmitResultListener() {
+                            @Override
+                            public void onSubmitResult(ActiveMissionInfo data) {
+								Log.i("TEST","------onSubmitResult");
+                            }
+                        }).submit();
+			}
 		}
 
 }
