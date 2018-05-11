@@ -102,12 +102,15 @@ package com.coocaa.webviewsdk.version;
 /*version 2.5.0
  * 1.增加提交活动任务数据接口
  */
+/*version 2.5.1
+ * 1.fixBug:完善获取激活id的逻辑，防止在5.0系统上出现为空的情况
+ */
 
 public class SystemWebViewSDK {
 
-	public static final String versionName = "2.5.0";
-	
-	public static final int versionCode = 2050000;
+	private static final String versionName = "2.5.1";
+
+	private static final int versionCode = 2050001;
 	
 	private static int focusPosition = -1;
 	

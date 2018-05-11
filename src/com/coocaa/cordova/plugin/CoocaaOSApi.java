@@ -627,6 +627,9 @@ public class CoocaaOSApi extends CordovaPlugin
                 if(activeidInfoData!=null)
                 {
                     activeidString = activeidInfoData.getCurrent();
+                    if(activeidString == null || "".equals(activeidString)){
+                        activeidString = SystemProperties.get("persist.sys.active_id");
+                    }
                 }
                 
                 TCSetData emmcidSetData = systemApi.getSetData(SkyConfigDefs.SKY_CFG_EMMC_CID);
