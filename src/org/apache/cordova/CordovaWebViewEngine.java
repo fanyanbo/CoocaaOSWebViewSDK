@@ -94,5 +94,6 @@ public interface CordovaWebViewEngine {
         void onReceivedIcon(Bitmap icon);
         void onProgressChanged(int newProcess);
         void doUpdateVisitedHistory(String url,boolean isReload);
+        void onReceivedSslError(int errorCode, String failingUrl);
     }
 }

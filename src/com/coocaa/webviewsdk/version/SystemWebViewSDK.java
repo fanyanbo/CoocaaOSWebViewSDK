@@ -90,21 +90,24 @@ package com.coocaa.webviewsdk.version;
 /*version 2.3.10
  * 1.增加动态设置全屏背景是否显示的接口
  * 2.封装发送广播通知Web前端的接口
- * 3.完善日志提交接口
- * 4.第二次调用url时，不重复加载插件
+ * 3.完善提交日志接口
+ * 4.第二次加载url时，不重复加载插件
  */
-/*version 2.3.11
+/*version 2.4.0
+ * 1.封装view
+ */
+/*version 2.4.1
+ * 1.增加onPageSslError的事件回调
+ */
+/*version 2.4.2
  * 1.增加网络断开事件监听
- */
-/*version 2.3.12
- * 1.增加退出酷开账号登录的接口
  */
 
 public class SystemWebViewSDK {
 
-	public static final String versionName = "2.3.12";
+	public static final String versionName = "2.4.2";
 	
-	public static final int versionCode = 2030012;
+	public static final int versionCode = 2040002;
 	
 	private static int focusPosition = -1;
 	

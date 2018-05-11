@@ -9,23 +9,20 @@ import com.skyworth.framework.skysdk.ipc.SkyActivity;
 import com.skyworth.framework.skysdk.ipc.SkyApplication.SkyCmdConnectorListener;
 import com.skyworth.framework.skysdk.ipc.SkyCmdProcessInstance;
 import com.skyworth.framework.skysdk.ipc.SkyCmdProcessInstance.SkyCmdProcessInstanceListener;
+import com.skyworth.framework.skysdk.util.SkyObjectByteSerialzie;
+import com.tianci.net.command.TCNetworkBroadcast;
+import com.tianci.net.define.NetworkDefs;
+import com.tianci.system.command.TCSystemDefs;
+import com.tianci.user.data.UserCmdDefine;
+
+import org.json.JSONObject;
 
 public class CordovaBaseActivity extends SkyActivity{
 	
 	
 	private static final String Tag = "WebViewSDK";
-    protected CordovaPlugin currentPlugin = null;
-    protected static boolean isCmdListenerReady = false;
     protected static SkyCmdConnectorListener listener;
-	
-	public void setPlugin(CordovaPlugin plugin){
-		Log.i(Tag, "CordovaBaseActivity2 setPlugin");  
-    	currentPlugin = plugin;
-    	if(isCmdListenerReady){
-    		((CoocaaOSApi)currentPlugin).onCmdInit();
-    	}
-	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -47,11 +44,6 @@ public class CordovaBaseActivity extends SkyActivity{
 		// TODO Auto-generated method stub
         Log.i(Tag,"CordovaBaseActivity2 onCmdConnectorInit");
         listener = this;
-        isCmdListenerReady = true;
-        if(currentPlugin!=null)
-    	{
-    		((CoocaaOSApi)currentPlugin).onCmdInit();
-    	}
         onSuperCmdInit();
 	}
 	
@@ -66,11 +58,42 @@ public class CordovaBaseActivity extends SkyActivity{
 	@Override
 	public byte[] onHandler(String fromtarget, String cmd, byte[] body) {
 		// TODO Auto-generated method stub
-    	if(currentPlugin!=null)
-    	{
-    		return ((CoocaaOSApi)currentPlugin).onHandler(fromtarget, cmd, body);
-    	}
-    	return null;
+		if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_MOUNTED //外接设备接入
+				.toString().equals(cmd)) {
+			String path = SkyObjectByteSerialzie.toObject(body, String.class);
+			CoocaaOSApi.broadCastUsbChangged(this, true, path == null ? "" : path);
+		} else if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_REMOVED //外接设备拔出
+				.toString().equals(cmd)) {
+			String path = SkyObjectByteSerialzie.toObject(body, String.class);
+			CoocaaOSApi.broadCastUsbChangged(this, false, path == null ? "" : path);
+		} else if (TCNetworkBroadcast.TC_NETWORK_BROADCAST_NET_ETH_EVENT
+				.toString().equals(cmd)) {
+			NetworkDefs.EthEvent ethEvnet = SkyObjectByteSerialzie.toObject(body, NetworkDefs.EthEvent.class);
+			if (ethEvnet != null) {
+				JSONObject mJson = CoocaaOSApi.getEthEventString("ethnet", ethEvnet);
+				if (mJson != null) {
+					CoocaaOSApi.broadCastNetChangged(this,mJson);
+				}
+			}
+		} else if (TCNetworkBroadcast.TC_NETWORK_BROADCAST_NET_WIFI_EVENT
+				.toString().equals(cmd)) {
+			NetworkDefs.WifiEvent wifiEvent = SkyObjectByteSerialzie.toObject(body, NetworkDefs.WifiEvent.class);
+			switch (wifiEvent) {
+				case EVENT_WIFI_CONNECT_SUCCEEDED:
+				case EVENT_WIFI_CONNECT_DISCONNECTED:
+					JSONObject mJson = CoocaaOSApi.getWifiEventString("wifi", wifiEvent);
+					if (mJson != null) {
+						CoocaaOSApi.broadCastNetChangged(this,mJson);
+					}
+					break;
+				default:
+					break;
+			}
+		} else if (UserCmdDefine.ACCOUNT_CHANGED.toString().equals(cmd)) {
+			CoocaaOSApi.broadCastUesrChangged(this);
+		}
+
+		return new byte[0];
 	}
 
 	@Override

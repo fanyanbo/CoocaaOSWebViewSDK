@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.cordova.CordovaInterfaceImpl.CordovaInterfaceListener;
 import org.apache.cordova.CordovaMainLayout.OnThemeChangedListener;
+import org.coocaa.webview.CoocaaOSConnecterDefaultImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -269,12 +270,6 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        
 	        mainLayout = new CordovaMainLayout(this);
 	        mainLayout.setListener(this);
-	        mLoadingView = new SkyWithBGLoadingView(this);
-	        FrameLayout.LayoutParams loading_p = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,FrameLayout.LayoutParams.WRAP_CONTENT);
-	        loading_p.gravity = Gravity.CENTER;
-	        mainLayout.addView(mLoadingView, loading_p);
-	        startLoading();
-	        setContentView(mainLayout);
 
 	        if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
 	        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
@@ -350,7 +345,12 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 				public void onProgressChanged(int process) {
 					Log.v(TAG, "onProgressChanged process == " +process);			
 				}
-				
+
+				@Override
+				public void onReceivedSslError(int errorCode, String failingUrl) {
+					Log.v(TAG, "onReceivedSslError errorCode = " + errorCode + ",failingUrl = " + failingUrl);
+				}
+
 				@Override
 				public void onPageStarted(String url) {
 					Log.v(TAG, "onPageStarted url == " +url);
@@ -605,6 +605,9 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        		appView.setUserAgentString(IE9_USERAGENT);
 	        }
 	        cordovaInterface.onCordovaInit(appView.getPluginManager());
+	        
+	        //add by fyb
+	        cordovaInterface.setCoocaaOSConnecter(new CoocaaOSConnecterDefaultImpl(getCmdConnectorListener()));
 
 	        // Wire the hardware volume controls to control media if desired.
 	        String volumePref = preferences.getString("DefaultVolumeStream", "");
@@ -654,9 +657,14 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 				mErrorBgLayout.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 				mErrorBgView.addView(mErrorBgLayout);
 	        }
-	               
-	        mLoadingView.bringToFront();
-	//        setContentView(mainLayout);
+	           
+	        mLoadingView = new SkyWithBGLoadingView(this);
+	        FrameLayout.LayoutParams loading_p = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,FrameLayout.LayoutParams.WRAP_CONTENT);
+	        loading_p.gravity = Gravity.CENTER;
+	        mainLayout.addView(mLoadingView, loading_p);
+	        startLoading();
+	        setContentView(mainLayout);
+//	        mLoadingView.bringToFront();
 	        if (preferences.contains("BackgroundColor")) {
 	            int backgroundColor = preferences.getInteger("BackgroundColor", Color.BLACK);
 	            // Background of activity:

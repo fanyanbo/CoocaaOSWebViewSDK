@@ -247,6 +247,8 @@ public class SystemWebViewClient extends WebViewClient {
     @Override
     public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
 
+        parentEngine.client.onReceivedSslError(error.getPrimaryError(), error.getUrl());
+
         final String packageName = parentEngine.cordova.getActivity().getPackageName();
         final PackageManager pm = parentEngine.cordova.getActivity().getPackageManager();
 

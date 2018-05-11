@@ -29,6 +29,7 @@ import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
 
+import org.coocaa.webview.CoocaaOSConnecter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -56,11 +57,6 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     protected boolean activityWasDestroyed = false;
     protected Bundle savedPluginState;
 
-    @Override
-	public void setPluginImlListener(CordovaPlugin plugin) {
-    	((CordovaBaseActivity)this.activity).setPlugin(plugin);
-	}
-
 	public CordovaInterfaceImpl(Activity activity) {
         this(activity, Executors.newCachedThreadPool());
     }
@@ -80,14 +76,28 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     	public void onReceivedTitle(String title);
     	public void onReceivedIcon(Bitmap icon);
     	public void onProgressChanged(int process);
+        public void onReceivedSslError(int errorCode, String failingUrl);
     }
     
     private CordovaInterfaceListener mCordovaListener;
+    private CoocaaOSConnecter mCoocaaOSConnecter;
     //set Listener
     public void setCordovaInterfaceListener(CordovaInterfaceListener corListener)
     {
     	mCordovaListener = corListener;
     }
+    
+	@Override
+	public void setCoocaaOSConnecter(CoocaaOSConnecter connecter) {
+		// TODO Auto-generated method stub
+		mCoocaaOSConnecter = connecter;
+	}
+	
+	@Override
+	public CoocaaOSConnecter getCoocaaOSConnecter() {
+		// TODO Auto-generated method stub
+		return mCoocaaOSConnecter;
+	}
 
     @Override
     public void startActivityForResult(CordovaPlugin command, Intent intent, int requestCode) {
@@ -228,6 +238,24 @@ public class CordovaInterfaceImpl implements CordovaInterface {
         		}
         		
 			}
+        }
+        else if("onReceivedSslError".equals(id)) {
+            if(mCordovaListener!=null)
+            {
+                if(data != null)
+                {
+                    JSONObject jsonObj = (JSONObject) data;
+
+                    try {
+                        String url = jsonObj.getString("url");
+                        int errorCode = jsonObj.getInt("errorCode");
+                        mCordovaListener.onReceivedSslError(errorCode, url);
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
         return null;
     }

@@ -1,9 +1,15 @@
 package org.apache.cordova;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.cordova.CordovaExtActivity.CordovaWebViewListener;
 import org.apache.cordova.CordovaInterfaceImpl.CordovaInterfaceListener;
+import org.coocaa.webview.CoocaaOSConnecter;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.coocaa.systemwebview.R;
 import com.skyworth.ui.api.SkyWithBGLoadingView;
@@ -11,10 +17,14 @@ import com.skyworth.ui.blurbg.BlurBgLayout;
 import com.skyworth.util.SkyScreenParams;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.SystemClock;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -49,13 +59,91 @@ public class CordovaExtWebView extends FrameLayout
     protected TextView mErrorPageTextView = null;
     protected Button mErrorPageBtnView = null;
     protected ImageView mErrorPageImageView = null;
-    protected String mCurRequstUrl = null;
-    
+    protected String mCurRequestUrl = null;
+
+	public static final String IE9_USERAGENT = "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)";
+	public static final String IPAD_USERAGENT = "Mozilla/5.0 (iPad; CPU OS 4_3_2 like Mac OS X;en-us) "
+			+ "AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5";
     private final int ERROR_DISCONNECT = 1;
     private final int ERROR_SIGNALWEAK = 2;
+	private final int STATUS_NO_LOADING = 0;
+	private final int STATUS_LOADING = 1;
+	private final int STATUS_LOADED_SUCCESS = 2;
+	private final int STATUS_LOADED_ERROR = 3;
     private long mEndTime = 0, mStartTime = 0;
-	
-    public CordovaWebViewListener mListener = null;
+	private int mStatus = 0, mLoadingProgress = 0;
+	protected int mCacheMode = 1;//0:no-cache,1:default,2:cache_only,3:cache_else_network
+	protected int mUserAgentMode = 0;//0:Android,1:IE9,2:IPad
+	protected int mDisplayPolicy = 0;//0:100%-display,1:always-display
+    
+    private CordovaExtWebViewListener mWebViewListener = null;
+	private CordovaExtWebViewDataListener mWebViewDataListener = null;
+	private JsBroadcastReceiver mJsBC = null;
+    
+    public interface CordovaExtWebViewListener
+    {
+    	public void onPageStarted(String url);
+    	public void onPageFinished(String url);
+    	public void onPageError(int errorCode, String description, String failingUrl);
+        public void onPageSslError(int errorCode, String failingUrl);
+    	public void onProgressChanged(int process);
+    }
+
+	public interface CordovaExtWebViewDataListener
+	{
+		public void notifyMessage(String data);
+		public void notifyLogInfo(String eventId, Map<String,String> map);
+		public void notifyPageResume(String pageName, Map<String,String> map);
+		public void notifyPagePause(String pageName);
+	}
+
+	private class JsBroadcastReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if("notify.js.log".equals(intent.getAction()) || "notify.js.log.resume".equals(intent.getAction())){
+				String eventId = intent.getStringExtra("eventId");
+				String params = intent.getStringExtra("params");
+				if(eventId == null) return;
+				if(params != null && !"".equals(params)){
+					try {
+						JSONObject jsonObject = new JSONObject(params);
+						Map<String,String> map = new HashMap<String,String>();
+						Iterator<String> keys = jsonObject.keys();
+						while(keys.hasNext()){
+							String key = keys.next();
+							String value = jsonObject.getString(key);
+							map.put(key, value);
+						}
+						if(mWebViewDataListener != null ){
+							if("notify.js.log.resume".equals(intent.getAction()))
+								mWebViewDataListener.notifyPageResume(eventId,map);
+							else
+								mWebViewDataListener.notifyLogInfo(eventId,map);
+						}
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}else{
+					if(mWebViewDataListener != null){
+						if("notify.js.log.resume".equals(intent.getAction()))
+							mWebViewDataListener.notifyPageResume(eventId,null);
+						else
+							mWebViewDataListener.notifyLogInfo(eventId,null);
+					}
+				}
+			}else if("notify.js.message".equals(intent.getAction())){
+				String data = intent.getStringExtra("key");
+				if(mWebViewDataListener != null)
+					mWebViewDataListener.notifyMessage(data);
+			}else if("notify.js.log.pause".equals(intent.getAction())){
+				String eventId = intent.getStringExtra("eventId");
+				if(eventId != null && mWebViewDataListener != null)
+					mWebViewDataListener.notifyPagePause(eventId);
+			}
+		}
+	}
     
 	public CordovaExtWebView(Context context) {
 		super(context);
@@ -63,6 +151,14 @@ public class CordovaExtWebView extends FrameLayout
 		mContext = context;
 		
 		loadConfig();
+
+		if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("notify.js.message");
+		filter.addAction("notify.js.log");
+		filter.addAction("notify.js.log.resume");
+		filter.addAction("notify.js.log.pause");
+		LocalBroadcastManager.getInstance(mContext).registerReceiver(mJsBC, filter);
 		
 		cordovaInterface = makeCordovaInterface();		
 		cordovaInterface
@@ -78,10 +174,11 @@ public class CordovaExtWebView extends FrameLayout
 						Log.v(TAG, "CordovaWebView onReceivedTitle title == " + title);
 						if(title != null){
 							if(title.contains("404")){
-								if(mListener != null)
-									mListener.onPageError(404, "404 Not Found", mCurRequstUrl);
+								if(mWebViewListener != null)
+									mWebViewListener.onPageError(404, "404 Not Found", mCurRequestUrl);
 								isNeedErrorPageBtn = false;
 								showErrorPage(ERROR_SIGNALWEAK);
+								mStatus = STATUS_LOADED_ERROR;
 							}
 						}
 					}
@@ -95,8 +192,8 @@ public class CordovaExtWebView extends FrameLayout
 					public void onReceivedError(final int errorCode,
 							String description, String failingUrl) {
 						Log.v(TAG,"CordovaWebView onReceivedError description = " + description + ",errorCode = " + errorCode);
-						if(mListener != null)
-							mListener.onPageError(errorCode, description, failingUrl);
+						if(mWebViewListener != null)
+							mWebViewListener.onPageError(errorCode, description, failingUrl);
 						
 						mStartTime = SystemClock.uptimeMillis();
 						Log.i(TAG,"onReceivedError mStartTime="+mStartTime);
@@ -106,43 +203,65 @@ public class CordovaExtWebView extends FrameLayout
 						}else{
 							showErrorPage(ERROR_SIGNALWEAK);
 						}
+						mStatus = STATUS_LOADED_ERROR;
+					}
+
+					@Override
+					public void onReceivedSslError(int errorCode, String failingUrl) {
+						Log.v(TAG, "onReceivedSslError errorCode = " + errorCode + ",failingUrl = " + failingUrl);
+
+                        if(mWebViewListener != null)
+                            mWebViewListener.onPageSslError(errorCode, failingUrl);
 					}
 
 					@Override
 					public void onProgressChanged(int process) {
 						Log.v(TAG,"CordovaWebView onProgressChanged process == "+ process);
+						mLoadingProgress = process;
+
+                        if(mWebViewListener != null)
+                            mWebViewListener.onProgressChanged(process);
 					}
 
 					@Override
 					public void onPageStarted(String url) {
 						Log.v(TAG,"CordovaWebView onPageStarted url == "+ url);
 						
-						mCurRequstUrl = url;
-						
+						mCurRequestUrl = url;
+
 						mEndTime = SystemClock.uptimeMillis();
 						Log.i(TAG,"onPageStarted (mEndTime - mStartTime)="+(mEndTime - mStartTime));
 						if((mEndTime - mStartTime) < 500l) return;
 						
-						if(mListener != null)
-							mListener.onPageStarted(url);
+						if(mWebViewListener != null)
+							mWebViewListener.onPageStarted(url);
 						
 						if(mLoadingView!=null)
 							mLoadingView.showLoading();
+
+						if(mDisplayPolicy == 0) appView.getView().setVisibility(View.INVISIBLE);
+
+						mStatus = STATUS_LOADING;
+						mLoadingProgress = 0;
 					}
 
 					@Override
 					public void onPageLoadingFinished(String url) {
 						Log.v(TAG,"CordovaWebView onPageLoadingFinished url == "+ url);
-						
+
 						mEndTime = SystemClock.uptimeMillis();
 						Log.i(TAG,"onPageLoadingFinished (mEndTime - mStartTime)="+(mEndTime - mStartTime));
 						if((mEndTime - mStartTime) < 520l) return;
 						
-						if(mListener != null)
-							mListener.onPageFinished(url);
+						if(mWebViewListener != null)
+							mWebViewListener.onPageFinished(url);
 						
-						if(mLoadingView!=null)
+						if(mLoadingView != null)
 							mLoadingView.dismissLoading();
+
+						appView.getView().setVisibility(View.VISIBLE);
+
+						mStatus = STATUS_LOADED_SUCCESS;
 					}
 
 					@Override
@@ -153,11 +272,15 @@ public class CordovaExtWebView extends FrameLayout
 
 	    init();   
 	}
-	
-	public void setListener(CordovaWebViewListener listener)
-	{
-		Log.i(TAG,"CordovaWebView----->setListener");
-		mListener = listener;
+
+	public void setCordovaExtWebViewListener(CordovaExtWebViewListener listener) {
+		Log.i(TAG, "setCordovaExtWebViewListener");
+		mWebViewListener = listener;
+	}
+
+	public void setCordovaExtWebViewDataListener(CordovaExtWebViewDataListener listener) {
+		Log.i(TAG, "setCordovaExtWebViewDataListener");
+		mWebViewDataListener = listener;
 	}
 
 	OnClickListener clickListener = new OnClickListener() {
@@ -193,12 +316,17 @@ public class CordovaExtWebView extends FrameLayout
     protected CordovaInterfaceImpl makeCordovaInterface() {    	
         return new CordovaInterfaceImpl((Activity)mContext);
     }
+    
+    public void setCoocaaOSConnecter(CoocaaOSConnecter connecter) {
+    	cordovaInterface.setCoocaaOSConnecter(connecter);
+    }
 
     protected void init() {
         appView = makeWebView();
         createViews();
         if (!appView.isInitialized()) {
-            appView.init(cordovaInterface, pluginEntries, preferences,0);
+            appView.init(cordovaInterface, pluginEntries, preferences, mCacheMode);
+			if(mUserAgentMode == 1) appView.setUserAgentString(IE9_USERAGENT);
         }
         cordovaInterface.onCordovaInit(appView.getPluginManager());
     }
@@ -330,7 +458,7 @@ public class CordovaExtWebView extends FrameLayout
         return CordovaWebViewImpl.createEngine(mContext, preferences);
     }
     
-    public void onCordovaWebViewPause()
+    public void onPause()
     {
         if (this.appView != null) {
             // CB-9382 If there is an activity that started for result and main activity is waiting for callback
@@ -340,7 +468,7 @@ public class CordovaExtWebView extends FrameLayout
         }
     }
     
-    public void onCordovaWebViewResume()
+    public void onResume()
     {
         if (this.appView == null) {
             return;
@@ -351,7 +479,7 @@ public class CordovaExtWebView extends FrameLayout
         this.appView.getView().setVisibility(View.VISIBLE);
     }
     
-    public void onCordovaWebViewStart()
+    public void onStart()
     {
         if (this.appView == null) {
             return;
@@ -359,7 +487,7 @@ public class CordovaExtWebView extends FrameLayout
         this.appView.handleStart();
     }
     
-    public void onCordovaWebViewStop()
+    public void onStop()
     {
         if (this.appView == null) {
             return;
@@ -367,18 +495,45 @@ public class CordovaExtWebView extends FrameLayout
         this.appView.handleStop();
     }
     
-    public void onCordovaWebViewDestroy()
+    public void onDestroy()
     {
         if (this.appView != null) {
             appView.handleDestroy();
         }
+
+		if(mJsBC != null)
+			LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mJsBC);
     }
     
     public void setThemeBg(boolean value) {
     	isNeedThemeBg = value;
     }
     
-    
+    public int getStatus() {
+		return mStatus;
+	}
+
+	public int getPageLoadingProgress() {
+		return mLoadingProgress;
+	}
+
+	public void setCacheMode(int value) {
+		if(value < 0 || value > 3)
+			value = 0;
+		mCacheMode = value;
+	}
+
+	public void setUserAgentMode(int value) {
+		if(value < 0 || value > 3)
+			value = 0;
+		mUserAgentMode = value;
+	}
+
+	public void setWebViewDisplayPolicy(int value) {
+		if(value < 0 || value > 1)
+			mDisplayPolicy = 0;
+		mDisplayPolicy = value;
+	}
     
     
     
