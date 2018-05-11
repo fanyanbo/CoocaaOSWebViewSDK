@@ -58,11 +58,11 @@ public class CordovaBaseActivity extends SkyActivity{
 	@Override
 	public byte[] onHandler(String fromtarget, String cmd, byte[] body) {
 		// TODO Auto-generated method stub
-		if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_MOUNTED //外接设备接入
+		if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_MOUNTED //澶栨帴璁惧鎺ュ叆
 				.toString().equals(cmd)) {
 			String path = SkyObjectByteSerialzie.toObject(body, String.class);
 			CoocaaOSApi.broadCastUsbChangged(this, true, path == null ? "" : path);
-		} else if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_REMOVED //外接设备拔出
+		} else if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_REMOVED //澶栨帴璁惧鎷斿嚭
 				.toString().equals(cmd)) {
 			String path = SkyObjectByteSerialzie.toObject(body, String.class);
 			CoocaaOSApi.broadCastUsbChangged(this, false, path == null ? "" : path);

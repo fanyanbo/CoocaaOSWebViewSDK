@@ -102,12 +102,15 @@ package com.coocaa.webviewsdk.version;
 /*version 2.4.2
  * 1.增加网络断开事件监听
  */
+/*version 2.4.3
+ * 1.fixBug:完善获取激活id的逻辑，防止在5.0系统上出现为空的情况
+ */
 
 public class SystemWebViewSDK {
 
-	public static final String versionName = "2.4.2";
-	
-	public static final int versionCode = 2040002;
+	private static final String versionName = "2.4.3";
+
+	private static final int versionCode = 2040003;
 	
 	private static int focusPosition = -1;
 	

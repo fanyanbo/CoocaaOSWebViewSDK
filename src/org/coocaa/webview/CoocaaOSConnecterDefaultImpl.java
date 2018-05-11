@@ -154,6 +154,9 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 			String activeidString = null;
 			if (activeidInfoData != null) {
 				activeidString = activeidInfoData.getCurrent();
+				if(activeidString == null || "".equals(activeidString)){
+					activeidString = SystemProperties.get("persist.sys.active_id");
+				}
 			}
 
 			TCSetData emmcidSetData = systemApi
