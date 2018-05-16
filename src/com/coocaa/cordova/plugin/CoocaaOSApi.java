@@ -19,6 +19,7 @@
 */
 package com.coocaa.cordova.plugin;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -113,6 +114,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String BROADCAST_COMMON_CHANGED = "COMMON_CHANGED";//抽象出来的通用状态变化
     /***************************************新添加*******************************************/
     private static final String GET_MOVIEPLATFORM_INFO = "getMoviePlatformInfo";
+    private static final String GET_MEM_INFO = "getMemInfo";
     private static final String GET_APP_INFO = "getAppInfo";
     private static final String GET_SPACE_INFO = "getSpaceInfo";
     private static final String GET_PROPERTY_VALUE = "getPropertiesValue";
@@ -122,6 +124,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String NOTIFY_JS_MESSAGE = "notifyJSMessage";
     private static final String NOTIFY_JS_LOG = "notifyJSLogInfo";
     private static final String NOTIFY_JS_LOG_EXTRA = "notifyJSLogInfoExtra";
+    private static final String SUBMIT_JS_PROMOTION_DATA = "submitPromotionData";
 
     private Context mContext;
     private CoocaaOSApiListener mCoocaaListener;
@@ -626,6 +629,9 @@ public class CoocaaOSApi extends CordovaPlugin
                 if(activeidInfoData!=null)
                 {
                     activeidString = activeidInfoData.getCurrent();
+                    if(activeidString == null || "".equals(activeidString)){
+                        activeidString = SystemProperties.get("persist.sys.active_id");
+                    }
                 }
                 
                 TCSetData emmcidSetData = systemApi.getSetData(SkyConfigDefs.SKY_CFG_EMMC_CID);
@@ -1073,25 +1079,40 @@ public class CoocaaOSApi extends CordovaPlugin
         }
         else if(GET_MOVIEPLATFORM_INFO.equals(action))
         {
-        	PackageManager pm = this.cordova.getActivity().getPackageManager();
-        	String versionName = "";
-        	int versionCode  = 0;
-        	
-        	try {
-        		PackageInfo info = pm.getPackageInfo("com.tianci.movieplatform", 0);
-        		versionName = info.versionName;
-        		versionCode = info.versionCode;
-        		JSONObject result = new JSONObject();
-        		result.put("versionName", versionName);
-        		result.put("versionCode", versionCode);
-        		result.put("packageName", "com.tianci.movieplatform");
+            PackageManager pm = this.cordova.getActivity().getPackageManager();
+            String versionName = "";
+            int versionCode  = 0;
+
+            try {
+                PackageInfo info = pm.getPackageInfo("com.tianci.movieplatform", 0);
+                versionName = info.versionName;
+                versionCode = info.versionCode;
+                JSONObject result = new JSONObject();
+                result.put("versionName", versionName);
+                result.put("versionCode", versionCode);
+                result.put("packageName", "com.tianci.movieplatform");
                 callbackContext.success(result);
 
-			} catch (NameNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				callbackContext.error("error occurs when called getMovieplatformInfo");
-			}
+            } catch (NameNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                callbackContext.error("error occurs when called getMovieplatformInfo");
+            }
+            return true;
+        }
+        else if(GET_MEM_INFO.equals(action))
+        {
+            long totalSize = 0, leftSize = 0;
+            ActivityManager activityManager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager.MemoryInfo outInfo = new ActivityManager.MemoryInfo();
+            activityManager.getMemoryInfo(outInfo);
+            totalSize = outInfo.totalMem;
+            leftSize = outInfo.availMem;
+            JSONObject result = new JSONObject();
+            result.put("totalSize", totalSize);
+            result.put("leftSize", leftSize);
+            Log.i("WebViewSDK","totalSize=" + totalSize + ",leftSize=" + leftSize);
+            callbackContext.success(result);
             return true;
         }
         else if(GET_APP_INFO.equals(action))
@@ -1551,6 +1572,22 @@ public class CoocaaOSApi extends CordovaPlugin
             }
             return true;
         }
+        else if(SUBMIT_JS_PROMOTION_DATA.equals(action))
+        {
+            String headers = "", params = "";
+            JSONObject headersObj = args.getJSONObject(0);
+            JSONObject paramsObj = args.getJSONObject(1);
+            if(headersObj != null && paramsObj != null){
+                headers = headersObj.getString("headers");
+                params = paramsObj.getString("params");
+            }
+            Intent intent = new Intent("notify.js.promotion.data");
+            intent.putExtra("headers", headers);
+            intent.putExtra("params", params);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            callbackContext.success();
+            return true;
+        }
         return false;
     }
 
@@ -1631,16 +1668,39 @@ public class CoocaaOSApi extends CordovaPlugin
                 for (Map.Entry<String, String> entry:entryseSet) {
                     myObject.put(entry.getKey(),entry.getValue());
                 }
+                myObject.put("cc_type","common");
                 final Intent intent = new Intent(BROADCAST_COMMON_CHANGED);
                 Bundle b = new Bundle();
                 b.putString("userdata", myObject.toString());
                 intent.putExtras(b);
                 LocalBroadcastManager.getInstance(context).sendBroadcastSync(intent);
             } catch (JSONException e) {
-                Log.e("WebViewSDK", "CommonCallBack error:" + e.toString());
+                Log.e("WebViewSDK", "broadCastCommonChanged error:" + e.toString());
                 e.printStackTrace();
             }
         }
     }
-    
+
+    public static void broadCastVoiceChanged(Context context, Map<String,String> map)
+    {
+        if(map != null && context != null) {
+            try {
+                JSONObject myObject = new JSONObject();
+                Set<Map.Entry<String, String>> entryseSet = map.entrySet();
+                for (Map.Entry<String, String> entry:entryseSet) {
+                    myObject.put(entry.getKey(),entry.getValue());
+                }
+                myObject.put("cc_type","voice");
+                final Intent intent = new Intent(BROADCAST_COMMON_CHANGED);
+                Bundle b = new Bundle();
+                b.putString("userdata", myObject.toString());
+                intent.putExtras(b);
+                LocalBroadcastManager.getInstance(context).sendBroadcastSync(intent);
+            } catch (JSONException e) {
+                Log.e("WebViewSDK", "broadCastVoiceChanged error:" + e.toString());
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
