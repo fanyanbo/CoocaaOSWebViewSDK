@@ -19,6 +19,7 @@
 */
 package com.coocaa.cordova.plugin;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -73,7 +74,8 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String HAS_USER_LOGIN = "hasCoocaaUserLogin";//当前用户是否登录
     private static final String GET_USER_INFO = "getUserInfo";//获取用户信息;
     private static final String START_QQ_ACOUNT = "startQQAccount";//启动qq登录
-    private static final String GET_DEVICE_INFO = "getDeviceInfo";//获取当前设备信息
+    private static final String GET_DEVICE_INFO = "getDeviceInfo";//获取酷开设备信息
+    private static final String GET_BASE_INFO = "getBaseInfo";//获取硬件设备信息
     private static final String IS_NET_CONNECTED = "isNetConnected";//获取当前网路连接状态
     private static final String GET_NET_TYPE = "getNetType";//获取当前网络类型//有线、无线
     private static final String GET_IP_INFO = "getIpInfo";//获取当前网络的ip地址//内网
@@ -979,6 +981,40 @@ public class CoocaaOSApi extends CordovaPlugin
                 // TODO Auto-generated catch block
                 e.printStackTrace();
                 callbackContext.error("error occurs when called getSpaceInfo");
+            }
+            return true;
+        }
+        else if(GET_BASE_INFO.equals(action))
+        {
+            try {
+                long totalMem = 0, leftMem = 0;
+                ActivityManager activityManager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
+                ActivityManager.MemoryInfo outInfo = new ActivityManager.MemoryInfo();
+                activityManager.getMemoryInfo(outInfo);
+                totalMem = outInfo.totalMem;
+                leftMem = outInfo.availMem;
+
+                long totalSpace = 0L, freeSpace = 0L;
+                long blockSize = 0L, availableBlocks = 0L, totalBlocks = 0L;
+                File path = Environment.getDataDirectory();
+                StatFs stat = new StatFs(path.getPath());
+                blockSize = stat.getBlockSize();
+                availableBlocks = stat.getAvailableBlocks();
+                totalBlocks = stat.getBlockCount();
+                totalSpace = blockSize * totalBlocks;
+                freeSpace = blockSize * availableBlocks;
+
+                JSONObject result = new JSONObject();
+                result.put("totalMem", totalMem);
+                result.put("leftMem", leftMem);
+                result.put("totalSpace", totalSpace);
+                result.put("freeSpace", freeSpace);
+                Log.i("WebViewSDK",result.toString());
+                callbackContext.success(result);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                callbackContext.error("error occurs when called getBaseInfo");
             }
             return true;
         }

@@ -18,7 +18,7 @@ public interface CoocaaOSConnecter {
     String getUserInfo();
 
 	/**
-     * 获取当前设备信息
+     * 获取酷开设备信息
      *
      * @return 如果无或错误则返回null
      */

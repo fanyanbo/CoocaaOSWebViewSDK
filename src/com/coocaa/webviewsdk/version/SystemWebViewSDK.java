@@ -104,6 +104,7 @@ package com.coocaa.webviewsdk.version;
  */
 /*version 2.4.3
  * 1.fixBug:完善获取激活id的逻辑，防止在5.0系统上出现为空的情况
+ * 2.增加获取硬件基本信息的接口：空间大小，内存大小
  */
 
 public class SystemWebViewSDK {
