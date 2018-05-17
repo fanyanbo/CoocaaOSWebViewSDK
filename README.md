@@ -2,9 +2,10 @@
 
 ### ``说明文档`` [请猛戳这里](https://github.com/fanyanbo/CoocaaOSWebViewSDK/blob/feature-20180309/README.md)
 
-* 如以view的方式集成，请checkout v2.4.0分支，其他分支暂不支持该功能
-
-v2.3.13
+* 如以view的方式集成，请checkout v2.4.0分支，master分支和其他分支暂不支持该功能
+  
+         
+v2.3.13 
 ==================
  * fixBug:完善获取激活id的逻辑，防止在5.0系统上出现为空的情况
  * 增加获取内存信息的接口
