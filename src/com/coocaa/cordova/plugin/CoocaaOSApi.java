@@ -114,7 +114,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String BROADCAST_COMMON_CHANGED = "COMMON_CHANGED";//抽象出来的通用状态变化
     /***************************************新添加*******************************************/
     private static final String GET_MOVIEPLATFORM_INFO = "getMoviePlatformInfo";
-    private static final String GET_MEM_INFO = "getMemInfo";
+    private static final String GET_BASE_INFO = "getBaseInfo";
     private static final String GET_APP_INFO = "getAppInfo";
     private static final String GET_SPACE_INFO = "getSpaceInfo";
     private static final String GET_PROPERTY_VALUE = "getPropertiesValue";
@@ -1100,18 +1100,31 @@ public class CoocaaOSApi extends CordovaPlugin
             }
             return true;
         }
-        else if(GET_MEM_INFO.equals(action))
+        else if(GET_BASE_INFO.equals(action))
         {
-            long totalSize = 0, leftSize = 0;
+            long totalMem = 0, leftMem = 0;
             ActivityManager activityManager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
             ActivityManager.MemoryInfo outInfo = new ActivityManager.MemoryInfo();
             activityManager.getMemoryInfo(outInfo);
-            totalSize = outInfo.totalMem;
-            leftSize = outInfo.availMem;
+            totalMem = outInfo.totalMem;
+            leftMem = outInfo.availMem;
+
+            long totalSpace = 0L, freeSpace = 0L;
+            long blockSize = 0L, availableBlocks = 0L, totalBlocks = 0L;
+            File path = Environment.getDataDirectory();
+            StatFs stat = new StatFs(path.getPath());
+            blockSize = stat.getBlockSize();
+            availableBlocks = stat.getAvailableBlocks();
+            totalBlocks = stat.getBlockCount();
+            totalSpace = blockSize * totalBlocks;
+            freeSpace = blockSize * availableBlocks;
+
             JSONObject result = new JSONObject();
-            result.put("totalSize", totalSize);
-            result.put("leftSize", leftSize);
-            Log.i("WebViewSDK","totalSize=" + totalSize + ",leftSize=" + leftSize);
+            result.put("totalSpace", totalSpace);
+            result.put("freeSpace", freeSpace);
+            result.put("totalMem", totalMem);
+            result.put("leftMem", leftMem);
+            Log.i("WebViewSDK",result.toString());
             callbackContext.success(result);
             return true;
         }

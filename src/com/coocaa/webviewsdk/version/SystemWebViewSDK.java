@@ -104,7 +104,7 @@ package com.coocaa.webviewsdk.version;
  */
 /*version 2.5.1
  * 1.fixBug:完善获取激活id的逻辑，防止在5.0系统上出现为空的情况
- * 2.增加获取内存信息的接口
+ * 2.增加获取设备基本信息的接口，目前仅包括内存信息,space信息
  * 3.增加发送语音广播通知Web前端的接口
  */
 
