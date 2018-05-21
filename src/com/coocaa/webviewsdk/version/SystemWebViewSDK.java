@@ -110,6 +110,7 @@ package com.coocaa.webviewsdk.version;
 /*version 2.5.2
  * 1.对接南京语音模块，使web前端具备监听特定语音口令的能力
  * 2.增加通道接口，使web前端具备setData和getData的能力(跟具体业务相关)
+ * 3.完善获取appinfo的接口，支持列表参数
  */
 
 public class SystemWebViewSDK {

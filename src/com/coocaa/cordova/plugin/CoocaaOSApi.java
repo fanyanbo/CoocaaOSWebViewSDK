@@ -70,12 +70,14 @@ import org.apache.cordova.CordovaExtActivity;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -1221,24 +1223,39 @@ public class CoocaaOSApi extends CordovaPlugin
         else if(GET_APP_INFO.equals(action))
         {
         	PackageManager pm = this.cordova.getActivity().getPackageManager();
-        	String versionName = "";
-        	int versionCode  = 0;
-        	
+            JSONObject resultObject = new JSONObject();
         	try {
-        		JSONObject pkgNameObj = args.getJSONObject(0);
-        		String packageName = pkgNameObj.getString("packageName");
-        		PackageInfo info = pm.getPackageInfo(packageName, 0);
-        		if(info == null){
-        			callbackContext.error("this App is not installed :" + packageName);
-        		}else{
-            		versionName = info.versionName;
-            		versionCode = info.versionCode;
-            		JSONObject result = new JSONObject();
-            		result.put("versionName", versionName);
-            		result.put("versionCode", versionCode);
-                    callbackContext.success(result);
-        		}
-			} catch (NameNotFoundException e) {
+                JSONObject pkgListObj = args.getJSONObject(0);
+                String pkgListStr = pkgListObj.getString("pkgList");
+                JSONObject jsonParams = new JSONObject(pkgListStr);
+                JSONArray params = jsonParams.getJSONArray("pkgList");
+                Log.i("WebViewSDK" , "length = " + params.length());
+                if (params.length() > 0) {
+                    for(int i=0; i<params.length(); i++){
+                        String pkgName = params.getString(i);
+                        Log.i("WebViewSDK" , "pkgName = " + pkgName);
+                        JSONObject valueObject = new JSONObject();
+                        PackageInfo info = null;
+                        try{
+                            info = pm.getPackageInfo(pkgName, 0);
+                            if (info != null) {
+                                valueObject.put("status", "0");
+                                valueObject.put("versionName", info.versionName);
+                                valueObject.put("versionCode", info.versionCode);
+                            }
+                        }catch (NameNotFoundException e){
+                            valueObject.put("status", "-1");
+                            valueObject.put("versionName", "-1");
+                            valueObject.put("versionCode", -1);
+                        }
+                        Log.i("WebViewSDK" , "valueObject = " + valueObject);
+                        resultObject.put(pkgName, valueObject);
+                    }
+                    callbackContext.success(resultObject.toString());
+                } else {
+                    callbackContext.error("params error occurs when called getAppInfo");
+                }
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				callbackContext.error("error occurs when called getAppInfo");
