@@ -1216,8 +1216,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 		}
 
 		protected void submitPromotionData(String headers, String params) {
-			Log.i("TEST",headers);
-			Log.i("TEST",params);
+
 			Map<String,String> mapParams = new HashMap<String,String>();
 			Map<String,String> mapHeaders = new HashMap<String,String>();
 			try {
@@ -1226,7 +1225,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 				while(paramKeys.hasNext()){
 					String key = paramKeys.next();
 					String value = jsonParams.getString(key);
-					Log.i("TEST","params key=" + key + ",value=" + value);
+					Log.i(TAG,"params key=" + key + ",value=" + value);
 					mapParams.put(key, value);
 				}
 			} catch (JSONException e) {
@@ -1239,7 +1238,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 					while(headerKeys.hasNext()){
 						String key = headerKeys.next();
 						String value = jsonHeaders.getString(key);
-						Log.i("TEST","headers key=" + key + ",value=" + value);
+						Log.i(TAG,"headers key=" + key + ",value=" + value);
 						mapHeaders.put(key, value);
 					}
 					SkyActivities.onCore()
@@ -1249,7 +1248,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
                                 .withResultListener(new ISubmitResultListener() {
                                     @Override
                                     public void onSubmitResult(ActiveMissionInfo data) {
-                                        Log.i("TEST","------onSubmitResult");
+                                        Log.i(TAG, "onSubmitResult" + data);
                                     }
                                 }).submit();
 				} catch (JSONException e) {
@@ -1262,7 +1261,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
                         .withResultListener(new ISubmitResultListener() {
                             @Override
                             public void onSubmitResult(ActiveMissionInfo data) {
-								Log.i("TEST","------onSubmitResult");
+								Log.i(TAG,"onSubmitResult" + data);
                             }
                         }).submit();
 			}
