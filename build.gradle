@@ -42,5 +42,4 @@ dependencies {
 //    provided fileTree(dir: 'C:/Android/adt-bundle-windows-x86_64-20131030/sdk2/extras/support/v4', include: ['android-support-v4.jar'])
 //    compile fileTree(dir: 'D:/GitCode/SystemGradle/Framework/Support/CoocaaPay', include: ['*.jar'])
 //    provided fileTree(dir: 'C:/Android/adt-bundle-windows-x86_64-20131030/sdk2/platforms/android-6.0/data', include: ['layoutlib.jar'])
-    compile project(path: ':ccPromotionSDK')
 }

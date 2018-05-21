@@ -103,7 +103,6 @@
     <orderEntry type="module" module-name="ccExACommonUISDK" exported="" />
     <orderEntry type="module" module-name="ccExASkyLogSDK" exported="" />
     <orderEntry type="module" module-name="ccSystemServiceSDK" exported="" />
-    <orderEntry type="module" module-name="ccPromotionSDK" exported="" />
     <orderEntry type="library" exported="" name="android-android-23" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-23.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-23.2.0" level="project" />
