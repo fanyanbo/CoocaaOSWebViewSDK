@@ -1246,7 +1246,6 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 								.withContext(getApplicationContext())
 								.withHeaders(mapHeaders)
 								.withParams(mapParams)
-								.withDebugMode(true)
                                 .withResultListener(new ISubmitResultListener() {
                                     @Override
                                     public void onSubmitResult(ActiveMissionInfo data) {
@@ -1260,7 +1259,6 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 				SkyActivities.onCore()
 						.withContext(getApplicationContext())
 						.withParams(mapParams)
-						.withDebugMode(true)
                         .withResultListener(new ISubmitResultListener() {
                             @Override
                             public void onSubmitResult(ActiveMissionInfo data) {
