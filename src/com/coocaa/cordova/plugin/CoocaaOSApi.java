@@ -77,7 +77,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
