@@ -3,8 +3,14 @@
 ### ``说明文档`` [请猛戳这里](https://github.com/fanyanbo/CoocaaOSWebViewSDK/blob/feature-20180309/README.md)
 
 * 如以view的方式集成，请checkout v2.4.0分支，其他分支暂不支持该功能
-  
-         
+* 该分支仅供江苏广电盒子项目使用，去掉v2.5.0版本PromotionSDK的依赖
+
+v2.5.2
+==================
+ * 对接语音模块，使web前端具备监听特定语音口令的能力
+ * 增加通道接口，使web前端具备setData和getData的能力(跟具体业务相关)
+ * 完善获取appinfo的接口，支持列表参数
+ 
 v2.5.1
 ==================
  * fixBug:完善获取激活id的逻辑，防止在5.0系统上出现为空的情况
