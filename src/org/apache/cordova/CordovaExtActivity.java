@@ -11,6 +11,7 @@ import org.apache.cordova.CordovaMainLayout.OnThemeChangedListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.coocaa.cordova.plugin.CoocaaOSApi;
 import com.coocaa.promotion.SkyActivities;
 import com.coocaa.promotion.callback.ISubmitResultListener;
 import com.coocaa.promotion.data.ActiveMissionInfo;
@@ -122,8 +123,10 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    private CordovaWebViewListener mWebViewListener = null;
 	    private CordovaWebPageListener mWebPageListener = null;
 	    private CordovaErrorPageListener mErrorPageListener = null;
+		private CordovaBusinessDataListener mBusinessListener = null;
 	    private JsBroadcastReceiver mJsBC = null;
 		private NetBroadcastReceiver mNetBC = null;
+		private VoiceBroadcastReceiver mVoiceBC = null;
 
 	    LocalBroadcastManager mLocalBroadcastManager;
 
@@ -146,6 +149,12 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    {
 	    	public void handleUI(String value);
 	    }
+
+		public interface CordovaBusinessDataListener
+		{
+			public String getBusinessData(String data);
+			public boolean setBusinessData(String data);
+		}
 	    
 	    private class JsBroadcastReceiver extends BroadcastReceiver {
 
@@ -222,6 +231,22 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 					return false;
 			}
 		}
+
+		private class VoiceBroadcastReceiver extends BroadcastReceiver {
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				Log.v(TAG, "VoiceBroadcastReceiver action = " + intent.getAction());
+				if ("com.skyworth.srtnj.action.voice.outcmd".equals(intent.getAction())) {
+					String value = intent.getStringExtra("voicecmd");
+					//String value = "{\"command\":24,\"detail\":{\"original\":\"射手榜查询\",\"parameter\":\"4\"}}";
+					Log.v(TAG, "com.skyworth.srtnj.action.voice.outcmd key = voicecmd, value = " + value);
+					Map<String, String> map = new HashMap<String, String>();
+	                map.put("voicecmd", value);
+                    CoocaaOSApi.broadCastVoiceChanged(mContext, map);
+				}
+			}
+		}
 	    
 	    public void setCordovaWebViewListener(CordovaWebViewListener listener) {
 	    	this.mWebViewListener = listener;
@@ -234,6 +259,14 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    public void setCordovaErrorPageListener(CordovaErrorPageListener listener) {
 	    	this.mErrorPageListener = listener;
 	    }
+
+		public void setCordovaBusinessDataListener(CordovaBusinessDataListener listener) {
+			this.mBusinessListener = listener;
+		}
+
+		public CordovaBusinessDataListener getCordovaBusinessDataListener() {
+			return this.mBusinessListener;
+		}
 	    /**
 	     * Called when the activity is first created.
 	     */
@@ -297,6 +330,11 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 			IntentFilter netfilter = new IntentFilter();
 			netfilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 			registerReceiver(mNetBC, netfilter);
+
+			if (mVoiceBC == null) mVoiceBC = new VoiceBroadcastReceiver();
+			IntentFilter voicefilter = new IntentFilter();
+			voicefilter.addAction("com.skyworth.srtnj.action.voice.outcmd");
+			registerReceiver(mVoiceBC, voicefilter);
 	        
 	        cordovaInterface.setCordovaInterfaceListener(new CordovaInterfaceListener() {
 				
@@ -922,10 +960,16 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	            appView.handleDestroy();
 	        }
 	       
-	        if(mJsBC != null)
+	        if (mJsBC != null)
 	        	LocalBroadcastManager.getInstance(this).unregisterReceiver(mJsBC);
-			if(mNetBC != null)
+			if ( mNetBC != null) {
 				unregisterReceiver(mNetBC);
+				mNetBC = null;
+			}
+			if (mVoiceBC != null) {
+				unregisterReceiver(mVoiceBC);
+				mVoiceBC = null;
+			}
 	    }
 
 	    /**

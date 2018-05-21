@@ -107,12 +107,16 @@ package com.coocaa.webviewsdk.version;
  * 2.增加获取设备基本信息的接口，目前仅包括内存信息,space信息
  * 3.增加发送语音广播通知Web前端的接口
  */
+/*version 2.5.2
+ * 1.对接南京语音模块，使web前端具备监听特定语音口令的能力
+ * 2.增加通道接口，使web前端具备setData和getData的能力(跟具体业务相关)
+ */
 
 public class SystemWebViewSDK {
 
-	private static final String versionName = "2.5.1";
+	private static final String versionName = "2.5.2";
 
-	private static final int versionCode = 2050001;
+	private static final int versionCode = 2050002;
 	
 	private static int focusPosition = -1;
 	

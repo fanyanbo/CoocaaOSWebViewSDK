@@ -66,6 +66,7 @@ import com.tianci.user.data.UserCmdDefine;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaBaseActivity;
+import org.apache.cordova.CordovaExtActivity;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
@@ -125,6 +126,8 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String NOTIFY_JS_LOG = "notifyJSLogInfo";
     private static final String NOTIFY_JS_LOG_EXTRA = "notifyJSLogInfoExtra";
     private static final String SUBMIT_JS_PROMOTION_DATA = "submitPromotionData";
+    private static final String SET_BUSINESS_DATA = "setBusinessData";
+    private static final String GET_BUSINESS_DATA = "getBusinessData";
 
     private Context mContext;
     private CoocaaOSApiListener mCoocaaListener;
@@ -136,6 +139,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private SkyMediaApi mediaApi;
     
     private CallbackBroadcastReceiver mCallbackBC = null;
+    private CordovaExtActivity.CordovaBusinessDataListener mBusinessListener = null;
     private static final String PAY_ACTION = "coocaa.webviewsdk.action.pay";  
 
     /**
@@ -152,7 +156,8 @@ public class CoocaaOSApi extends CordovaPlugin
         mContext = cordova.getActivity();
 
         Log.v("WebViewSDK", TAG + "CoocaaOSApi initialization");
-        cordova.setPluginImlListener(this);  
+        cordova.setPluginImlListener(this);
+        mBusinessListener = cordova.getCordovaBusinessDataListener();
              
         if (mCallbackBC == null)
         	mCallbackBC = new CallbackBroadcastReceiver();
@@ -973,6 +978,91 @@ public class CoocaaOSApi extends CordovaPlugin
         	LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
         	callbackContext.success();
         	return true;
+        }
+        else if(SET_BUSINESS_DATA.equals(action))
+        {
+            JSONObject dataObj = args.getJSONObject(0);
+            JSONObject typeObj = args.getJSONObject(1);
+            String cc_data = "", cc_type = "";
+            if(dataObj != null){
+                cc_data = dataObj.getString("cc_data");
+                cc_type = typeObj.getString("cc_type");
+            }
+            Log.i("WebViewSDK","SET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
+            if("sync".equals(cc_type)) {
+                if(mBusinessListener != null) {
+                    String ret = mBusinessListener.getBusinessData(cc_data);
+                    if(ret == null || "".equals(ret)){
+                        callbackContext.error("error occurs when called getBusinessData");
+                    }else{
+                        callbackContext.success(ret);
+                    }
+                }else{
+                    callbackContext.error("no implement");
+                }
+            } else {
+                final String finalData = cc_data;
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+
+
+                        if (mBusinessListener != null) {
+                            boolean ret = mBusinessListener.setBusinessData(finalData);
+                            if (ret) {
+                                callbackContext.success();
+                            } else {
+                                callbackContext.error("error occurs when called setBusinessData");
+                            }
+                        } else {
+                            callbackContext.error("no implement");
+                        }
+                    }
+                });
+            }
+            return true;
+        }
+        else if(GET_BUSINESS_DATA.equals(action))
+        {
+            JSONObject dataObj = args.getJSONObject(0);
+            JSONObject typeObj = args.getJSONObject(1);
+            String cc_data = "",cc_type = "";
+            if(dataObj != null){
+                cc_data = dataObj.getString("cc_data");
+                cc_type = typeObj.getString("cc_type");
+            }
+            Log.i("WebViewSDK","GET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
+            if("sync".equals(cc_type)) {
+                if(mBusinessListener != null) {
+                    String ret = mBusinessListener.getBusinessData(cc_data);
+                    if(ret == null || "".equals(ret)){
+                        callbackContext.error("error occurs when called getBusinessData");
+                    }else{
+                        callbackContext.success(ret);
+                    }
+                }else{
+                    callbackContext.error("no implement");
+                }
+            } else{
+                final String finalData = cc_data;
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if(mBusinessListener != null){
+                            String ret = mBusinessListener.getBusinessData(finalData);
+                            if(ret == null || "".equals(ret)){
+                                callbackContext.error("error occurs when called getBusinessData");
+                            }else{
+                                callbackContext.success(ret);
+                            }
+                        }else{
+                            callbackContext.error("no implement");
+                        }
+                    }
+                });
+            }
+            return true;
         }
         else if(LAUNCH_ONLINE_MOVIE_PLAYER.equals(action))
         {

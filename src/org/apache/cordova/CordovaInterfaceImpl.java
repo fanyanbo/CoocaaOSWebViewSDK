@@ -61,7 +61,12 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     	((CordovaBaseActivity)this.activity).setPlugin(plugin);
 	}
 
-	public CordovaInterfaceImpl(Activity activity) {
+    @Override
+    public CordovaExtActivity.CordovaBusinessDataListener getCordovaBusinessDataListener() {
+        return ((CordovaExtActivity)this.activity).getCordovaBusinessDataListener();
+    }
+
+    public CordovaInterfaceImpl(Activity activity) {
         this(activity, Executors.newCachedThreadPool());
     }
 
