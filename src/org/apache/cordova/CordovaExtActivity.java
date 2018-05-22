@@ -35,8 +35,6 @@ import android.graphics.Color;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -138,8 +136,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    {
 	    	public void notifyMessage(String data);
 	    	public void notifyLogInfo(String eventId, Map<String,String> map);
-			public void notifyPageResume(String eventId, Map<String,String> map);
-			public void notifyPagePause(String eventId);
+			public void notifyPageResume(String pageName, Map<String,String> map);
+			public void notifyPagePause(String pageName);
 	    }
 	    
 	    public interface CordovaErrorPageListener

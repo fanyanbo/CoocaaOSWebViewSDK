@@ -13,17 +13,7 @@
     <application
         android:allowBackup="true" 
         android:hardwareAccelerated="true">
-        
-        <activity
-            android:name="com.coocaa.sky.ccapi.MActivity"
-            android:configChanges="orientation|keyboard|keyboardHidden|locale|touchscreen|navigation|screenLayout|uiMode|screenSize|locale"
-            android:launchMode="singleTask"
-            android:theme="@style/AppBaseTheme3" >
-            <intent-filter>
-                <action android:name="coocaa.intent.action.pay" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+
         
     </application>
 

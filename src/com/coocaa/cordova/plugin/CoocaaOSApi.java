@@ -992,11 +992,11 @@ public class CoocaaOSApi extends CordovaPlugin
             Log.i("WebViewSDK","SET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
             if("sync".equals(cc_type)) {
                 if(mBusinessListener != null) {
-                    String ret = mBusinessListener.getBusinessData(cc_data);
-                    if(ret == null || "".equals(ret)){
-                        callbackContext.error("error occurs when called getBusinessData");
+                    boolean ret = mBusinessListener.setBusinessData(cc_data);
+                    if(!ret){
+                        callbackContext.error("error occurs when called setBusinessData");
                     }else{
-                        callbackContext.success(ret);
+                        callbackContext.success();
                     }
                 }else{
                     callbackContext.error("no implement");
