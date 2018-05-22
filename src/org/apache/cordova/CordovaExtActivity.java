@@ -141,8 +141,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    {
 	    	public void notifyMessage(String data);
 	    	public void notifyLogInfo(String eventId, Map<String,String> map);
-			public void notifyPageResume(String eventId, Map<String,String> map);
-			public void notifyPagePause(String eventId);
+			public void notifyPageResume(String pageName, Map<String,String> map);
+			public void notifyPagePause(String pageName);
 	    }
 	    
 	    public interface CordovaErrorPageListener
