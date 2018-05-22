@@ -526,10 +526,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 		}
 		
 		protected void hideErrorPage() {
-			
 			mErrorPageIsShown = false;
-			if(mErrorView!=null)
-			{
+			if(mErrorView!=null) {
 				mErrorView.setVisibility(View.GONE);
 			}
 		}
@@ -543,15 +541,14 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 		}
 		
 		protected void startLoading() {
-			if(mLoadingView!=null)
-			{
+			if(mLoadingView!=null) {
 				mLoadingView.showLoading();
 				isLoading = true;
 			}
 		}
 		
 		protected void stopLoading() {
-			if(mLoadingView != null){
+			if(mLoadingView != null) {
 				mLoadingView.dismissLoading();
 				isLoading = false;
 			}
