@@ -59,8 +59,7 @@ public class MainApplication extends SkyApplication{
         android:name=".MainApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-	
-    ...
+	...    
 ```
 
 ### 以View的方式进行集成
