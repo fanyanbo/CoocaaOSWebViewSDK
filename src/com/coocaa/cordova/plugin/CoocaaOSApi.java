@@ -126,7 +126,6 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String NOTIFY_JS_MESSAGE = "notifyJSMessage";
     private static final String NOTIFY_JS_LOG = "notifyJSLogInfo";
     private static final String NOTIFY_JS_LOG_EXTRA = "notifyJSLogInfoExtra";
-    private static final String SUBMIT_JS_PROMOTION_DATA = "submitPromotionData";
     private static final String SET_BUSINESS_DATA = "setBusinessData";
     private static final String GET_BUSINESS_DATA = "getBusinessData";
 
@@ -1689,22 +1688,6 @@ public class CoocaaOSApi extends CordovaPlugin
                 e.printStackTrace();
                 callbackContext.error("error occurs when called getSpaceInfo");
             }
-            return true;
-        }
-        else if(SUBMIT_JS_PROMOTION_DATA.equals(action))
-        {
-            String headers = "", params = "";
-            JSONObject headersObj = args.getJSONObject(0);
-            JSONObject paramsObj = args.getJSONObject(1);
-            if(headersObj != null && paramsObj != null){
-                headers = headersObj.getString("headers");
-                params = paramsObj.getString("params");
-            }
-            Intent intent = new Intent("notify.js.promotion.data");
-            intent.putExtra("headers", headers);
-            intent.putExtra("params", params);
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-            callbackContext.success();
             return true;
         }
         return false;

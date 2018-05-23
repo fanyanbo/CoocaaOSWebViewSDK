@@ -112,12 +112,15 @@ package com.coocaa.webviewsdk.version;
  * 2.增加通道接口，使web前端具备setData和getData的能力(跟具体业务相关)
  * 3.完善获取appinfo的接口，支持列表参数
  */
+/*version 2.5.3
+ * 1.删除对PromotionSDK的依赖，剥离业务相关代码
+ */
 
 public class SystemWebViewSDK {
 
-	private static final String versionName = "2.5.2";
+	private static final String versionName = "2.5.3";
 
-	private static final int versionCode = 2050002;
+	private static final int versionCode = 2050003;
 	
 	private static int focusPosition = -1;
 	
