@@ -145,10 +145,15 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    	public void handleUI(String value);
 	    }
 
+	    public interface BussinessCallback
+		{
+			public void onResult(String value);
+		}
+
 		public interface CordovaBusinessDataListener
 		{
-			public String getBusinessData(String data);
-			public boolean setBusinessData(String data);
+			public String getBusinessData(String data, BussinessCallback cb);
+			public boolean setBusinessData(String data, BussinessCallback cb);
 		}
 	    
 	    private class JsBroadcastReceiver extends BroadcastReceiver {

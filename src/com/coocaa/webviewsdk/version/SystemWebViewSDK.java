@@ -115,12 +115,15 @@ package com.coocaa.webviewsdk.version;
 /*version 2.5.3
  * 1.删除对PromotionSDK的依赖，剥离业务相关代码
  */
+/*version 2.5.4
+ * 1.完善business的接口，满足获取异步结果回调的需求
+ */
 
 public class SystemWebViewSDK {
 
-	private static final String versionName = "2.5.3";
+	private static final String versionName = "2.5.4";
 
-	private static final int versionCode = 2050003;
+	private static final int versionCode = 2050004;
 	
 	private static int focusPosition = -1;
 	

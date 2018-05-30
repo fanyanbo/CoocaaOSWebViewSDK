@@ -991,10 +991,17 @@ public class CoocaaOSApi extends CordovaPlugin
             Log.i("WebViewSDK","SET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
             if("sync".equals(cc_type)) {
                 if(mBusinessListener != null) {
-                    boolean ret = mBusinessListener.setBusinessData(cc_data);
-                    if(!ret){
-                        callbackContext.error("error occurs when called setBusinessData");
-                    }else{
+                    boolean ret = mBusinessListener.setBusinessData(cc_data, new CordovaExtActivity.BussinessCallback() {
+                        @Override
+                        public void onResult(String value) {
+                            if ("success".equals(value))
+                                callbackContext.success();
+                            else{
+                                callbackContext.error("error occurs when called setBusinessData");
+                            }
+                        }
+                    });
+                    if (ret) {
                         callbackContext.success();
                     }
                 }else{
@@ -1006,13 +1013,20 @@ public class CoocaaOSApi extends CordovaPlugin
                     @Override
                     public void run() {
 
-
                         if (mBusinessListener != null) {
-                            boolean ret = mBusinessListener.setBusinessData(finalData);
+
+                            boolean ret = mBusinessListener.setBusinessData(finalData, new CordovaExtActivity.BussinessCallback() {
+                                @Override
+                                public void onResult(String value) {
+                                    if ("success".equals(value))
+                                        callbackContext.success();
+                                    else{
+                                        callbackContext.error("error occurs when called setBusinessData");
+                                    }
+                                }
+                            });
                             if (ret) {
                                 callbackContext.success();
-                            } else {
-                                callbackContext.error("error occurs when called setBusinessData");
                             }
                         } else {
                             callbackContext.error("no implement");
@@ -1034,10 +1048,13 @@ public class CoocaaOSApi extends CordovaPlugin
             Log.i("WebViewSDK","GET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
             if("sync".equals(cc_type)) {
                 if(mBusinessListener != null) {
-                    String ret = mBusinessListener.getBusinessData(cc_data);
-                    if(ret == null || "".equals(ret)){
-                        callbackContext.error("error occurs when called getBusinessData");
-                    }else{
+                    String ret = mBusinessListener.getBusinessData(cc_data, new CordovaExtActivity.BussinessCallback() {
+                        @Override
+                        public void onResult(String value) {
+                            callbackContext.success(value);
+                        }
+                    });
+                    if(ret != null && !"".equals(ret)) {
                         callbackContext.success(ret);
                     }
                 }else{
@@ -1050,10 +1067,13 @@ public class CoocaaOSApi extends CordovaPlugin
                     public void run() {
 
                         if(mBusinessListener != null){
-                            String ret = mBusinessListener.getBusinessData(finalData);
-                            if(ret == null || "".equals(ret)){
-                                callbackContext.error("error occurs when called getBusinessData");
-                            }else{
+                            String ret = mBusinessListener.getBusinessData(finalData, new CordovaExtActivity.BussinessCallback() {
+                                @Override
+                                public void onResult(String value) {
+                                    callbackContext.success(value);
+                                }
+                            });
+                            if(ret != null && !"".equals(ret)) {
                                 callbackContext.success(ret);
                             }
                         }else{
