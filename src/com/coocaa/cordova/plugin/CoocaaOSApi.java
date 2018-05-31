@@ -994,6 +994,7 @@ public class CoocaaOSApi extends CordovaPlugin
                     boolean ret = mBusinessListener.setBusinessData(cc_data, new CordovaExtActivity.BussinessCallback() {
                         @Override
                         public void onResult(String value) {
+                            Log.i("WebViewSDK","setBusinessData onResule = " + value);
                             if ("success".equals(value))
                                 callbackContext.success();
                             else{
@@ -1018,6 +1019,7 @@ public class CoocaaOSApi extends CordovaPlugin
                             boolean ret = mBusinessListener.setBusinessData(finalData, new CordovaExtActivity.BussinessCallback() {
                                 @Override
                                 public void onResult(String value) {
+                                    Log.i("WebViewSDK","setBusinessData onResule = " + value);
                                     if ("success".equals(value))
                                         callbackContext.success();
                                     else{
@@ -1051,6 +1053,7 @@ public class CoocaaOSApi extends CordovaPlugin
                     String ret = mBusinessListener.getBusinessData(cc_data, new CordovaExtActivity.BussinessCallback() {
                         @Override
                         public void onResult(String value) {
+                            Log.i("WebViewSDK","getBusinessData onResule = " + value);
                             callbackContext.success(value);
                         }
                     });
@@ -1070,6 +1073,7 @@ public class CoocaaOSApi extends CordovaPlugin
                             String ret = mBusinessListener.getBusinessData(finalData, new CordovaExtActivity.BussinessCallback() {
                                 @Override
                                 public void onResult(String value) {
+                                    Log.i("WebViewSDK","getBusinessData onResule = " + value);
                                     callbackContext.success(value);
                                 }
                             });
