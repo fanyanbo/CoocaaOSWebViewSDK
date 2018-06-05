@@ -118,12 +118,15 @@ package com.coocaa.webviewsdk.version;
 /*version 2.5.4
  * 1.完善business的接口，满足获取异步结果回调的需求
  */
+/*version 2.5.5
+ * 1.启动activity时，增加setflag的支持
+ */
 
 public class SystemWebViewSDK {
 
-	private static final String versionName = "2.5.4";
+	private static final String versionName = "2.5.5";
 
-	private static final int versionCode = 2050004;
+	private static final int versionCode = 2050005;
 	
 	private static int focusPosition = -1;
 	

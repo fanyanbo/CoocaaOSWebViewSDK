@@ -69,6 +69,7 @@ public class startApp extends CordovaPlugin {
 		String spackage = null;
 		String intetype = null;
 		String intenuri = null;
+		String intentFlag = null;
 		
 		try {
 			if (args.get(0) instanceof JSONArray) {
@@ -78,7 +79,7 @@ public class startApp extends CordovaPlugin {
 				if(args.getJSONArray(0).length() > 2) {
 					spackage = args.getJSONArray(0).getString(2);
 				}
-				
+
 				if(args.getJSONArray(0).length() > 3) {
 					intetype = args.getJSONArray(0).getString(3);					
 				}
@@ -86,12 +87,16 @@ public class startApp extends CordovaPlugin {
 				if(args.getJSONArray(0).length() > 4) {
 					intenuri = args.getJSONArray(0).getString(4);
 				}
+
+				if(args.getJSONArray(0).length() > 5) {
+					intentFlag = args.getJSONArray(0).getString(5);
+				}
 			}
 			else {
 				com_name = args.getString(0);
 			}
 						 
-			Log.i("WebViewSDK","com_name = " + com_name + ",activity = " + activity + ",spackage = " + spackage + ",intetype = " + intetype + ",intenuri = " + intenuri);
+			Log.i("WebViewSDK","com_name = " + com_name + ",activity = " + activity + ",spackage = " + spackage + ",intetype = " + intetype + ",intenuri = " + intenuri + ",intentFlag = " + intentFlag);
 			 
 			/**
 			 * call activity
@@ -130,15 +135,22 @@ public class startApp extends CordovaPlugin {
 			if(spackage != null && spackage.length() != 0) {
 				LaunchIntent.setPackage(spackage);
 			}
-			
+
 			/**
 			 * setType, http://developer.android.com/intl/ru/reference/android/content/Intent.html#setType(java.lang.String)
 			 */
 			if(intetype != null && intetype.length() != 0) {
 				LaunchIntent.setType(intetype);
 			}
-			
-		
+
+			if(intentFlag != null && intentFlag.length() != 0) {
+				if("new_task".equals(intentFlag)){
+					LaunchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				}else if("multi_task".equals(intentFlag)){
+					LaunchIntent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+				}
+			}
+
 			/**
 			 * put arguments
 			 */
