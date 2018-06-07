@@ -20,8 +20,12 @@
 package org.apache.cordova;
 
 import android.app.Activity;
+import android.app.Application;
+import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageParser;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,7 +49,8 @@ import java.util.concurrent.Executors;
  */
 public class CordovaInterfaceImpl implements CordovaInterface {
     private static final String TAG = "CordovaInterfaceImpl";
-    protected Activity activity;
+ //   protected Activity activity;
+    protected Context activity;
     protected ExecutorService threadPool;
     protected PluginManager pluginManager;
 
@@ -56,14 +61,16 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     protected int activityResultRequestCode;
     protected boolean activityWasDestroyed = false;
     protected Bundle savedPluginState;
+    private CordovaContext cordovaContext;
 
-	public CordovaInterfaceImpl(Activity activity) {
+	public CordovaInterfaceImpl(Context activity) {
         this(activity, Executors.newCachedThreadPool());
     }
 
-    public CordovaInterfaceImpl(Activity activity, ExecutorService threadPool) {
+    public CordovaInterfaceImpl(Context activity, ExecutorService threadPool) {
         this.activity = activity;
         this.threadPool = threadPool;
+        cordovaContext = new CordovaContext(activity);
     }
     
     public interface CordovaInterfaceListener
@@ -80,7 +87,7 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     }
     
     private CordovaInterfaceListener mCordovaListener;
-    private CoocaaOSConnecter mCoocaaOSConnecter;
+    private CoocaaOSConnecter mCoocaaOSConnecter = null;
     //set Listener
     public void setCordovaInterfaceListener(CordovaInterfaceListener corListener)
     {
@@ -103,7 +110,9 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     public void startActivityForResult(CordovaPlugin command, Intent intent, int requestCode) {
         setActivityResultCallback(command);
         try {
-            activity.startActivityForResult(intent, requestCode);
+            if ( activity instanceof Activity ) {
+                ((Activity)activity).startActivityForResult(intent, requestCode);
+            }
         } catch (RuntimeException e) { // E.g.: ActivityNotFoundException
             activityResultCallback = null;
             throw e;
@@ -120,14 +129,25 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     }
 
     @Override
-    public Activity getActivity() {
-        return activity;
+    public CordovaContext getActivity() {
+        return cordovaContext;
     }
 
     @Override
     public Object onMessage(String id, Object data) {
         if ("exit".equals(id)) {
-            activity.finish();
+//            activity.finish();
+            Log.i("WebViewSDK","exit 1111");
+            if ( activity instanceof Activity ) {
+                Log.i("WebViewSDK","exit 2222");
+                ((Activity)activity).finish();
+            }else if (activity instanceof Application) {
+                Log.i("WebViewSDK","exit 333");
+            }else if (activity instanceof Service) {
+                Log.i("WebViewSDK","exit 4444");
+            }else {
+                Log.i("WebViewSDK","exit 5555");
+            }
         }
         else if("onPageStarted".equals(id))
         {
@@ -427,7 +447,7 @@ public class CordovaInterfaceImpl implements CordovaInterface {
             String[] permissions = new String [1];
             permissions[0] = permission;
             //getActivity().requestPermissions(permissions, requestCode);
-            SysWebviewCompatLayer.activityRequestPermissions(getActivity(), permissions, requestCode);
+//            SysWebviewCompatLayer.activityRequestPermissions(getActivity(), permissions, requestCode);
     	}
     }
 
@@ -441,7 +461,7 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     	{
     		 permissionResultCallback = plugin;
     	     //getActivity().requestPermissions(permissions, requestCode);
-    	     SysWebviewCompatLayer.activityRequestPermissions(getActivity(), permissions, requestCode);
+//    	     SysWebviewCompatLayer.activityRequestPermissions(getActivity(), permissions, requestCode);
     	}
     }
 
@@ -450,15 +470,16 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     	/* FIXME: modify Build.VERSION_CODES.M ->23
     	 * 
     	 */
-        if(Build.VERSION.SDK_INT >= 23)
-        {
-            //int result = activity.checkSelfPermission(permission);
-            int result = SysWebviewCompatLayer.activitycheckSelfPermission(activity, permission);
-            return PackageManager.PERMISSION_GRANTED == result;
-        }
-        else
-        {
-            return true;
-        }
+//        if(Build.VERSION.SDK_INT >= 23)
+//        {
+//            //int result = activity.checkSelfPermission(permission);
+//            int result = SysWebviewCompatLayer.activitycheckSelfPermission(activity, permission);
+//            return PackageManager.PERMISSION_GRANTED == result;
+//        }
+//        else
+//        {
+//            return true;
+//        }
+        return true;
     }
 }

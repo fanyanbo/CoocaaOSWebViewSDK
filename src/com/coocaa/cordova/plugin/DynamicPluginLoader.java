@@ -150,7 +150,7 @@ public class DynamicPluginLoader extends CordovaPlugin
     }
 
     //read from sp,compare last modify time with local jar file
-    private void checkLocalPlugins(Activity activity,File dexDir)
+    private void checkLocalPlugins(Context activity,File dexDir)
     {
         SharedPreferences sp = activity.getSharedPreferences(SP_PLUGININFO, Context.MODE_PRIVATE);
         exPluginInfoMap = getDynamicPluginInfoEx(sp);

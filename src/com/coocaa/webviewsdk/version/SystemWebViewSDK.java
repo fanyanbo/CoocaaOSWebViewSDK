@@ -106,12 +106,15 @@ package com.coocaa.webviewsdk.version;
  * 1.fixBug:完善获取激活id的逻辑，防止在5.0系统上出现为空的情况
  * 2.增加获取硬件基本信息的接口：空间大小，内存大小
  */
+/*version 2.4.4
+ * 1.重构view的封装
+ */
 
 public class SystemWebViewSDK {
 
-	private static final String versionName = "2.4.3";
+	private static final String versionName = "2.4.4";
 
-	private static final int versionCode = 2040003;
+	private static final int versionCode = 2040004;
 	
 	private static int focusPosition = -1;
 	

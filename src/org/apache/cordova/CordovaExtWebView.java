@@ -314,7 +314,7 @@ public class CordovaExtWebView extends FrameLayout
     }
     
     protected CordovaInterfaceImpl makeCordovaInterface() {    	
-        return new CordovaInterfaceImpl((Activity)mContext);
+        return new CordovaInterfaceImpl(mContext);
     }
     
     public void setCoocaaOSConnecter(CoocaaOSConnecter connecter) {

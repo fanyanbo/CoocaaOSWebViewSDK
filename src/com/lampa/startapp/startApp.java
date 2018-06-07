@@ -237,6 +237,7 @@ public class startApp extends CordovaPlugin {
 			/**
 			 * start activity
 			 */
+			LaunchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			this.cordova.getActivity().startActivity(LaunchIntent);
 			callback.success();
 			
