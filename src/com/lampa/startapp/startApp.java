@@ -144,11 +144,9 @@ public class startApp extends CordovaPlugin {
 			}
 
 			if(intentFlag != null && intentFlag.length() != 0) {
-				if("new_task".equals(intentFlag)){
-					LaunchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				}else if("multi_task".equals(intentFlag)){
-					LaunchIntent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-				}
+				int flagInt = Integer.parseInt(intentFlag);
+				Log.i("WebViewSDK","flags = " + flagInt);
+				LaunchIntent.setFlags(flagInt);
 			}
 
 			/**
