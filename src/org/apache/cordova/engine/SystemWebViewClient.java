@@ -20,6 +20,7 @@ package org.apache.cordova.engine;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Hashtable;
 
 import org.apache.cordova.AuthenticationToken;
@@ -348,7 +349,7 @@ public class SystemWebViewClient extends WebViewClient {
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
         try {
         	
-        	Log.i("WebViewSDK","shouldInterceptRequest url = " + url);
+        	Log.i("WebViewSDK","=====>shouldInterceptRequest url = " + url);
             // Check the against the whitelist and lock out access to the WebView directory
             // Changing this will cause problems for your application
             if (!parentEngine.pluginManager.shouldAllowRequest(url)) {
@@ -367,6 +368,17 @@ public class SystemWebViewClient extends WebViewClient {
                 return new WebResourceResponse(result.mimeType, "UTF-8", result.inputStream);
             }
             // If we don't need to special-case the request, let the browser load it.
+            if (url.contains("jquery-1.8.3")) {
+                Log.i("WebViewSDK","shouldInterceptRequest special-case url = " + url);
+                InputStream is = null;
+                try {
+                    is =  parentEngine.cordova.getActivity().getAssets().open("jquery-1.8.3.min.js");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                WebResourceResponse response = new WebResourceResponse("application/x-javascript", "utf-8", is);
+                return response;
+            }
             return null;
         } catch (IOException e) {
             if (!(e instanceof FileNotFoundException)) {

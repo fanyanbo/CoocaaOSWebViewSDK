@@ -99,17 +99,34 @@ package com.coocaa.webviewsdk.version;
 /*version 2.3.12
  * 1.增加退出酷开账号登录的接口
  */
-/*version 2.3.13
+/*version 2.5.0
+ * 1.增加提交活动任务数据接口
+ */
+/*version 2.5.1
  * 1.fixBug:完善获取激活id的逻辑，防止在5.0系统上出现为空的情况
- * 2.增加获取内存信息的接口
+ * 2.增加获取设备基本信息的接口，目前仅包括内存信息,space信息
  * 3.增加发送语音广播通知Web前端的接口
+ */
+/*version 2.5.2
+ * 1.对接南京语音模块，使web前端具备监听特定语音口令的能力
+ * 2.增加通道接口，使web前端具备setData和getData的能力(跟具体业务相关)
+ * 3.完善获取appinfo的接口，支持列表参数
+ */
+/*version 2.5.3
+ * 1.删除对PromotionSDK的依赖，剥离业务相关代码
+ */
+/*version 2.5.4
+ * 1.完善business的接口，满足获取异步结果回调的需求
+ */
+/*version 2.5.5
+ * 1.启动activity时，增加setflag的支持
  */
 
 public class SystemWebViewSDK {
 
-	private static final String versionName = "2.3.13";
+	private static final String versionName = "2.5.5";
 
-	private static final int versionCode = 2030013;
+	private static final int versionCode = 2050005;
 	
 	private static int focusPosition = -1;
 	

@@ -87,4 +87,6 @@ public interface CordovaInterface {
     
     public void setPluginImlListener(CordovaPlugin plugin);
 
+    public CordovaExtActivity.CordovaBusinessDataListener getCordovaBusinessDataListener();
+
 }

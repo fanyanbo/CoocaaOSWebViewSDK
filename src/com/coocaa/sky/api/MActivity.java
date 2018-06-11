@@ -635,7 +635,11 @@ public class MActivity extends BaseActivity {
 
         }
         if (key == 27) {
-            if (!isOver) {
+            if (!netIsConnect() && isOver) {
+                TCSettingApi settingApi = new TCSettingApi();
+                settingApi.connectNetworkWithConfirmUI(MActivity.this);
+                return true;
+            } else if (!isOver) {
                 onexit();
             }
         }

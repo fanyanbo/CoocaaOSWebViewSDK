@@ -66,9 +66,11 @@ import com.tianci.user.data.UserCmdDefine;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaBaseActivity;
+import org.apache.cordova.CordovaExtActivity;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -124,6 +126,8 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String NOTIFY_JS_MESSAGE = "notifyJSMessage";
     private static final String NOTIFY_JS_LOG = "notifyJSLogInfo";
     private static final String NOTIFY_JS_LOG_EXTRA = "notifyJSLogInfoExtra";
+    private static final String SET_BUSINESS_DATA = "setBusinessData";
+    private static final String GET_BUSINESS_DATA = "getBusinessData";
 
     private Context mContext;
     private CoocaaOSApiListener mCoocaaListener;
@@ -135,6 +139,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private SkyMediaApi mediaApi;
     
     private CallbackBroadcastReceiver mCallbackBC = null;
+    private CordovaExtActivity.CordovaBusinessDataListener mBusinessListener = null;
     private static final String PAY_ACTION = "coocaa.webviewsdk.action.pay";  
 
     /**
@@ -151,7 +156,8 @@ public class CoocaaOSApi extends CordovaPlugin
         mContext = cordova.getActivity();
 
         Log.v("WebViewSDK", TAG + "CoocaaOSApi initialization");
-        cordova.setPluginImlListener(this);  
+        cordova.setPluginImlListener(this);
+        mBusinessListener = cordova.getCordovaBusinessDataListener();
              
         if (mCallbackBC == null)
         	mCallbackBC = new CallbackBroadcastReceiver();
@@ -973,6 +979,115 @@ public class CoocaaOSApi extends CordovaPlugin
         	callbackContext.success();
         	return true;
         }
+        else if(SET_BUSINESS_DATA.equals(action))
+        {
+            JSONObject dataObj = args.getJSONObject(0);
+            JSONObject typeObj = args.getJSONObject(1);
+            String cc_data = "", cc_type = "";
+            if(dataObj != null){
+                cc_data = dataObj.getString("cc_data");
+                cc_type = typeObj.getString("cc_type");
+            }
+            Log.i("WebViewSDK","SET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
+            if("sync".equals(cc_type)) {
+                if(mBusinessListener != null) {
+                    boolean ret = mBusinessListener.setBusinessData(cc_data, new CordovaExtActivity.BussinessCallback() {
+                        @Override
+                        public void onResult(String value) {
+                            Log.i("WebViewSDK","setBusinessData onResule = " + value);
+                            if ("success".equals(value))
+                                callbackContext.success();
+                            else{
+                                callbackContext.error("error occurs when called setBusinessData");
+                            }
+                        }
+                    });
+                    if (ret) {
+                        callbackContext.success();
+                    }
+                }else{
+                    callbackContext.error("no implement");
+                }
+            } else {
+                final String finalData = cc_data;
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if (mBusinessListener != null) {
+
+                            boolean ret = mBusinessListener.setBusinessData(finalData, new CordovaExtActivity.BussinessCallback() {
+                                @Override
+                                public void onResult(String value) {
+                                    Log.i("WebViewSDK","setBusinessData onResule = " + value);
+                                    if ("success".equals(value))
+                                        callbackContext.success();
+                                    else{
+                                        callbackContext.error("error occurs when called setBusinessData");
+                                    }
+                                }
+                            });
+                            if (ret) {
+                                callbackContext.success();
+                            }
+                        } else {
+                            callbackContext.error("no implement");
+                        }
+                    }
+                });
+            }
+            return true;
+        }
+        else if(GET_BUSINESS_DATA.equals(action))
+        {
+            JSONObject dataObj = args.getJSONObject(0);
+            JSONObject typeObj = args.getJSONObject(1);
+            String cc_data = "",cc_type = "";
+            if(dataObj != null){
+                cc_data = dataObj.getString("cc_data");
+                cc_type = typeObj.getString("cc_type");
+            }
+            Log.i("WebViewSDK","GET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
+            if("sync".equals(cc_type)) {
+                if(mBusinessListener != null) {
+                    String ret = mBusinessListener.getBusinessData(cc_data, new CordovaExtActivity.BussinessCallback() {
+                        @Override
+                        public void onResult(String value) {
+                            Log.i("WebViewSDK","getBusinessData onResule = " + value);
+                            callbackContext.success(value);
+                        }
+                    });
+                    if(ret != null && !"".equals(ret)) {
+                        callbackContext.success(ret);
+                    }
+                }else{
+                    callbackContext.error("no implement");
+                }
+            } else{
+                final String finalData = cc_data;
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if(mBusinessListener != null){
+                            String ret = mBusinessListener.getBusinessData(finalData, new CordovaExtActivity.BussinessCallback() {
+                                @Override
+                                public void onResult(String value) {
+                                    Log.i("WebViewSDK","getBusinessData onResule = " + value);
+                                    callbackContext.success(value);
+                                }
+                            });
+                            if(ret != null && !"".equals(ret)) {
+                                callbackContext.success(ret);
+                            }
+                        }else{
+                            callbackContext.error("no implement");
+                        }
+                    }
+                });
+            }
+            return true;
+        }
         else if(LAUNCH_ONLINE_MOVIE_PLAYER.equals(action))
         {
             if(mCoocaaListener!=null && mediaApi!=null)
@@ -1119,10 +1234,10 @@ public class CoocaaOSApi extends CordovaPlugin
             freeSpace = blockSize * availableBlocks;
 
             JSONObject result = new JSONObject();
-            result.put("totalMem", totalMem);
-            result.put("leftMem", leftMem);
             result.put("totalSpace", totalSpace);
             result.put("freeSpace", freeSpace);
+            result.put("totalMem", totalMem);
+            result.put("leftMem", leftMem);
             Log.i("WebViewSDK",result.toString());
             callbackContext.success(result);
             return true;
@@ -1130,24 +1245,39 @@ public class CoocaaOSApi extends CordovaPlugin
         else if(GET_APP_INFO.equals(action))
         {
         	PackageManager pm = this.cordova.getActivity().getPackageManager();
-        	String versionName = "";
-        	int versionCode  = 0;
-        	
+            JSONObject resultObject = new JSONObject();
         	try {
-        		JSONObject pkgNameObj = args.getJSONObject(0);
-        		String packageName = pkgNameObj.getString("packageName");
-        		PackageInfo info = pm.getPackageInfo(packageName, 0);
-        		if(info == null){
-        			callbackContext.error("this App is not installed :" + packageName);
-        		}else{
-            		versionName = info.versionName;
-            		versionCode = info.versionCode;
-            		JSONObject result = new JSONObject();
-            		result.put("versionName", versionName);
-            		result.put("versionCode", versionCode);
-                    callbackContext.success(result);
-        		}
-			} catch (NameNotFoundException e) {
+                JSONObject pkgListObj = args.getJSONObject(0);
+                String pkgListStr = pkgListObj.getString("pkgList");
+                JSONObject jsonParams = new JSONObject(pkgListStr);
+                JSONArray params = jsonParams.getJSONArray("pkgList");
+                Log.i("WebViewSDK" , "length = " + params.length());
+                if (params.length() > 0) {
+                    for(int i=0; i<params.length(); i++){
+                        String pkgName = params.getString(i);
+                        Log.i("WebViewSDK" , "pkgName = " + pkgName);
+                        JSONObject valueObject = new JSONObject();
+                        PackageInfo info = null;
+                        try{
+                            info = pm.getPackageInfo(pkgName, 0);
+                            if (info != null) {
+                                valueObject.put("status", "0");
+                                valueObject.put("versionName", info.versionName);
+                                valueObject.put("versionCode", info.versionCode);
+                            }
+                        }catch (NameNotFoundException e){
+                            valueObject.put("status", "-1");
+                            valueObject.put("versionName", "-1");
+                            valueObject.put("versionCode", -1);
+                        }
+                        Log.i("WebViewSDK" , "valueObject = " + valueObject);
+                        resultObject.put(pkgName, valueObject);
+                    }
+                    callbackContext.success(resultObject.toString());
+                } else {
+                    callbackContext.error("params error occurs when called getAppInfo");
+                }
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				callbackContext.error("error occurs when called getAppInfo");
