@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import java.util.HashMap;
@@ -73,6 +74,9 @@ class CoreAndroid extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         PluginResult.Status status = PluginResult.Status.OK;
         String result = "";
+
+        Log.i("WebViewSDK","CoreAndroid action = " + action);
+//        Log.i("WebViewSDK","CoreAndroid args.getString(0) = " + args.getString(0));
         
         try {
             if (action.equals("clearCache")) {
@@ -262,6 +266,7 @@ class CoreAndroid extends CordovaPlugin {
             webView.setButtonPlumbedToJs(KeyEvent.KEYCODE_VOLUME_DOWN, override);
         }
         else if (button.equals("menubutton")) {
+            Log.i("WebViewSDK","========>inject menu override = " + override);
             webView.setButtonPlumbedToJs(KeyEvent.KEYCODE_MENU, override);
         }
     }

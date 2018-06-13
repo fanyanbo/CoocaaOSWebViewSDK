@@ -121,6 +121,9 @@ package com.coocaa.webviewsdk.version;
 /*version 2.5.5
  * 1.启动activity时，增加setflag的支持
  */
+/*version 2.5.6
+ * 1.优化广播注册与反注册的逻辑，解决发送多次广播消息的问题
+ */
 
 public class SystemWebViewSDK {
 
