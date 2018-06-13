@@ -121,12 +121,15 @@ package com.coocaa.webviewsdk.version;
 /*version 2.5.5
  * 1.启动activity时，增加setflag的支持
  */
+/*version 2.5.6
+ * 1.优化广播注册于反注册的逻辑，解决发送多次广播消息的问题
+ */
 
 public class SystemWebViewSDK {
 
-	private static final String versionName = "2.5.5";
+	private static final String versionName = "2.5.6";
 
-	private static final int versionCode = 2050005;
+	private static final int versionCode = 2050006;
 	
 	private static int focusPosition = -1;
 	

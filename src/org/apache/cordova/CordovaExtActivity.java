@@ -320,16 +320,6 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 			filter.addAction("notify.js.log.resume");
 			filter.addAction("notify.js.log.pause");
 	        mLocalBroadcastManager.registerReceiver(mJsBC, filter);
-
-			if (mNetBC == null) mNetBC = new NetBroadcastReceiver();
-			IntentFilter netfilter = new IntentFilter();
-			netfilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-			registerReceiver(mNetBC, netfilter);
-
-			if (mVoiceBC == null) mVoiceBC = new VoiceBroadcastReceiver();
-			IntentFilter voicefilter = new IntentFilter();
-			voicefilter.addAction("com.skyworth.srtnj.action.voice.outcmd");
-			registerReceiver(mVoiceBC, voicefilter);
 	        
 	        cordovaInterface.setCordovaInterfaceListener(new CordovaInterfaceListener() {
 				
@@ -866,6 +856,15 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        super.onPause();
 	        LOG.d(TAG, "Paused the activity.");
 
+			if ( mNetBC != null) {
+				unregisterReceiver(mNetBC);
+				mNetBC = null;
+			}
+			if (mVoiceBC != null) {
+				unregisterReceiver(mVoiceBC);
+				mVoiceBC = null;
+			}
+
 	        if (this.appView != null) {
 	            // CB-9382 If there is an activity that started for result and main activity is waiting for callback
 	            // result, we shoudn't stop WebView Javascript timers, as activity for result might be using them
@@ -892,6 +891,16 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    protected void onResume() {
 	        super.onResume();
 	        LOG.d(TAG, "Resumed the activity.");
+
+			if (mNetBC == null) mNetBC = new NetBroadcastReceiver();
+			IntentFilter netfilter = new IntentFilter();
+			netfilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+			registerReceiver(mNetBC, netfilter);
+
+			if (mVoiceBC == null) mVoiceBC = new VoiceBroadcastReceiver();
+			IntentFilter voicefilter = new IntentFilter();
+			voicefilter.addAction("com.skyworth.srtnj.action.voice.outcmd");
+			registerReceiver(mVoiceBC, voicefilter);
 
 	        if (this.appView == null) {
 	            return;
@@ -957,14 +966,6 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	       
 	        if (mJsBC != null)
 	        	LocalBroadcastManager.getInstance(this).unregisterReceiver(mJsBC);
-			if ( mNetBC != null) {
-				unregisterReceiver(mNetBC);
-				mNetBC = null;
-			}
-			if (mVoiceBC != null) {
-				unregisterReceiver(mVoiceBC);
-				mVoiceBC = null;
-			}
 	    }
 
 	    /**
