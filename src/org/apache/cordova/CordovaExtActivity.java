@@ -1186,7 +1186,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 				}else if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN){
 					keyCode = 40;
 				}
-				if(keyCode > 0 && mMachineName != null && mMachineName.equals("rtd299x_tv010_4k")){
+				//E710U, 42Y1Y-8A13
+				if(keyCode > 0 && mMachineName != null && ( mMachineName.equals("rtd299x_tv010_4k") || mMachineName.equals("h25ref")) ){
 					Log.i(TAG,"CordovaExtActivity dispatchKeyEvent keyCode = " + keyCode);
 	                appView.loadUrlIntoView(
 	                        "javascript:(function(){var ev=document.createEvent('HTMLEvents');ev.which=ev.keyCode=" +
