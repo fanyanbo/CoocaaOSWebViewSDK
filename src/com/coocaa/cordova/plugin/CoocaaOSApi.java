@@ -123,6 +123,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String GET_WEBVIEWSDK_INFO = "getWebViewSDKInfo";
     private static final String GET_CURRENT_THEME = "getCurTheme";
     private static final String SET_FOCUS_POSITION = "setFocusPosition";
+    private static final String SET_SPECIAL_MACHINE = "setSpecialMachine";
     private static final String NOTIFY_JS_MESSAGE = "notifyJSMessage";
     private static final String NOTIFY_JS_LOG = "notifyJSLogInfo";
     private static final String NOTIFY_JS_LOG_EXTRA = "notifyJSLogInfoExtra";
@@ -430,8 +431,7 @@ public class CoocaaOSApi extends CordovaPlugin
 
         public JSONObject isNetConnected()
         {
-            if(netApi!=null && isCmdBindSuccess)
-            {
+            if (netApi != null && isCmdBindSuccess) {
                 boolean isConnect = netApi.isConnect();
                 JSONObject jsonObject = new JSONObject();
                 try {
@@ -446,107 +446,93 @@ public class CoocaaOSApi extends CordovaPlugin
         
         public void startQQAcount()
         {
-            if(userApi!=null && isCmdBindSuccess)
-            {
-            	userApi.loginByType(AccountType.qq);
+            if (userApi != null && isCmdBindSuccess) {
+                userApi.loginByType(AccountType.qq);
             }
         }
 
         public void setUserLogout()
         {
-            if(isCmdBindSuccess)
-            {
+            if (isCmdBindSuccess) {
                 logoutSync();
             }
         }
         
         public JSONObject getUserAccessToken()
         {
-        	if(userApi!=null && isCmdBindSuccess)
-            {
-            	  String token = userApi.getToken("ACCESS");
-                  if(token!=null)
-                  {
-                  	 JSONObject jsonObject = new JSONObject();
-                       try {
-                           jsonObject.put("accesstoken", token);
-                           return jsonObject;
-                       } catch (JSONException e) {
-                           e.printStackTrace();
-                       }
-                  }
+            if (userApi != null && isCmdBindSuccess) {
+                String token = userApi.getToken("ACCESS");
+                if (token != null) {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("accesstoken", token);
+                        return jsonObject;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        	return null;
+            return null;
         }
 
         public JSONObject getNetType()
         {
-            if(netApi!=null && isCmdBindSuccess)
-            {
+            if (netApi != null && isCmdBindSuccess) {
                 String netType = netApi.getNetType();
-                if(netType!=null)
-                {
-                	 JSONObject jsonObject = new JSONObject();
-                     try {
-                         jsonObject.put("nettype", netType);
-                         return jsonObject;
-                     } catch (JSONException e) {
-                         e.printStackTrace();
-                     }
+                if (netType != null) {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("nettype", netType);
+                        return jsonObject;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-               
             }
             return null;
         }
 
         public JSONObject getIpInfo()
         {
-            if(netApi!=null && isCmdBindSuccess)
-            {
+            if (netApi != null && isCmdBindSuccess) {
                 SkyIpInfo ipInfo = netApi.getIpInfo();
-                if(ipInfo!=null)
-                {
-                	 JSONObject jsonObject = new JSONObject();
-                     try {
-                         jsonObject.put("dns0", ipInfo.dns0);
-                         jsonObject.put("dns1", ipInfo.dns1);
-                         jsonObject.put("gateway", ipInfo.gateway);
-                         jsonObject.put("ip", ipInfo.ip);
-                         jsonObject.put("mac", ipInfo.mac);
-                         jsonObject.put("netmask", ipInfo.netmask);
-                         return jsonObject;
-                     } catch (JSONException e) {
-                         e.printStackTrace();
-                     }
+                if (ipInfo != null) {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("dns0", ipInfo.dns0);
+                        jsonObject.put("dns1", ipInfo.dns1);
+                        jsonObject.put("gateway", ipInfo.gateway);
+                        jsonObject.put("ip", ipInfo.ip);
+                        jsonObject.put("mac", ipInfo.mac);
+                        jsonObject.put("netmask", ipInfo.netmask);
+                        return jsonObject;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-               
             }
             return null;
         }
 
         public JSONObject getLocation()
         {
-            if(systemApi!=null && isCmdBindSuccess)
-            {
+            if (systemApi != null && isCmdBindSuccess) {
                 TCSetData locationData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_LOCATION);
-                if(locationData!=null)
-                {
-                	TCInfoSetData locInfoData = (TCInfoSetData) locationData;
+                if (locationData != null) {
+                    TCInfoSetData locInfoData = (TCInfoSetData) locationData;
                     String locationString = null;
-                    if (locInfoData!=null)
-                    {
+                    if (locInfoData != null) {
                         locationString = locInfoData.getCurrent();
-                        Log.v(TAG,"location String=" + locationString);
+                        Log.v(TAG, "location String=" + locationString);
                         try {
-                            JSONObject jsonObj = new  JSONObject();
-                            jsonObj.put("location",locationString);
-                            return  jsonObj;
+                            JSONObject jsonObj = new JSONObject();
+                            jsonObj.put("location", locationString);
+                            return jsonObj;
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                 }
-                
             }
             return null;
         }
@@ -806,12 +792,10 @@ public class CoocaaOSApi extends CordovaPlugin
                 return null;
 
             SkyCmdURI uri = getUserUri(cmd);
-            if (uri == null)
-            {
+            if (uri == null) {
                 Log.e(TAG, "execCmd(), uri is null");
                 return null;
-            } else
-            {
+            } else {
                 return SkyApplication.getApplication().execCommand(mListener, uri, body);
             }
         }
@@ -819,14 +803,11 @@ public class CoocaaOSApi extends CordovaPlugin
         private SkyCmdURI getUserUri(String cmd)
         {
             SkyCmdURI uri = null;
-            try
-            {
+            try {
                 uri = new SkyCmdURI("tianci://com.tianci.user/com.tianci.user.UserService?cmd=" + cmd);
-            } catch (URISyntaxException e)
-            {
+            } catch (URISyntaxException e) {
                 Log.e(TAG, "URISyntaxException = " + e.getMessage());
-            } catch (SkyCmdURI.SkyCmdPathErrorException e)
-            {
+            } catch (SkyCmdURI.SkyCmdPathErrorException e) {
                 Log.e(TAG, "SkyCmdPathErrorException = " + e.getMessage());
             }
             return uri;
@@ -868,8 +849,6 @@ public class CoocaaOSApi extends CordovaPlugin
         if(mCoocaaListener != null)
         	mCoocaaListener = null;
     }
-    
-    
 
     /**
      * Executes the request and returns PluginResult.
@@ -881,15 +860,13 @@ public class CoocaaOSApi extends CordovaPlugin
      */
     @Override
     public boolean execute(final String action, final CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
-    	Log.i("WebViewSDK","CoocaaOSApi execute action = " + action);
-        if(WAIT_OS_READY.equals(action))
-        {
+        Log.i("WebViewSDK", "CoocaaOSApi execute action = " + action);
+        if (WAIT_OS_READY.equals(action)) {
             this.cordova.getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
-                	Log.i("WebViewSDK","WAIT_OS_READY isCmdBindSuccess:" + isCmdBindSuccess);
-                    while(!isCmdBindSuccess/* && mRef <= 1*/)
-                    {
+                    Log.i("WebViewSDK", "WAIT_OS_READY isCmdBindSuccess:" + isCmdBindSuccess);
+                    while (!isCmdBindSuccess/* && mRef <= 1*/) {
                         try {
                             Thread.sleep(50);
                         } catch (InterruptedException e) {
@@ -900,104 +877,92 @@ public class CoocaaOSApi extends CordovaPlugin
                 }
             });
             return true;
-        }
-        else if(LAUNCH_SOURCE_LIST.equals(action))
-        {
+        } else if (LAUNCH_SOURCE_LIST.equals(action)) {
             Intent intent = new Intent("startSourceList");
             intent.putExtra("specialKey", SkyworthBroadcastKey.SKY_BROADCAST_KEY_SIGNAL);
             cordova.getActivity().sendBroadcast(intent);
             callbackContext.success();
             return true;
-        }
-        else if(SET_FOCUS_POSITION.equals(action))
-        {
-        	JSONObject paramObj = args.getJSONObject(0);
-        	if(paramObj != null){
-        		String strPos = paramObj.getString("focusposition");
-        		int iPos = 0;
-        		try{
-        			iPos = Integer.parseInt(strPos);
-        			SystemWebViewSDK.setFocusPosition(iPos);
-        		}catch(Exception e){
-        			callbackContext.error(e.toString());
-        		}
-        	}
-        	callbackContext.success();
-        	return true;
-        }
-        else if(NOTIFY_JS_LOG.equals(action))
-        {
-        	String eventId = "";
-        	String params = "";
-        	JSONObject eventIdObj = args.getJSONObject(0);
-        	JSONObject paramsObj = args.getJSONObject(1);
-        	if(eventIdObj != null && paramsObj != null){
-        		eventId = eventIdObj.getString("eventId");
-        		params = paramsObj.getString("params");
-        	}
+        } else if (SET_FOCUS_POSITION.equals(action)) {
+            JSONObject paramObj = args.getJSONObject(0);
+            if (paramObj != null) {
+                String strPos = paramObj.getString("focusposition");
+                int iPos = 0;
+                try {
+                    iPos = Integer.parseInt(strPos);
+                    SystemWebViewSDK.setFocusPosition(iPos);
+                } catch (Exception e) {
+                    callbackContext.error(e.toString());
+                }
+            }
+            callbackContext.success();
+            return true;
+        } else if (NOTIFY_JS_LOG.equals(action)) {
+            String eventId = "";
+            String params = "";
+            JSONObject eventIdObj = args.getJSONObject(0);
+            JSONObject paramsObj = args.getJSONObject(1);
+            if (eventIdObj != null && paramsObj != null) {
+                eventId = eventIdObj.getString("eventId");
+                params = paramsObj.getString("params");
+            }
             Intent intent = new Intent("notify.js.log");
             intent.putExtra("eventId", eventId);
             intent.putExtra("params", params);
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-        	callbackContext.success();
-        	return true;
-        }
-        else if(NOTIFY_JS_LOG_EXTRA.equals(action))
-        {
-            String eventId = "",params = "",type = "";
+            callbackContext.success();
+            return true;
+        } else if (NOTIFY_JS_LOG_EXTRA.equals(action)) {
+            String eventId = "", params = "", type = "";
             JSONObject eventIdObj = args.getJSONObject(0);
             JSONObject paramsObj = args.getJSONObject(1);
             JSONObject typeObj = args.getJSONObject(2);
-            if(eventIdObj != null && paramsObj != null && typeObj != null){
+            if (eventIdObj != null && paramsObj != null && typeObj != null) {
                 eventId = eventIdObj.getString("eventId");
                 params = paramsObj.getString("params");
                 type = typeObj.getString("type");
             }
-            if("resume".equals(type)){
+            if ("resume".equals(type)) {
                 Intent intent = new Intent("notify.js.log.resume");
                 intent.putExtra("eventId", eventId);
                 intent.putExtra("params", params);
                 LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-            }else if("pause".equals(type)){
+            } else if ("pause".equals(type)) {
                 Intent intent = new Intent("notify.js.log.pause");
                 intent.putExtra("eventId", eventId);
                 LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
             }
             callbackContext.success();
             return true;
-        }
-        else if(NOTIFY_JS_MESSAGE.equals(action))
-        {
-			JSONObject paramObj = args.getJSONObject(0);
-			String data = "";
-			if(paramObj != null){
-				data = paramObj.getString("webInfo");
-			}
-        	Intent intent = new Intent("notify.js.message");
-        	intent.putExtra("key", data);
-        	LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-        	callbackContext.success();
-        	return true;
-        }
-        else if(SET_BUSINESS_DATA.equals(action))
-        {
+        } else if (NOTIFY_JS_MESSAGE.equals(action)) {
+            JSONObject paramObj = args.getJSONObject(0);
+            String data = "";
+            if (paramObj != null) {
+                data = paramObj.getString("webInfo");
+            }
+            Intent intent = new Intent("notify.js.message");
+            intent.putExtra("key", data);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            callbackContext.success();
+            return true;
+        } else if (SET_BUSINESS_DATA.equals(action)) {
             JSONObject dataObj = args.getJSONObject(0);
             JSONObject typeObj = args.getJSONObject(1);
             String cc_data = "", cc_type = "";
-            if(dataObj != null){
+            if (dataObj != null) {
                 cc_data = dataObj.getString("cc_data");
                 cc_type = typeObj.getString("cc_type");
             }
-            Log.i("WebViewSDK","SET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
-            if("sync".equals(cc_type)) {
-                if(mBusinessListener != null) {
+            Log.i("WebViewSDK", "SET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
+            if ("sync".equals(cc_type)) {
+                if (mBusinessListener != null) {
                     boolean ret = mBusinessListener.setBusinessData(cc_data, new CordovaExtActivity.BussinessCallback() {
                         @Override
                         public void onResult(String value) {
-                            Log.i("WebViewSDK","setBusinessData onResule = " + value);
+                            Log.i("WebViewSDK", "setBusinessData onResule = " + value);
                             if ("success".equals(value))
                                 callbackContext.success();
-                            else{
+                            else {
                                 callbackContext.error("error occurs when called setBusinessData");
                             }
                         }
@@ -1005,7 +970,7 @@ public class CoocaaOSApi extends CordovaPlugin
                     if (ret) {
                         callbackContext.success();
                     }
-                }else{
+                } else {
                     callbackContext.error("no implement");
                 }
             } else {
@@ -1019,10 +984,10 @@ public class CoocaaOSApi extends CordovaPlugin
                             boolean ret = mBusinessListener.setBusinessData(finalData, new CordovaExtActivity.BussinessCallback() {
                                 @Override
                                 public void onResult(String value) {
-                                    Log.i("WebViewSDK","setBusinessData onResule = " + value);
+                                    Log.i("WebViewSDK", "setBusinessData onResule = " + value);
                                     if ("success".equals(value))
                                         callbackContext.success();
-                                    else{
+                                    else {
                                         callbackContext.error("error occurs when called setBusinessData");
                                     }
                                 }
@@ -1037,66 +1002,60 @@ public class CoocaaOSApi extends CordovaPlugin
                 });
             }
             return true;
-        }
-        else if(GET_BUSINESS_DATA.equals(action))
-        {
+        } else if (GET_BUSINESS_DATA.equals(action)) {
             JSONObject dataObj = args.getJSONObject(0);
             JSONObject typeObj = args.getJSONObject(1);
-            String cc_data = "",cc_type = "";
-            if(dataObj != null){
+            String cc_data = "", cc_type = "";
+            if (dataObj != null) {
                 cc_data = dataObj.getString("cc_data");
                 cc_type = typeObj.getString("cc_type");
             }
-            Log.i("WebViewSDK","GET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
-            if("sync".equals(cc_type)) {
-                if(mBusinessListener != null) {
+            Log.i("WebViewSDK", "GET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
+            if ("sync".equals(cc_type)) {
+                if (mBusinessListener != null) {
                     String ret = mBusinessListener.getBusinessData(cc_data, new CordovaExtActivity.BussinessCallback() {
                         @Override
                         public void onResult(String value) {
-                            Log.i("WebViewSDK","getBusinessData onResule = " + value);
+                            Log.i("WebViewSDK", "getBusinessData onResule = " + value);
                             callbackContext.success(value);
                         }
                     });
-                    if(ret != null && !"".equals(ret)) {
+                    if (ret != null && !"".equals(ret)) {
                         callbackContext.success(ret);
                     }
-                }else{
+                } else {
                     callbackContext.error("no implement");
                 }
-            } else{
+            } else {
                 final String finalData = cc_data;
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
 
-                        if(mBusinessListener != null){
+                        if (mBusinessListener != null) {
                             String ret = mBusinessListener.getBusinessData(finalData, new CordovaExtActivity.BussinessCallback() {
                                 @Override
                                 public void onResult(String value) {
-                                    Log.i("WebViewSDK","getBusinessData onResule = " + value);
+                                    Log.i("WebViewSDK", "getBusinessData onResule = " + value);
                                     callbackContext.success(value);
                                 }
                             });
-                            if(ret != null && !"".equals(ret)) {
+                            if (ret != null && !"".equals(ret)) {
                                 callbackContext.success(ret);
                             }
-                        }else{
+                        } else {
                             callbackContext.error("no implement");
                         }
                     }
                 });
             }
             return true;
-        }
-        else if(LAUNCH_ONLINE_MOVIE_PLAYER.equals(action))
-        {
-            if(mCoocaaListener!=null && mediaApi!=null)
-            {
+        } else if (LAUNCH_ONLINE_MOVIE_PLAYER.equals(action)) {
+            if (mCoocaaListener != null && mediaApi != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
-                        try
-                        {
+                        try {
                             JSONObject urlObj = args.getJSONObject(0);
                             JSONObject nameObj = args.getJSONObject(1);
                             JSONObject needParseObj = args.getJSONObject(2);
@@ -1105,19 +1064,15 @@ public class CoocaaOSApi extends CordovaPlugin
                             SkyMediaItem[] items = new SkyMediaItem[1];
                             SkyMediaItem item = new SkyMediaItem();
                             item.type = SkyMediaItem.SkyMediaType.MOVIE;
-                            
+
                             String needParseString = "false";
-                            if(needParseObj!=null)
-                            {
-                            	needParseString = needParseObj.getString("needparse");
+                            if (needParseObj != null) {
+                                needParseString = needParseObj.getString("needparse");
                             }
-                            
-                            if("true".equals(needParseString) || "false".equals(needParseString))
-                            {
+
+                            if ("true".equals(needParseString) || "false".equals(needParseString)) {
                                 item.setNeedParse(Boolean.valueOf(needParseString));
-                            }
-                            else
-                            {
+                            } else {
                                 item.setNeedParse(false);
                             }
                             item.url = urlObj.getString("url");
@@ -1125,77 +1080,56 @@ public class CoocaaOSApi extends CordovaPlugin
                             item.extra.put("url_type", urlType);
                             items[0] = item;
                             SkyMediaApiParam param = new SkyMediaApiParam();
-                            param.setPlayList(items,0);
+                            param.setPlayList(items, 0);
                             mediaApi.startOnlinePlayer(param);
                             callbackContext.success();
-                        }catch(JSONException e)
-                        {
+                        } catch (JSONException e) {
                             callbackContext.error(e.toString());
                         }
                     }
                 });
-            }
-            else
-            {
+            } else {
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if (GET_USER_INFO.equals(action))
-        {
-            if(mCoocaaListener!=null)
-            {
+        } else if (GET_USER_INFO.equals(action)) {
+            if (mCoocaaListener != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
                         JSONObject successobj = mCoocaaListener.getLoginUserInfo();
-                        if(successobj!=null)
-                        {
+                        if (successobj != null) {
                             callbackContext.success(successobj);
-                        }
-                        else
-                        {
+                        } else {
                             callbackContext.error("error occurs when called getLoginUserInfo");
                         }
                     }
                 });
-            }
-            else
-            {
+            } else {
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if (GET_DEVICE_INFO.equals(action))
-        {
-            if(mCoocaaListener!=null)
-            {
+        } else if (GET_DEVICE_INFO.equals(action)) {
+            if (mCoocaaListener != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
                         JSONObject successobj = mCoocaaListener.getDeviceInfo();
-                        if(successobj!=null)
-                        {
+                        if (successobj != null) {
                             callbackContext.success(successobj);
-                        }
-                        else
-                        {
+                        } else {
                             callbackContext.error("error occurs when called getDeviceInfo");
                         }
                     }
                 });
-            }
-            else
-            {
+            } else {
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(GET_MOVIEPLATFORM_INFO.equals(action))
-        {
+        } else if (GET_MOVIEPLATFORM_INFO.equals(action)) {
             PackageManager pm = this.cordova.getActivity().getPackageManager();
             String versionName = "";
-            int versionCode  = 0;
+            int versionCode = 0;
 
             try {
                 PackageInfo info = pm.getPackageInfo("com.tianci.movieplatform", 0);
@@ -1213,11 +1147,9 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("error occurs when called getMovieplatformInfo");
             }
             return true;
-        }
-        else if(GET_BASE_INFO.equals(action))
-        {
+        } else if (GET_BASE_INFO.equals(action)) {
             long totalMem = 0, leftMem = 0;
-            ActivityManager activityManager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager activityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
             ActivityManager.MemoryInfo outInfo = new ActivityManager.MemoryInfo();
             activityManager.getMemoryInfo(outInfo);
             totalMem = outInfo.totalMem;
@@ -1238,118 +1170,106 @@ public class CoocaaOSApi extends CordovaPlugin
             result.put("freeSpace", freeSpace);
             result.put("totalMem", totalMem);
             result.put("leftMem", leftMem);
-            Log.i("WebViewSDK",result.toString());
+            Log.i("WebViewSDK", result.toString());
             callbackContext.success(result);
             return true;
-        }
-        else if(GET_APP_INFO.equals(action))
-        {
-        	PackageManager pm = this.cordova.getActivity().getPackageManager();
+        } else if (GET_APP_INFO.equals(action)) {
+            PackageManager pm = this.cordova.getActivity().getPackageManager();
             JSONObject resultObject = new JSONObject();
-        	try {
+            try {
                 JSONObject pkgListObj = args.getJSONObject(0);
                 String pkgListStr = pkgListObj.getString("pkgList");
                 JSONObject jsonParams = new JSONObject(pkgListStr);
                 JSONArray params = jsonParams.getJSONArray("pkgList");
-                Log.i("WebViewSDK" , "length = " + params.length());
+                Log.i("WebViewSDK", "length = " + params.length());
                 if (params.length() > 0) {
-                    for(int i=0; i<params.length(); i++){
+                    for (int i = 0; i < params.length(); i++) {
                         String pkgName = params.getString(i);
-                        Log.i("WebViewSDK" , "pkgName = " + pkgName);
+                        Log.i("WebViewSDK", "pkgName = " + pkgName);
                         JSONObject valueObject = new JSONObject();
                         PackageInfo info = null;
-                        try{
+                        try {
                             info = pm.getPackageInfo(pkgName, 0);
                             if (info != null) {
                                 valueObject.put("status", "0");
                                 valueObject.put("versionName", info.versionName);
                                 valueObject.put("versionCode", info.versionCode);
                             }
-                        }catch (NameNotFoundException e){
+                        } catch (NameNotFoundException e) {
                             valueObject.put("status", "-1");
                             valueObject.put("versionName", "-1");
                             valueObject.put("versionCode", -1);
                         }
-                        Log.i("WebViewSDK" , "valueObject = " + valueObject);
+                        Log.i("WebViewSDK", "valueObject = " + valueObject);
                         resultObject.put(pkgName, valueObject);
                     }
                     callbackContext.success(resultObject.toString());
                 } else {
                     callbackContext.error("params error occurs when called getAppInfo");
                 }
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				callbackContext.error("error occurs when called getAppInfo");
-			}
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                callbackContext.error("error occurs when called getAppInfo");
+            }
             return true;
-        }
-        else if(GET_CURRENT_THEME.equals(action))
-        {
-        	String theme = "";
-        	try {
-    	        if(SkyThemeEngine.getInstance().getThemeColorSeries() == ThemeColorSeriesEnum.E_THEME_COLOR_SERIES_DARK){
-    	        	theme = "dark";
-    	        }else{
-    	        	theme = "light";
-    	        }
-        		JSONObject result = new JSONObject();
-        		result.put("theme", theme);
+        } else if (GET_CURRENT_THEME.equals(action)) {
+            String theme = "";
+            try {
+                if (SkyThemeEngine.getInstance().getThemeColorSeries() == ThemeColorSeriesEnum.E_THEME_COLOR_SERIES_DARK) {
+                    theme = "dark";
+                } else {
+                    theme = "light";
+                }
+                JSONObject result = new JSONObject();
+                result.put("theme", theme);
                 callbackContext.success(result);
 
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				callbackContext.error("error occurs when called getCurTheme");
-			}
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                callbackContext.error("error occurs when called getCurTheme");
+            }
             return true;
-        }
-        else if(GET_WEBVIEWSDK_INFO.equals(action))
-        {
-        	String versionName = "";
-        	int versionCode  = 0;
-        	
-        	try {
-        		versionName = SystemWebViewSDK.getVersionName();
-        		versionCode = SystemWebViewSDK.getVersionCode();
-        		JSONObject result = new JSONObject();
-        		result.put("versionName", versionName);
-        		result.put("versionCode", versionCode);
+        } else if (GET_WEBVIEWSDK_INFO.equals(action)) {
+            String versionName = "";
+            int versionCode = 0;
+
+            try {
+                versionName = SystemWebViewSDK.getVersionName();
+                versionCode = SystemWebViewSDK.getVersionCode();
+                JSONObject result = new JSONObject();
+                result.put("versionName", versionName);
+                result.put("versionCode", versionCode);
                 callbackContext.success(result);
 
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				callbackContext.error("error occurs when called getWebViewSDKInfo");
-			}
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                callbackContext.error("error occurs when called getWebViewSDKInfo");
+            }
             return true;
-        }
-        else if(CREATE_APP_TASK.equals(action))
-        {
-        	try
-        	{
-        		//appstore 5.x support!
-        		if(mDownloadListenrer == null)
-            	{
-            		SuperXFinder.setContext(mContext);
+        } else if (CREATE_APP_TASK.equals(action)) {
+            try {
+                //appstore 5.x support!
+                if (mDownloadListenrer == null) {
+                    SuperXFinder.setContext(mContext);
                     mDownloadListenrer = new MyTableDownloadListener();
                     TableDownload._createTableDownloadListener(mContext, mDownloadListenrer);
-                    if(mProcessListener == null)
-            		{
-            			mProcessListener = new MyTableMoniteDownloadListener();
-            			TableDownload._addTableDownloadMonitor(mProcessListener);
-            		}
-            	}
-        		
-        	}catch (Exception e)
-        	{
-        		e.printStackTrace();
-        	}
+                    if (mProcessListener == null) {
+                        mProcessListener = new MyTableMoniteDownloadListener();
+                        TableDownload._addTableDownloadMonitor(mProcessListener);
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             this.cordova.getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
-                    try{
-                    	
+                    try {
+
                         JSONObject urlObj = args.getJSONObject(0);
                         JSONObject md5Obj = args.getJSONObject(1);
                         JSONObject titleObj = args.getJSONObject(2);
@@ -1363,14 +1283,11 @@ public class CoocaaOSApi extends CordovaPlugin
                         String appid = appidObj.getString("appid");
                         String icon = iconObj.getString("icon");
                         TableDownload checkdownloader = TableDownload._queryDownloadByUrl(url);
-                        if (checkdownloader==null)
-                        {
+                        if (checkdownloader == null) {
                             checkdownloader = TableDownload._createAppDownload(url, md5, title, pkgname, appid, icon);
                         }
-                        if (checkdownloader!=null)
-                        {
-                            if(mDownloadListenrer!=null)
-                            {
+                        if (checkdownloader != null) {
+                            if (mDownloadListenrer != null) {
                                 mDownloadListenrer.addDownloadTask(checkdownloader);
                             }
                             TableDownload._start(checkdownloader.getId());
@@ -1380,7 +1297,7 @@ public class CoocaaOSApi extends CordovaPlugin
                                 jsonObject.put("status", checkdownloader.getStatus());
                                 jsonObject.put("name", checkdownloader.getName());
                                 jsonObject.put("url", checkdownloader.getUrl());
-                                jsonObject.put("progress", checkdownloader.getLength()>0?checkdownloader.getProgress():0);
+                                jsonObject.put("progress", checkdownloader.getLength() > 0 ? checkdownloader.getProgress() : 0);
                                 jsonObject.put("createtime", checkdownloader.getCreatetime());
                                 jsonObject.put("code", checkdownloader.getOncode());
                                 jsonObject.put("extra", checkdownloader.getOnextra());
@@ -1388,178 +1305,123 @@ public class CoocaaOSApi extends CordovaPlugin
                                 e.printStackTrace();
                             }
                             callbackContext.success(jsonObject);
-                        }
-                        else
-                        {
+                        } else {
                             callbackContext.error("error occurs when called createDownloadTask");
                         }
-                    }catch(JSONException e)
-                    {
+                    } catch (JSONException e) {
                         callbackContext.error(e.toString());
                     }
                 }
             });
             return true;
-        }
-        else if(RESUME_APP_TASK.equals(action))
-        {
+        } else if (RESUME_APP_TASK.equals(action)) {
             JSONObject taskIdObj = args.getJSONObject(0);
             String taskId = taskIdObj.getString("taskid");
-            if(mDownloadListenrer!=null)
-            {
+            if (mDownloadListenrer != null) {
                 mDownloadListenrer.resumeTaskId(Long.valueOf(taskId));
             }
             return true;
-        }
-        else if(DELETE_APP_TASK.equals(action))
-        {
+        } else if (DELETE_APP_TASK.equals(action)) {
             JSONObject taskIdObj = args.getJSONObject(0);
             String taskId = taskIdObj.getString("taskid");
-            if(mDownloadListenrer!=null)
-            {
+            if (mDownloadListenrer != null) {
                 mDownloadListenrer.deleteTaskId(Long.valueOf(taskId));
             }
             return true;
-        }
-        else if(PAUSE_APP_TASK.equals(action))
-        {
+        } else if (PAUSE_APP_TASK.equals(action)) {
             JSONObject taskIdObj = args.getJSONObject(0);
             String taskId = taskIdObj.getString("taskid");
-            if(mDownloadListenrer!=null)
-            {
+            if (mDownloadListenrer != null) {
                 mDownloadListenrer.pauseTaskId(Long.valueOf(taskId));
             }
             return true;
-        }
-        else if(IS_NET_CONNECTED.equals(action))
-        {
-            if(mCoocaaListener!=null)
-            {
+        } else if (IS_NET_CONNECTED.equals(action)) {
+            if (mCoocaaListener != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
                         JSONObject successobj = mCoocaaListener.isNetConnected();
-                        if(successobj!=null)
-                        {
+                        if (successobj != null) {
                             callbackContext.success(successobj);
-                        }
-                        else
-                        {
+                        } else {
                             callbackContext.error("error occurs when called isNetConnected");
                         }
                     }
                 });
-            }
-            else
-            {
+            } else {
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(GET_NET_TYPE.equals(action))
-        {
-            if(mCoocaaListener!=null)
-            {
+        } else if (GET_NET_TYPE.equals(action)) {
+            if (mCoocaaListener != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
                         JSONObject successobj = mCoocaaListener.getNetType();
-                        if(successobj!=null)
-                        {
+                        if (successobj != null) {
                             callbackContext.success(successobj);
-                        }
-                        else
-                        {
+                        } else {
                             callbackContext.error("error occurs when called getNetType");
                         }
                     }
                 });
-            }
-            else
-            {
+            } else {
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(GET_DEVICE_LOCATION.equals(action))
-        {
-            if(mCoocaaListener!=null)
-            {
+        } else if (GET_DEVICE_LOCATION.equals(action)) {
+            if (mCoocaaListener != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
                         JSONObject successobj = mCoocaaListener.getLocation();
-                        if(successobj!=null)
-                        {
+                        if (successobj != null) {
                             callbackContext.success(successobj);
-                        }
-                        else
-                        {
+                        } else {
                             callbackContext.error("error occurs when called getNetType");
                         }
                     }
                 });
-            }
-            else
-            {
+            } else {
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(GET_IP_INFO.equals(action))
-        {
-            if(mCoocaaListener!=null)
-            {
+        } else if (GET_IP_INFO.equals(action)) {
+            if (mCoocaaListener != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
                         JSONObject successobj = mCoocaaListener.getIpInfo();
-                        if(successobj!=null)
-                        {
+                        if (successobj != null) {
                             callbackContext.success(successobj);
-                        }
-                        else
-                        {
+                        } else {
                             callbackContext.error("error occurs when called getIpInfo");
                         }
                     }
                 });
-            }
-            else
-            {
+            } else {
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if (HAS_USER_LOGIN.equals(action))
-        {
-            if(mCoocaaListener!=null)
-            {
+        } else if (HAS_USER_LOGIN.equals(action)) {
+            if (mCoocaaListener != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
                         JSONObject successobj = mCoocaaListener.hasUserLogin();
-                        if(successobj!=null)
-                        {
+                        if (successobj != null) {
                             callbackContext.success(successobj);
-                        }
-                        else
-                        {
+                        } else {
                             callbackContext.error("error occurs when called hasUserLogin");
                         }
                     }
                 });
-            }
-            else
-            {
+            } else {
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(START_QQ_ACOUNT.equals(action))
-        {
-            if(mCoocaaListener!=null)
-            {
+        } else if (START_QQ_ACOUNT.equals(action)) {
+            if (mCoocaaListener != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
@@ -1567,17 +1429,12 @@ public class CoocaaOSApi extends CordovaPlugin
                         callbackContext.success();
                     }
                 });
-            }
-            else
-            {
+            } else {
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(SET_USER_LOGINOUT.equals(action))
-        {
-            if(mCoocaaListener!=null)
-            {
+        } else if (SET_USER_LOGINOUT.equals(action)) {
+            if (mCoocaaListener != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
@@ -1585,62 +1442,48 @@ public class CoocaaOSApi extends CordovaPlugin
                         callbackContext.success();
                     }
                 });
-            }
-            else
-            {
+            } else {
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(GET_USER_ACCESS_TOKEN.equals(action))
-        {
-        	   if(mCoocaaListener!=null)
-               {
-                   this.cordova.getThreadPool().execute(new Runnable() {
-                       @Override
-                       public void run() {
-                           JSONObject successobj = mCoocaaListener.getUserAccessToken();
-                           if(successobj!=null)
-                           {
-                               callbackContext.success(successobj);
-                           }
-                           else
-                           {
-                               callbackContext.error("error occurs when called getUserAccessToken");
-                           }
-                       }
-                   });
-               }
-               else
-               {
-                   callbackContext.error("mCoocaaListener is not ready!");
-               }
-               return true;
-        }
-        else if(GET_PROPERTY_VALUE.equals(action))
-        {
-        	try {
-        		String propertiesValue  = "";
-        		JSONObject pkgNameObj = args.getJSONObject(0);
-        		String propertiesKey = pkgNameObj.getString("propertiesKey");
-        		if(propertiesKey != null)
-        			propertiesValue = SystemProperties.get(propertiesKey);
-            	JSONObject result = new JSONObject();
-            	result.put("propertiesValue", propertiesValue);
-                callbackContext.success(result);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				callbackContext.error("error occurs when called getPropertiesValue");
-			}
+        } else if (GET_USER_ACCESS_TOKEN.equals(action)) {
+            if (mCoocaaListener != null) {
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject successobj = mCoocaaListener.getUserAccessToken();
+                        if (successobj != null) {
+                            callbackContext.success(successobj);
+                        } else {
+                            callbackContext.error("error occurs when called getUserAccessToken");
+                        }
+                    }
+                });
+            } else {
+                callbackContext.error("mCoocaaListener is not ready!");
+            }
             return true;
-        }
-        else if(PURCHASE_ORDER.equals(action))
-        {
+        } else if (GET_PROPERTY_VALUE.equals(action)) {
+            try {
+                String propertiesValue = "";
+                JSONObject pkgNameObj = args.getJSONObject(0);
+                String propertiesKey = pkgNameObj.getString("propertiesKey");
+                if (propertiesKey != null)
+                    propertiesValue = SystemProperties.get(propertiesKey);
+                JSONObject result = new JSONObject();
+                result.put("propertiesValue", propertiesValue);
+                callbackContext.success(result);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                callbackContext.error("error occurs when called getPropertiesValue");
+            }
+            return true;
+        } else if (PURCHASE_ORDER.equals(action)) {
             this.cordova.getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
-                   	try{
+                    try {
                         JSONObject appCodeObj = args.getJSONObject(0);//商户编号ID,由酷开发布给第三方
                         JSONObject tradeidObj = args.getJSONObject(1);//订单编号ID
                         JSONObject productNameObj = args.getJSONObject(2);//商品名称，例如“影视包年”
@@ -1651,7 +1494,7 @@ public class CoocaaOSApi extends CordovaPlugin
                         JSONObject cmdObj = args.getJSONObject(7);
                         JSONObject tokenObj = args.getJSONObject(8);
                         JSONObject phoneNumObj = args.getJSONObject(9);
-                        
+
                         String appcode = appCodeObj.getString("appcode");
                         String Tradeid = tradeidObj.getString("Tradeid");
                         String ProductName = productNameObj.getString("ProductName");
@@ -1662,13 +1505,13 @@ public class CoocaaOSApi extends CordovaPlugin
                         double amount = amountObj.getDouble("amount");
                         String token = tokenObj.getString("token");
                         String phoneNum = phoneNumObj.getString("tel");
-                        
+
                         Intent mIntent = new Intent("coocaa.intent.movie.pay");
                         String pkgName = mContext.getPackageName();
-                        if(pkgName != null)
-                        	mIntent.setPackage(pkgName);
+                        if (pkgName != null)
+                            mIntent.setPackage(pkgName);
                         else
-                        	mIntent.setPackage("com.tianci.movieplatform");
+                            mIntent.setPackage("com.tianci.movieplatform");
                         mIntent.putExtra("appcode", appcode);
                         mIntent.putExtra("ProductName", ProductName);
                         mIntent.putExtra("Tradeid", Tradeid);
@@ -1679,20 +1522,17 @@ public class CoocaaOSApi extends CordovaPlugin
                         mIntent.putExtra("cmd", cmd);
                         mIntent.putExtra("token", token);
                         mIntent.putExtra("tel", phoneNum);
-                        
+
                         mContext.startActivity(mIntent);
                         callbackContext.success();
-                        
-                	}catch(Exception e)
-                    {
+
+                    } catch (Exception e) {
                         callbackContext.error(e.toString());
                     }
                 }
             });
-        	return true;
-        }
-        else if(GET_SPACE_INFO.equals(action))
-        {
+            return true;
+        } else if (GET_SPACE_INFO.equals(action)) {
             try {
                 long totalSpace = 0L, freeSpace = 0L;
                 long blockSize = 0L, availableBlocks = 0L, totalBlocks = 0L;
@@ -1712,6 +1552,14 @@ public class CoocaaOSApi extends CordovaPlugin
                 e.printStackTrace();
                 callbackContext.error("error occurs when called getSpaceInfo");
             }
+            return true;
+        } else if (SET_SPECIAL_MACHINE.equals(action)) {
+            JSONObject paramObj = args.getJSONObject(0);
+            if (paramObj != null) {
+                String machineList = paramObj.getString("machineList");
+                SystemWebViewSDK.setSpecialMachineStr(machineList);
+            }
+            callbackContext.success();
             return true;
         }
         return false;
@@ -1787,14 +1635,14 @@ public class CoocaaOSApi extends CordovaPlugin
 
     public static void broadCastCommonChanged(Context context, Map<String,String> map)
     {
-        if(map != null && context != null) {
+        if (map != null && context != null) {
             try {
                 JSONObject myObject = new JSONObject();
                 Set<Map.Entry<String, String>> entryseSet = map.entrySet();
-                for (Map.Entry<String, String> entry:entryseSet) {
-                    myObject.put(entry.getKey(),entry.getValue());
+                for (Map.Entry<String, String> entry : entryseSet) {
+                    myObject.put(entry.getKey(), entry.getValue());
                 }
-                myObject.put("cc_type","common");
+                myObject.put("cc_type", "common");
                 final Intent intent = new Intent(BROADCAST_COMMON_CHANGED);
                 Bundle b = new Bundle();
                 b.putString("userdata", myObject.toString());
@@ -1809,14 +1657,14 @@ public class CoocaaOSApi extends CordovaPlugin
 
     public static void broadCastVoiceChanged(Context context, Map<String,String> map)
     {
-        if(map != null && context != null) {
+        if (map != null && context != null) {
             try {
                 JSONObject myObject = new JSONObject();
                 Set<Map.Entry<String, String>> entryseSet = map.entrySet();
-                for (Map.Entry<String, String> entry:entryseSet) {
-                    myObject.put(entry.getKey(),entry.getValue());
+                for (Map.Entry<String, String> entry : entryseSet) {
+                    myObject.put(entry.getKey(), entry.getValue());
                 }
-                myObject.put("cc_type","voice");
+                myObject.put("cc_type", "voice");
                 final Intent intent = new Intent(BROADCAST_COMMON_CHANGED);
                 Bundle b = new Bundle();
                 b.putString("userdata", myObject.toString());

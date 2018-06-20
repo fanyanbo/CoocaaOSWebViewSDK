@@ -902,15 +902,16 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 			voicefilter.addAction("com.skyworth.srtnj.action.voice.outcmd");
 			registerReceiver(mVoiceBC, voicefilter);
 
-	        if (this.appView == null) {
+			if (this.appView == null) {
 	            return;
 	        }
-	        // Force window to have focus, so application always
+
+			// Force window to have focus, so application always
 	        // receive user input. Workaround for some devices (Samsung Galaxy Note 3 at least)
 	        this.getWindow().getDecorView().requestFocus();
 
 	        this.appView.handleResume(this.keepRunning);
-	        
+
 			if(mErrorPageIsShown || isLoading())
 			{
 				if(mErrorView!=null)
@@ -1187,8 +1188,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 					keyCode = 40;
 				}
 				//E710U, 42Y1Y-8A13
-				if(keyCode > 0 && mMachineName != null && ( mMachineName.equals("rtd299x_tv010_4k") || mMachineName.equals("h25ref")) ){
-					Log.i(TAG,"CordovaExtActivity dispatchKeyEvent keyCode = " + keyCode);
+				if(keyCode > 0 && mMachineName != null && ( mMachineName.equals("rtd299x_tv010_4k") || mMachineName.equals("h25ref") || isSpecialMachine())){
+					Log.i(TAG,"handle special machine dispatchKeyEvent keyCode = " + keyCode);
 	                appView.loadUrlIntoView(
 	                        "javascript:(function(){var ev=document.createEvent('HTMLEvents');ev.which=ev.keyCode=" +
 	                        		keyCode + ";ev.initEvent('" + "keydown" +
@@ -1198,6 +1199,16 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 			}
 			
 			return super.dispatchKeyEvent(event);
+		}
+
+
+		private boolean isSpecialMachine() {
+			if (SystemWebViewSDK.getSpecialMachineStr() != null) {
+				if(SystemWebViewSDK.getSpecialMachineStr().contains(mMachineName)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		@Override

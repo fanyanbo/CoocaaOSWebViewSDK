@@ -132,6 +132,8 @@ public class SystemWebViewSDK {
 	private static final int versionCode = 2050006;
 	
 	private static int focusPosition = -1;
+
+	private static String specialMachineStr = null;
 	
 	public static String getVersionName()
 	{
@@ -152,4 +154,8 @@ public class SystemWebViewSDK {
 	{
 		return focusPosition;
 	}
+
+	public static void setSpecialMachineStr(String params) { specialMachineStr = params; }
+
+	public static String getSpecialMachineStr() { return specialMachineStr; }
 }
