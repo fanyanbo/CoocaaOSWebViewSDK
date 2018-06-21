@@ -597,9 +597,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 		}
 		
 	    protected void init(FrameLayout errorPageBg) {
-			Log.i("WebViewSDK","================>createWebView Before");
 	        appView = makeWebView();
-			Log.i("WebViewSDK","================>createWebView After");
 	        createViews(errorPageBg);
 	        if (!appView.isInitialized()) {
 	        	appView.init(cordovaInterface, pluginEntries, preferences, cacheMode);

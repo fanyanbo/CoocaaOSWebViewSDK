@@ -425,7 +425,7 @@ public class CoocaaOSApi extends CordovaPlugin
                     while(!isCmdBindSuccess/* && mRef <= 1*/)
                     {
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(150);
                             mCoocaaOSConnecter = cordova.getCoocaaOSConnecter();
                             if(mCoocaaOSConnecter != null) isCmdBindSuccess = true;
                             Log.i("WebViewSDK","WAIT_OS_READY isCmdBindSuccess:" + isCmdBindSuccess + ",tid = " + android.os.Process.myTid());
