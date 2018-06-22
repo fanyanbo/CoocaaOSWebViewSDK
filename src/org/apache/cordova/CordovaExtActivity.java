@@ -63,7 +63,7 @@ import android.widget.TextView;
 
 public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeChangedListener{
 
-	   public static String TAG = "WebViewSDK";
+	   public static final String TAG = "WebViewSDK";
 
 	    // The webview for our app
 	    protected CordovaWebView appView;

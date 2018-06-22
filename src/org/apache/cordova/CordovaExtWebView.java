@@ -5,18 +5,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.cordova.CordovaExtActivity.CordovaWebViewListener;
 import org.apache.cordova.CordovaInterfaceImpl.CordovaInterfaceListener;
 import org.coocaa.webview.CoocaaOSConnecter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.coocaa.cordova.plugin.CoocaaOSApi;
 import com.coocaa.systemwebview.R;
 import com.skyworth.ui.api.SkyWithBGLoadingView;
 import com.skyworth.ui.blurbg.BlurBgLayout;
 import com.skyworth.util.SkyScreenParams;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,16 +28,14 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class CordovaExtWebView extends FrameLayout
 {
-	public static String TAG = "WebViewSDK";
+	public static final String TAG = "WebViewSDK";
 	private Context mContext;
 	
 	// The webview for our app
@@ -79,6 +76,8 @@ public class CordovaExtWebView extends FrameLayout
     private CordovaExtWebViewListener mWebViewListener = null;
 	private CordovaExtWebViewDataListener mWebViewDataListener = null;
 	private JsBroadcastReceiver mJsBC = null;
+	private VoiceBroadcastReceiver mVoiceBC = null;
+	private LocalBroadcastManager mLocalBroadcastManager;
     
     public interface CordovaExtWebViewListener
     {
@@ -145,6 +144,21 @@ public class CordovaExtWebView extends FrameLayout
 			}
 		}
 	}
+
+	private class VoiceBroadcastReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.v(TAG, "VoiceBroadcastReceiver action = " + intent.getAction());
+			if ("com.skyworth.srtnj.action.voice.outcmd".equals(intent.getAction())) {
+				String value = intent.getStringExtra("voicecmd");
+				Log.v(TAG, "com.skyworth.srtnj.action.voice.outcmd key = voicecmd, value = " + value);
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("voicecmd", value);
+				CoocaaOSApi.broadCastVoiceChanged(mContext, map);
+			}
+		}
+	}
     
 	public CordovaExtWebView(Context context) {
 		super(context);
@@ -153,14 +167,6 @@ public class CordovaExtWebView extends FrameLayout
 		
 		loadConfig();
 
-		if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
-		IntentFilter filter = new IntentFilter();
-		filter.addAction("notify.js.message");
-		filter.addAction("notify.js.log");
-		filter.addAction("notify.js.log.resume");
-		filter.addAction("notify.js.log.pause");
-		LocalBroadcastManager.getInstance(mContext).registerReceiver(mJsBC, filter);
-		
 		cordovaInterface = makeCordovaInterface();		
 		cordovaInterface
 				.setCordovaInterfaceListener(new CordovaInterfaceListener() {
@@ -378,7 +384,7 @@ public class CordovaExtWebView extends FrameLayout
     		mErrorPageLayout.addView(mErrorPageBgLayout);
     		
     		double heightRate = getHeight() / 1080.0;		
-    		Log.i(TAG, "-------------->width = " + getWidth() + ", height = " +getHeight() + ",heightRate = " + heightRate);
+    		Log.i(TAG, "width = " + getWidth() + ", height = " +getHeight() + ",heightRate = " + heightRate);
     		
     		mErrorPageImageView = new ImageView(mContext);			
 			FrameLayout.LayoutParams imgViewLp = new FrameLayout.LayoutParams(
@@ -467,6 +473,15 @@ public class CordovaExtWebView extends FrameLayout
     
     public void onPause()
     {
+		if (mJsBC != null) {
+			LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mJsBC);
+			mJsBC = null;
+		}
+		if (mVoiceBC != null) {
+			mContext.unregisterReceiver(mVoiceBC);
+			mVoiceBC = null;
+		}
+
         if (this.appView != null) {
             // CB-9382 If there is an activity that started for result and main activity is waiting for callback
             // result, we shoudn't stop WebView Javascript timers, as activity for result might be using them
@@ -477,6 +492,20 @@ public class CordovaExtWebView extends FrameLayout
     
     public void onResume()
     {
+		if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
+		mLocalBroadcastManager = LocalBroadcastManager.getInstance(mContext);
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("notify.js.message");
+		filter.addAction("notify.js.log");
+		filter.addAction("notify.js.log.resume");
+		filter.addAction("notify.js.log.pause");
+		mLocalBroadcastManager.registerReceiver(mJsBC, filter);
+
+		if (mVoiceBC == null) mVoiceBC = new VoiceBroadcastReceiver();
+		IntentFilter voicefilter = new IntentFilter();
+		voicefilter.addAction("com.skyworth.srtnj.action.voice.outcmd");
+		mContext.registerReceiver(mVoiceBC, voicefilter);
+
         if (this.appView == null) {
             return;
         }

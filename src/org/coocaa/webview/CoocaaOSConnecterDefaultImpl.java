@@ -31,12 +31,13 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
     private TCSystemService systemApi;
     private NetApiForCommon netApi;
     private SkyUserApi userApi;
+	public static final String TAG = "WebViewSDK";
 
     /**
      * @param listener 酷开系统ipc通信核心对象
      */
     public  CoocaaOSConnecterDefaultImpl(SkyApplication.SkyCmdConnectorListener listener) {
-    	Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl listener = " + listener);
+    	Log.i(TAG,"CoocaaOSConnecterDefaultImpl listener = " + listener);
     	if(listener != null) {
             systemApi = new TCSystemService(listener);
             netApi = new NetApiForCommon(listener);
@@ -61,7 +62,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 
 	@Override
 	public String getUserInfo() {
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getUserInfo");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getUserInfo");
 		// TODO Auto-generated method stub
 		if (userApi != null) {
 			Map<String, Object> userInfo = userApi.getAccoutInfo();
@@ -75,7 +76,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getDeviceInfo() {
 		// TODO Auto-generated method stub
-		Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getDeviceInfo");
+		Log.i(TAG,"CoocaaOSConnecterDefaultImpl getDeviceInfo");
 		if (systemApi != null) {
 			// 屏幕尺寸
 			TCSetData pannelSetData = systemApi
@@ -199,7 +200,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String isNetConnected() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl isNetConnected");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl isNetConnected");
         if(netApi != null)
         {
             boolean isConnect = netApi.isConnect();
@@ -217,7 +218,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getNetType() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getNetType");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getNetType");
 		if (netApi != null) {
 			String netType = netApi.getNetType();
 			if (netType != null) {
@@ -236,7 +237,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getIpInfo() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getIpInfo");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getIpInfo");
 		if (netApi != null) {
 			SkyIpInfo ipInfo = netApi.getIpInfo();
 			if (ipInfo != null) {
@@ -260,7 +261,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getDeviceLocation() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getDeviceLocation");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getDeviceLocation");
 		if (systemApi != null) {
 			TCSetData locationData = systemApi
 					.getSetData(TCEnvKey.SKY_SYSTEM_ENV_LOCATION);
@@ -285,7 +286,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getLoginUserInfo() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getLoginUserInfo");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getLoginUserInfo");
         if (userApi != null) {
             Map<String, Object> userInfo = userApi.getAccoutInfo();
             if (userInfo != null && userInfo.size() > 0) {
@@ -299,7 +300,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public String getUserAccessToken() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl getUserAccessToken");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl getUserAccessToken");
 		if (userApi != null) {
 			String token = userApi.getToken("ACCESS");
 			if (token != null) {
@@ -318,7 +319,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public void startQQAcount() {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl startQQAcount");
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl startQQAcount");
         if(userApi != null) {
             userApi.loginByType(SkyUserApi.AccountType.qq);
         }
@@ -328,7 +329,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 	@Override
 	public byte[] onHandler(Context context, String fromtarget, String cmd, byte[] body) {
 
-        Log.i("WebViewSDK","CoocaaOSConnecterDefaultImpl onHandler fromtarget = " + fromtarget + ",cmd = " + cmd);
+        Log.i(TAG,"CoocaaOSConnecterDefaultImpl onHandler fromtarget = " + fromtarget + ",cmd = " + cmd);
 		if(context == null) return new byte[0];
 		if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_MOUNTED //外接设备接入
 				.toString().equals(cmd)) {
