@@ -83,6 +83,7 @@ public class CordovaExtWebView extends FrameLayout
     public interface CordovaExtWebViewListener
     {
     	public void onPageStarted(String url);
+		public void onPageExit();
     	public void onPageFinished(String url);
     	public void onPageError(int errorCode, String description, String failingUrl);
         public void onPageSslError(int errorCode, String failingUrl);
@@ -243,6 +244,12 @@ public class CordovaExtWebView extends FrameLayout
 
 						mStatus = STATUS_LOADING;
 						mLoadingProgress = 0;
+					}
+
+					@Override
+					public void onPageExit() {
+						if(mWebViewListener != null)
+							mWebViewListener.onPageExit();
 					}
 
 					@Override

@@ -76,6 +76,7 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     public interface CordovaInterfaceListener
     {
     	public void	onPageStarted(String url);
+        public void	onPageExit();
     	public void onPageLoadingFinished(String url);
     	public void onReceivedError(int errorCode, String description, String failingUrl);
     	public void doUpdateVisitedHistory(String url, boolean isReload);
@@ -137,16 +138,16 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     public Object onMessage(String id, Object data) {
         if ("exit".equals(id)) {
 //            activity.finish();
-            Log.i("WebViewSDK","exit 1111");
             if ( activity instanceof Activity ) {
-                Log.i("WebViewSDK","exit 2222");
+                Log.i("WebViewSDK","exit activity");
                 ((Activity)activity).finish();
             }else if (activity instanceof Application) {
-                Log.i("WebViewSDK","exit 333");
+                mCordovaListener.onPageExit();
+                Log.i("WebViewSDK","exit application");
             }else if (activity instanceof Service) {
-                Log.i("WebViewSDK","exit 4444");
+                Log.i("WebViewSDK","exit service");
             }else {
-                Log.i("WebViewSDK","exit 5555");
+                Log.i("WebViewSDK","exit error");
             }
         }
         else if("onPageStarted".equals(id))

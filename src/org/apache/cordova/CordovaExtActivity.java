@@ -379,7 +379,12 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 						}
 					});
 				}
-				
+
+				@Override
+				public void onPageExit() {
+
+				}
+
 				@Override
 				public void onPageLoadingFinished(String url) {
 					Log.v(TAG, "onPageLoadingFinished url == " +url);

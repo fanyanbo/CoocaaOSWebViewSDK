@@ -300,7 +300,12 @@ public class CordovaActivity extends CordovaBaseActivity{
 					});
 				}
 			}
-			
+
+			@Override
+			public void onPageExit() {
+
+			}
+
 			@Override
 			public void onPageLoadingFinished(String url) {
 				
