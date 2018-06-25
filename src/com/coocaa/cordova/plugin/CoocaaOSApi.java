@@ -133,14 +133,10 @@ public class CoocaaOSApi extends CordovaPlugin
         Log.v(TAG, TAG + ": initialization");
         super.initialize(cordova, webView);
         mContext = cordova.getActivity();
-
         mWebView = webView;
-        Log.v("WebViewSDK", "CoocaaOSApi initialization isShown:" + mWebView.getView().isShown());
-        
         mCoocaaOSConnecter = cordova.getCoocaaOSConnecter();
         if(mCoocaaOSConnecter != null) isCmdBindSuccess = true;
         Log.v("WebViewSDK", "CoocaaOSApi initialization CoocaaOSConnecter:" + mCoocaaOSConnecter);
-
         mBusinessListener = cordova.getCordovaBusinessDataListener();
 
         if (mCallbackBC == null) mCallbackBC = new CallbackBroadcastReceiver();

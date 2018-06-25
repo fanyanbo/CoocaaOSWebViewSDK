@@ -298,14 +298,6 @@ public class CordovaExtWebView extends FrameLayout
 		mWebViewDataListener = listener;
 	}
 
-	OnClickListener clickListener = new OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			Log.i(TAG, "CordovaExtActivity OnClickListener "
-					+ v.getTag().toString());
-		}
-	};
-	
     @SuppressWarnings("deprecation")
     protected void loadConfig() {
         ConfigXmlParser parser = new ConfigXmlParser();
@@ -321,7 +313,7 @@ public class CordovaExtWebView extends FrameLayout
         if (appView == null) {
             init();
         }
-
+		mStatus = STATUS_NO_LOADING;
         // If keepRunning
         this.keepRunning = preferences.getBoolean("KeepRunning", true);
 
@@ -380,7 +372,122 @@ public class CordovaExtWebView extends FrameLayout
         this.addView(mainLayout,new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.MATCH_PARENT));
     }
     
-//    protected boolean initErrorPage(int errorType) {
+
+    
+    protected CordovaWebView makeWebView() {
+        return new CordovaWebViewImpl(makeWebViewEngine());
+    }
+
+    protected CordovaWebViewEngine makeWebViewEngine() {
+        return CordovaWebViewImpl.createEngine(mContext, preferences);
+    }
+
+	public void onPause() {
+		if (mJsBC != null) {
+			LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mJsBC);
+			mJsBC = null;
+		}
+		if (mVoiceBC != null) {
+			mContext.unregisterReceiver(mVoiceBC);
+			mVoiceBC = null;
+		}
+
+		if (this.appView != null) {
+			// CB-9382 If there is an activity that started for result and main activity is waiting for callback
+			// result, we shoudn't stop WebView Javascript timers, as activity for result might be using them
+			boolean keepRunning = this.keepRunning || this.cordovaInterface.activityResultCallback != null;
+			this.appView.handlePause(keepRunning);
+		}
+	}
+
+	public void onResume() {
+		if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
+		mLocalBroadcastManager = LocalBroadcastManager.getInstance(mContext);
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("notify.js.message");
+		filter.addAction("notify.js.log");
+		filter.addAction("notify.js.log.resume");
+		filter.addAction("notify.js.log.pause");
+		mLocalBroadcastManager.registerReceiver(mJsBC, filter);
+
+		if (mVoiceBC == null) mVoiceBC = new VoiceBroadcastReceiver();
+		IntentFilter voicefilter = new IntentFilter();
+		voicefilter.addAction("com.skyworth.srtnj.action.voice.outcmd");
+		mContext.registerReceiver(mVoiceBC, voicefilter);
+
+		if (this.appView == null) {
+			return;
+		}
+
+		this.appView.handleResume(this.keepRunning);
+
+		this.appView.getView().setVisibility(View.VISIBLE);
+	}
+
+	public void onStart() {
+		if (this.appView == null) {
+			return;
+		}
+		this.appView.handleStart();
+	}
+
+	public void onStop() {
+		if (this.appView == null) {
+			return;
+		}
+		this.appView.handleStop();
+	}
+
+	public void onDestroy() {
+		if (this.appView != null) {
+			appView.handleDestroy();
+		}
+
+		if (mJsBC != null)
+			LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mJsBC);
+	}
+
+	public void setThemeBg(boolean value) {
+    	isNeedThemeBg = value;
+    }
+    
+    public int getStatus() {
+		return mStatus;
+	}
+
+	public int getPageLoadingProgress() {
+		return mLoadingProgress;
+	}
+
+	public void setCacheMode(int value) {
+		if(value < 0 || value > 3)
+			value = 0;
+		mCacheMode = value;
+	}
+
+	public void setUserAgentMode(int value) {
+		if(value < 0 || value > 3)
+			value = 0;
+		mUserAgentMode = value;
+	}
+
+	public void setWebViewDisplayPolicy(int value) {
+		if(value < 0 || value > 1)
+			mDisplayPolicy = 0;
+		mDisplayPolicy = value;
+	}
+
+	public boolean dispatchKeyEvent(int keyCode) {
+		Log.i(TAG,"CordovaExtWebView dispatchKeyEvent keyCode = " + keyCode);
+		if (appView != null)
+			appView.loadUrlIntoView(
+				"javascript:(function(){var ev=document.createEvent('HTMLEvents');ev.which=ev.keyCode=" +
+						keyCode + ";ev.initEvent('" + "keydown" +
+						"',true, true);document.body.dispatchEvent(ev);})()", false);
+		return true;
+	}
+
+	//    protected boolean initErrorPage(int errorType) {
 //
 //    	boolean isInitThis = false;
 //
@@ -471,153 +578,10 @@ public class CordovaExtWebView extends FrameLayout
 //			mErrorPageLayout.setVisibility(View.INVISIBLE);
 //	}
     
-    protected CordovaWebView makeWebView() {
-        return new CordovaWebViewImpl(makeWebViewEngine());
-    }
+    
+    
+    
+    
 
-    protected CordovaWebViewEngine makeWebViewEngine() {
-        return CordovaWebViewImpl.createEngine(mContext, preferences);
-    }
-    
-    public void onPause()
-    {
-		if (mJsBC != null) {
-			LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mJsBC);
-			mJsBC = null;
-		}
-		if (mVoiceBC != null) {
-			mContext.unregisterReceiver(mVoiceBC);
-			mVoiceBC = null;
-		}
 
-        if (this.appView != null) {
-            // CB-9382 If there is an activity that started for result and main activity is waiting for callback
-            // result, we shoudn't stop WebView Javascript timers, as activity for result might be using them
-            boolean keepRunning = this.keepRunning || this.cordovaInterface.activityResultCallback != null;
-            this.appView.handlePause(keepRunning);
-        }
-    }
-    
-    public void onResume()
-    {
-		if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
-		mLocalBroadcastManager = LocalBroadcastManager.getInstance(mContext);
-		IntentFilter filter = new IntentFilter();
-		filter.addAction("notify.js.message");
-		filter.addAction("notify.js.log");
-		filter.addAction("notify.js.log.resume");
-		filter.addAction("notify.js.log.pause");
-		mLocalBroadcastManager.registerReceiver(mJsBC, filter);
-
-		if (mVoiceBC == null) mVoiceBC = new VoiceBroadcastReceiver();
-		IntentFilter voicefilter = new IntentFilter();
-		voicefilter.addAction("com.skyworth.srtnj.action.voice.outcmd");
-		mContext.registerReceiver(mVoiceBC, voicefilter);
-
-        if (this.appView == null) {
-            return;
-        }
-
-        this.appView.handleResume(this.keepRunning);
-        
-        this.appView.getView().setVisibility(View.VISIBLE);
-    }
-    
-    public void onStart()
-    {
-        if (this.appView == null) {
-            return;
-        }
-        this.appView.handleStart();
-    }
-    
-    public void onStop()
-    {
-        if (this.appView == null) {
-            return;
-        }
-        this.appView.handleStop();
-    }
-    
-    public void onDestroy()
-    {
-        if (this.appView != null) {
-            appView.handleDestroy();
-        }
-
-		if(mJsBC != null)
-			LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mJsBC);
-    }
-    
-    public void setThemeBg(boolean value) {
-    	isNeedThemeBg = value;
-    }
-    
-    public int getStatus() {
-		return mStatus;
-	}
-
-	public int getPageLoadingProgress() {
-		return mLoadingProgress;
-	}
-
-	public void setCacheMode(int value) {
-		if(value < 0 || value > 3)
-			value = 0;
-		mCacheMode = value;
-	}
-
-	public void setUserAgentMode(int value) {
-		if(value < 0 || value > 3)
-			value = 0;
-		mUserAgentMode = value;
-	}
-
-	public void setWebViewDisplayPolicy(int value) {
-		if(value < 0 || value > 1)
-			mDisplayPolicy = 0;
-		mDisplayPolicy = value;
-	}
-
-	public boolean dispatchKeyEvent(int keyCode) {
-		Log.i(TAG,"CordovaExtWebView dispatchKeyEvent keyCode = " + keyCode);
-		if (appView != null)
-			appView.loadUrlIntoView(
-				"javascript:(function(){var ev=document.createEvent('HTMLEvents');ev.which=ev.keyCode=" +
-						keyCode + ";ev.initEvent('" + "keydown" +
-						"',true, true);document.body.dispatchEvent(ev);})()", false);
-		return true;
-	}
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
