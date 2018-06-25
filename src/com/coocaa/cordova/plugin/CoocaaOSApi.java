@@ -86,6 +86,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String GET_PROPERTY_VALUE = "getPropertiesValue";
     private static final String GET_WEBVIEWSDK_INFO = "getWebViewSDKInfo";
     private static final String GET_CURRENT_THEME = "getCurTheme";
+    private static final String GET_SHOWN_STATUS = "getShownStatus";
     private static final String SET_FOCUS_POSITION = "setFocusPosition";
     /***************************************应用商城任务**********************************************/
     private static final String CREATE_APP_TASK = "createDownloadTask";//创建下载任务
@@ -116,7 +117,9 @@ public class CoocaaOSApi extends CordovaPlugin
     
     private CallbackBroadcastReceiver mCallbackBC = null;
     private BusinessDataListener.CordovaBusinessDataListener mBusinessListener = null;
-    private static final String PAY_ACTION = "coocaa.webviewsdk.action.pay";  
+    private static final String PAY_ACTION = "coocaa.webviewsdk.action.pay";
+
+    private CordovaWebView mWebView;
 
     /**
      * Sets the context of the Command. This can then be used to do things like
@@ -130,10 +133,13 @@ public class CoocaaOSApi extends CordovaPlugin
         Log.v(TAG, TAG + ": initialization");
         super.initialize(cordova, webView);
         mContext = cordova.getActivity();
+
+        mWebView = webView;
+        Log.v("WebViewSDK", "CoocaaOSApi initialization isShown:" + mWebView.getView().isShown());
         
         mCoocaaOSConnecter = cordova.getCoocaaOSConnecter();
         if(mCoocaaOSConnecter != null) isCmdBindSuccess = true;
-        Log.v(TAG, "CoocaaOSApi initialization CoocaaOSConnecter:" + mCoocaaOSConnecter);
+        Log.v("WebViewSDK", "CoocaaOSApi initialization CoocaaOSConnecter:" + mCoocaaOSConnecter);
 
         mBusinessListener = cordova.getCordovaBusinessDataListener();
 
@@ -673,6 +679,11 @@ public class CoocaaOSApi extends CordovaPlugin
             } else {
                 callbackContext.error("mCoocaaOSConnecter is not ready!");
             }
+            return true;
+        }
+        else if (GET_SHOWN_STATUS.equals(action)){
+            Log.v("WebViewSDK", "webview isShown = " + mWebView.getView().isShown());
+            callbackContext.error("no implement");
             return true;
         }
         else if(GET_APP_INFO.equals(action))
