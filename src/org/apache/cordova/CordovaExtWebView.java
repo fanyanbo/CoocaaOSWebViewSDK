@@ -27,6 +27,7 @@ import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -576,6 +577,16 @@ public class CordovaExtWebView extends FrameLayout
 		if(value < 0 || value > 1)
 			mDisplayPolicy = 0;
 		mDisplayPolicy = value;
+	}
+
+	public boolean dispatchKeyEvent(int keyCode) {
+		Log.i(TAG,"CordovaExtWebView dispatchKeyEvent keyCode = " + keyCode);
+		if (appView != null)
+			appView.loadUrlIntoView(
+				"javascript:(function(){var ev=document.createEvent('HTMLEvents');ev.which=ev.keyCode=" +
+						keyCode + ";ev.initEvent('" + "keydown" +
+						"',true, true);document.body.dispatchEvent(ev);})()", false);
+		return true;
 	}
     
     
