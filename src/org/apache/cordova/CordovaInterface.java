@@ -22,6 +22,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import com.coocaa.cordova.plugin.BusinessDataListener;
+
 import org.apache.cordova.CordovaPlugin;
 import org.coocaa.webview.CoocaaOSConnecter;
 
@@ -90,5 +92,9 @@ public interface CordovaInterface {
     public void setCoocaaOSConnecter(CoocaaOSConnecter connecter);
     
     public CoocaaOSConnecter getCoocaaOSConnecter();
+
+    public void setCordovaBusinessDataListener(BusinessDataListener.CordovaBusinessDataListener listener);
+
+    public BusinessDataListener.CordovaBusinessDataListener getCordovaBusinessDataListener();
 
 }

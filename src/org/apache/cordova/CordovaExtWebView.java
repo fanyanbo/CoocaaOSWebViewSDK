@@ -10,6 +10,7 @@ import org.coocaa.webview.CoocaaOSConnecter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.coocaa.cordova.plugin.BusinessDataListener;
 import com.coocaa.cordova.plugin.CoocaaOSApi;
 import com.coocaa.systemwebview.R;
 import com.skyworth.ui.api.SkyWithBGLoadingView;
@@ -333,6 +334,12 @@ public class CordovaExtWebView extends FrameLayout
     public void setCoocaaOSConnecter(CoocaaOSConnecter connecter) {
     	cordovaInterface.setCoocaaOSConnecter(connecter);
     }
+
+	public void setCordovaBusinessDataListener(BusinessDataListener.CordovaBusinessDataListener listener) {
+		if(cordovaInterface != null) {
+			cordovaInterface.setCordovaBusinessDataListener(listener);
+		}
+	}
 
     protected void init() {
         appView = makeWebView();

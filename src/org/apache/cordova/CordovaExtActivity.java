@@ -12,6 +12,8 @@ import org.coocaa.webview.CoocaaOSConnecterDefaultImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.coocaa.cordova.plugin.BusinessDataListener;
+import com.coocaa.cordova.plugin.CoocaaOSApi;
 import com.coocaa.systemwebview.R;
 import com.coocaa.webviewsdk.version.SystemWebViewSDK;
 import com.skyworth.framework.skysdk.properties.SkySystemProperties;
@@ -120,8 +122,9 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    private CordovaWebViewListener mWebViewListener = null;
 	    private CordovaWebPageListener mWebPageListener = null;
 	    private CordovaErrorPageListener mErrorPageListener = null;
+		private BusinessDataListener.CordovaBusinessDataListener mBusinessListener = null;
 	    private JsBroadcastReceiver mJsBC = null;
-		private NetBroadcastReceiver mNetBC = null;
+		private VoiceBroadcastReceiver mVoiceBC = null;
 
 	    LocalBroadcastManager mLocalBroadcastManager;
 
@@ -193,27 +196,18 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 			}
 	    }
 
-		private class NetBroadcastReceiver extends BroadcastReceiver {
+		private class VoiceBroadcastReceiver extends BroadcastReceiver {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				Log.v(TAG, "NetBroadcastReceiver action = " + intent.getAction());
-				if(ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())){
-					if(!isNetConnected(mContext)) {
-						if(mWebViewListener != null)
-							mWebViewListener.onPageError(-101, "net disconnected!", mLoadingUrl);
-					}
+				Log.v(TAG, "VoiceBroadcastReceiver action = " + intent.getAction());
+				if ("com.skyworth.srtnj.action.voice.outcmd".equals(intent.getAction())) {
+					String value = intent.getStringExtra("voicecmd");
+					Log.v(TAG, "com.skyworth.srtnj.action.voice.outcmd key = voicecmd, value = " + value);
+					Map<String, String> map = new HashMap<String, String>();
+					map.put("voicecmd", value);
+					CoocaaOSApi.broadCastVoiceChanged(mContext, map);
 				}
-			}
-
-			public boolean isNetConnected(Context context) {
-				ConnectivityManager connectivityManager = (ConnectivityManager) context
-						.getSystemService(Context.CONNECTIVITY_SERVICE);
-				NetworkInfo info = connectivityManager.getActiveNetworkInfo();
-				if (info != null && info.isAvailable() && info.isConnected()) {
-					return true;
-				} else
-					return false;
 			}
 		}
 	    
@@ -228,6 +222,12 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    public void setCordovaErrorPageListener(CordovaErrorPageListener listener) {
 	    	this.mErrorPageListener = listener;
 	    }
+
+		public void setCordovaBusinessDataListener(BusinessDataListener.CordovaBusinessDataListener listener) {
+			if(cordovaInterface != null) {
+				cordovaInterface.setCordovaBusinessDataListener(listener);
+			}
+		}
 	    /**
 	     * Called when the activity is first created.
 	     */
@@ -271,20 +271,6 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        mainLayout = new CordovaMainLayout(this);
 	        mainLayout.setListener(this);
 
-	        if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
-	        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
-	        IntentFilter filter = new IntentFilter();
-	        filter.addAction("notify.js.message");
-	        filter.addAction("notify.js.log");
-			filter.addAction("notify.js.log.resume");
-			filter.addAction("notify.js.log.pause");
-	        mLocalBroadcastManager.registerReceiver(mJsBC, filter);
-
-			if (mNetBC == null) mNetBC = new NetBroadcastReceiver();
-			IntentFilter netfilter = new IntentFilter();
-			netfilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-			registerReceiver(mNetBC, netfilter);
-	        
 	        cordovaInterface.setCordovaInterfaceListener(new CordovaInterfaceListener() {
 				
 				@Override
@@ -395,12 +381,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 					mEndTime = SystemClock.uptimeMillis();
 					Log.i(TAG,"onPageLoadingFinished (mEndTime - mStartTime)="+(mEndTime - mStartTime));
 					if((mEndTime - mStartTime) < 520l) return;
-					
-//					else if("rtd299x_tv010".equals(mMachineName) || "rtd299x_tv010_4k".equals(mMachineName) || "full_sky918_u1".equals(mMachineName) || "sky818_k1".equals(mMachineName)){
-//						mEndTime = SystemClock.uptimeMillis();
-//						if((mEndTime - mStartTime) < 520l) return;
-//					}
-					
+
 					runOnUiThread(new Runnable() {
 						
 						@Override
@@ -611,7 +592,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        }
 	        cordovaInterface.onCordovaInit(appView.getPluginManager());
 	        
-	        //add by fyb
+	        //set IPC Connecter
 	        cordovaInterface.setCoocaaOSConnecter(new CoocaaOSConnecterDefaultImpl(getCmdConnectorListener()));
 
 	        // Wire the hardware volume controls to control media if desired.
@@ -838,6 +819,15 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        super.onPause();
 	        LOG.d(TAG, "Paused the activity.");
 
+			if (mJsBC != null) {
+				LocalBroadcastManager.getInstance(this).unregisterReceiver(mJsBC);
+				mJsBC = null;
+			}
+			if (mVoiceBC != null) {
+				unregisterReceiver(mVoiceBC);
+				mVoiceBC = null;
+			}
+
 	        if (this.appView != null) {
 	            // CB-9382 If there is an activity that started for result and main activity is waiting for callback
 	            // result, we shoudn't stop WebView Javascript timers, as activity for result might be using them
@@ -864,6 +854,20 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    protected void onResume() {
 	        super.onResume();
 	        LOG.d(TAG, "Resumed the activity.");
+
+			if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
+			mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+			IntentFilter filter = new IntentFilter();
+			filter.addAction("notify.js.message");
+			filter.addAction("notify.js.log");
+			filter.addAction("notify.js.log.resume");
+			filter.addAction("notify.js.log.pause");
+			mLocalBroadcastManager.registerReceiver(mJsBC, filter);
+
+			if (mVoiceBC == null) mVoiceBC = new VoiceBroadcastReceiver();
+			IntentFilter netfilter = new IntentFilter();
+			netfilter.addAction("com.skyworth.srtnj.action.voice.outcmd");
+			registerReceiver(mVoiceBC, netfilter);
 
 	        if (this.appView == null) {
 	            return;
@@ -926,11 +930,6 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        	
 	            appView.handleDestroy();
 	        }
-	       
-	        if(mJsBC != null)
-	        	LocalBroadcastManager.getInstance(this).unregisterReceiver(mJsBC);
-			if(mNetBC != null)
-				unregisterReceiver(mNetBC);
 	    }
 
 	    /**

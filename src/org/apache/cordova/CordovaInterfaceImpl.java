@@ -37,6 +37,7 @@ import org.coocaa.webview.CoocaaOSConnecter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.coocaa.cordova.plugin.BusinessDataListener;
 import com.skyworth.systemwebview.extra.SysWebviewCompatLayer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -89,6 +90,7 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     
     private CordovaInterfaceListener mCordovaListener;
     private CoocaaOSConnecter mCoocaaOSConnecter = null;
+    private BusinessDataListener.CordovaBusinessDataListener mBusinessDataListener = null;
     //set Listener
     public void setCordovaInterfaceListener(CordovaInterfaceListener corListener)
     {
@@ -106,6 +108,16 @@ public class CordovaInterfaceImpl implements CordovaInterface {
 		// TODO Auto-generated method stub
 		return mCoocaaOSConnecter;
 	}
+
+	@Override
+    public void setCordovaBusinessDataListener(BusinessDataListener.CordovaBusinessDataListener listener) {
+        mBusinessDataListener = listener;
+    }
+
+    @Override
+    public BusinessDataListener.CordovaBusinessDataListener getCordovaBusinessDataListener() {
+        return mBusinessDataListener;
+    }
 
     @Override
     public void startActivityForResult(CordovaPlugin command, Intent intent, int requestCode) {
