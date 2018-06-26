@@ -593,7 +593,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        cordovaInterface.onCordovaInit(appView.getPluginManager());
 	        
 	        //set IPC Connecter
-	        cordovaInterface.setCoocaaOSConnecter(new CoocaaOSConnecterDefaultImpl(getCmdConnectorListener()));
+	        cordovaInterface.setCoocaaOSConnecter(new CoocaaOSConnecterDefaultImpl(this, getCmdConnectorListener()));
 
 	        // Wire the hardware volume controls to control media if desired.
 	        String volumePref = preferences.getString("DefaultVolumeStream", "");

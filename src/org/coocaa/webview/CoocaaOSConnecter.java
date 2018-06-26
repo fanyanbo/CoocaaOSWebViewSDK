@@ -67,11 +67,30 @@ public interface CoocaaOSConnecter {
     String getUserAccessToken();
 
     /**
+     * 退出当前登录
+     *
+     * @return
+     */
+    void setUserLogout();
+
+    /**
      * 启动登录
      *
      * @return
      */
     void startQQAcount();
 
+    /**
+     * 启动在线播放
+     *
+     * @return
+     */
+    void startOnlinePlayer(String url, String name, String needParse, String urlType);
+
+    /**
+     * 接收消息
+     *
+     * @return
+     */
     byte[] onHandler(Context context, String fromtarget, String cmd, byte[] body);
 }

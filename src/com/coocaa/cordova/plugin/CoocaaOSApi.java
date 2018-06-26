@@ -75,6 +75,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String HAS_USER_LOGIN = "hasCoocaaUserLogin";//当前用户是否登录
     private static final String GET_USER_INFO = "getUserInfo";//获取用户信息;
     private static final String START_QQ_ACOUNT = "startQQAccount";//启动qq登录
+    private static final String SET_USER_LOGINOUT = "setCoocaaUserLogout";//退出用户登录
     private static final String GET_DEVICE_INFO = "getDeviceInfo";//获取酷开设备信息
     private static final String GET_BASE_INFO = "getBaseInfo";//获取硬件设备信息
     private static final String IS_NET_CONNECTED = "isNetConnected";//获取当前网路连接状态
@@ -631,6 +632,32 @@ public class CoocaaOSApi extends CordovaPlugin
         }
         else if(LAUNCH_ONLINE_MOVIE_PLAYER.equals(action))
         {
+            if (mCoocaaOSConnecter != null) {
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            JSONObject urlObj = args.getJSONObject(0);
+                            JSONObject nameObj = args.getJSONObject(1);
+                            JSONObject needParseObj = args.getJSONObject(2);
+                            JSONObject urlTypeObj = args.getJSONObject(3);
+                            String urlStr = urlObj.getString("url");
+                            String nameStr = nameObj.getString("name");
+                            String needParseStr = "false";
+                            if (needParseObj != null) {
+                                needParseStr = needParseObj.getString("needparse");
+                            }
+                            String urlTypeStr = urlTypeObj.getString("urlType");
+                            mCoocaaOSConnecter.startOnlinePlayer(urlStr,nameStr,needParseStr,urlTypeStr);
+                            callbackContext.success();
+                        } catch (JSONException e) {
+                            callbackContext.error(e.toString());
+                        }
+                    }
+                });
+            } else {
+                callbackContext.error("mCoocaaListener is not ready!");
+            }
             return true;
         }
         else if (GET_USER_INFO.equals(action))
@@ -991,6 +1018,20 @@ public class CoocaaOSApi extends CordovaPlugin
                     @Override
                     public void run() {
                         mCoocaaOSConnecter.startQQAcount();
+                        callbackContext.success();
+                    }
+                });
+            } else {
+                callbackContext.error("mCoocaaListener is not ready!");
+            }
+            return true;
+        }
+        else if (SET_USER_LOGINOUT.equals(action)) {
+            if (mCoocaaOSConnecter != null) {
+                this.cordova.getThreadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCoocaaOSConnecter.setUserLogout();
                         callbackContext.success();
                     }
                 });
