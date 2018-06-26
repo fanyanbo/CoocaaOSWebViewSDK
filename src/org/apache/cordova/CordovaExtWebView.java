@@ -487,6 +487,26 @@ public class CordovaExtWebView extends FrameLayout
 		return true;
 	}
 
+	public void clearHistory() {
+		if (appView != null) {
+			appView.clearHistory();
+		}
+	}
+
+	public boolean canGoBack() {
+		if (appView != null) {
+			return appView.canGoBack();
+		}
+		return false;
+	}
+
+	public boolean backHistory() {
+		if (appView != null) {
+			return appView.backHistory();
+		}
+		return false;
+	}
+
 	//    protected boolean initErrorPage(int errorType) {
 //
 //    	boolean isInitThis = false;
