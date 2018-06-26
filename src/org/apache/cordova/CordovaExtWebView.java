@@ -50,8 +50,9 @@ public class CordovaExtWebView extends FrameLayout
     protected boolean keepRunning = true;
     protected boolean isNeedThemeBg = false;
     protected FrameLayout mainLayout = null;
-	protected SkyWithBGLoadingView mLoadingView = null;
     protected BlurBgLayout mThemeBgLayout = null;
+
+//	  protected SkyWithBGLoadingView mLoadingView = null;
 //    protected boolean isNeedErrorPageBtn = true;
 //    protected FrameLayout mErrorPageLayout = null;
 //    protected BlurBgLayout mErrorPageBgLayout = null;
@@ -169,7 +170,7 @@ public class CordovaExtWebView extends FrameLayout
 		
 		loadConfig();
 
-		cordovaInterface = makeCordovaInterface();		
+		cordovaInterface = makeCordovaInterface();
 		cordovaInterface
 				.setCordovaInterfaceListener(new CordovaInterfaceListener() {
 
@@ -181,12 +182,10 @@ public class CordovaExtWebView extends FrameLayout
 					@Override
 					public void onReceivedTitle(String title) {
 						Log.v(TAG, "CordovaWebView onReceivedTitle title == " + title);
-						if(title != null){
-							if(title.contains("404")){
-								if(mWebViewListener != null)
+						if (title != null) {
+							if (title.contains("404")) {
+								if (mWebViewListener != null)
 									mWebViewListener.onPageError(404, "404 Not Found", mCurRequestUrl);
-//								isNeedErrorPageBtn = false;
-//								showErrorPage(ERROR_SIGNALWEAK);
 								mStatus = STATUS_LOADED_ERROR;
 							}
 						}
@@ -199,19 +198,14 @@ public class CordovaExtWebView extends FrameLayout
 
 					@Override
 					public void onReceivedError(final int errorCode,
-							String description, String failingUrl) {
-						Log.v(TAG,"CordovaWebView onReceivedError description = " + description + ",errorCode = " + errorCode);
-						if(mWebViewListener != null)
+												String description, String failingUrl) {
+						Log.v(TAG, "CordovaWebView onReceivedError description = " + description + ",errorCode = " + errorCode);
+						if (mWebViewListener != null)
 							mWebViewListener.onPageError(errorCode, description, failingUrl);
-						
+
 						mStartTime = SystemClock.uptimeMillis();
-						Log.i(TAG,"onReceivedError mStartTime="+mStartTime);
-						
-//						if(errorCode == -2){
-//							showErrorPage(ERROR_DISCONNECT);
-//						}else{
-//							showErrorPage(ERROR_SIGNALWEAK);
-//						}
+						Log.i(TAG, "onReceivedError mStartTime=" + mStartTime);
+
 						mStatus = STATUS_LOADED_ERROR;
 					}
 
@@ -219,36 +213,31 @@ public class CordovaExtWebView extends FrameLayout
 					public void onReceivedSslError(int errorCode, String failingUrl) {
 						Log.v(TAG, "onReceivedSslError errorCode = " + errorCode + ",failingUrl = " + failingUrl);
 
-                        if(mWebViewListener != null)
-                            mWebViewListener.onPageSslError(errorCode, failingUrl);
+						if (mWebViewListener != null)
+							mWebViewListener.onPageSslError(errorCode, failingUrl);
 					}
 
 					@Override
 					public void onProgressChanged(int process) {
-						Log.v(TAG,"CordovaWebView onProgressChanged process == "+ process);
+						Log.v(TAG, "CordovaWebView onProgressChanged process == " + process);
 						mLoadingProgress = process;
 
-                        if(mWebViewListener != null)
-                            mWebViewListener.onProgressChanged(process);
+						if (mWebViewListener != null)
+							mWebViewListener.onProgressChanged(process);
 					}
 
 					@Override
 					public void onPageStarted(String url) {
-						Log.v(TAG,"CordovaWebView onPageStarted url == "+ url);
-						
+						Log.v(TAG, "CordovaWebView onPageStarted url == " + url);
+
 						mCurRequestUrl = url;
 
 						mEndTime = SystemClock.uptimeMillis();
-						Log.i(TAG,"onPageStarted (mEndTime - mStartTime)="+(mEndTime - mStartTime));
-						if((mEndTime - mStartTime) < 500l) return;
-						
-						if(mWebViewListener != null)
-							mWebViewListener.onPageStarted(url);
-						
-						if(mLoadingView!=null)
-							mLoadingView.showLoading();
+						Log.i(TAG, "onPageStarted (mEndTime - mStartTime)=" + (mEndTime - mStartTime));
+						if ((mEndTime - mStartTime) < 500l) return;
 
-						if(mDisplayPolicy == 0) appView.getView().setVisibility(View.INVISIBLE);
+						if (mWebViewListener != null)
+							mWebViewListener.onPageStarted(url);
 
 						mStatus = STATUS_LOADING;
 						mLoadingProgress = 0;
@@ -256,23 +245,20 @@ public class CordovaExtWebView extends FrameLayout
 
 					@Override
 					public void onPageExit() {
-						if(mWebViewListener != null)
+						if (mWebViewListener != null)
 							mWebViewListener.onPageExit();
 					}
 
 					@Override
 					public void onPageLoadingFinished(String url) {
-						Log.v(TAG,"CordovaWebView onPageLoadingFinished url == "+ url);
+						Log.v(TAG, "CordovaWebView onPageLoadingFinished url == " + url);
 
 						mEndTime = SystemClock.uptimeMillis();
-						Log.i(TAG,"onPageLoadingFinished (mEndTime - mStartTime)="+(mEndTime - mStartTime));
-						if((mEndTime - mStartTime) < 520l) return;
-						
-						if(mWebViewListener != null)
+						Log.i(TAG, "onPageLoadingFinished (mEndTime - mStartTime)=" + (mEndTime - mStartTime));
+						if ((mEndTime - mStartTime) < 520l) return;
+
+						if (mWebViewListener != null)
 							mWebViewListener.onPageFinished(url);
-						
-						if(mLoadingView != null)
-							mLoadingView.dismissLoading();
 
 						appView.getView().setVisibility(View.VISIBLE);
 
@@ -281,11 +267,11 @@ public class CordovaExtWebView extends FrameLayout
 
 					@Override
 					public void doUpdateVisitedHistory(String url,
-							boolean isReload) {
+													   boolean isReload) {
 					}
 				});
 
-	    init();   
+//	    init();   //???
 	}
 
 	public void setCordovaExtWebViewListener(CordovaExtWebViewListener listener) {
@@ -319,7 +305,22 @@ public class CordovaExtWebView extends FrameLayout
 
         appView.loadUrlIntoView(url, true);
     }
-    
+
+	public void loadUrl(String url, Map<String,String> header) {
+
+		if (appView == null) {
+			init();
+		}
+		mStatus = STATUS_NO_LOADING;
+		// If keepRunning
+		this.keepRunning = preferences.getBoolean("KeepRunning", true);
+
+		if(header != null)
+			appView.loadUrlIntoView(url,header,true);
+		else
+			appView.loadUrlIntoView(url,true);
+	}
+
     protected CordovaInterfaceImpl makeCordovaInterface() {    	
         return new CordovaInterfaceImpl(mContext);
     }
@@ -347,14 +348,14 @@ public class CordovaExtWebView extends FrameLayout
     protected void createViews() {
     	
     	mainLayout = new FrameLayout(mContext);
-    	
-        if(isNeedThemeBg){
-        	mThemeBgLayout = new BlurBgLayout(mContext);
-        	mThemeBgLayout.setPageType(BlurBgLayout.PAGETYPE.SECONDE_PAGE);
-        	mThemeBgLayout.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        	mainLayout.addView(mThemeBgLayout);
-        }
-        //Why are we setting a constant as the ID? This should be investigated
+		Log.i("WebViewSDK","createViews isNeedThemeBg = " + isNeedThemeBg);
+		if (isNeedThemeBg) {
+			mThemeBgLayout = new BlurBgLayout(mContext);
+			mThemeBgLayout.setPageType(BlurBgLayout.PAGETYPE.SECONDE_PAGE);
+			mThemeBgLayout.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+			mainLayout.addView(mThemeBgLayout);
+		}
+		//Why are we setting a constant as the ID? This should be investigated
         appView.getView().setId(100);
         appView.getView().setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -364,16 +365,14 @@ public class CordovaExtWebView extends FrameLayout
         appView.getView().setBackgroundColor(Color.BLACK);
         appView.getView().requestFocusFromTouch();
         
-        mLoadingView = new SkyWithBGLoadingView(mContext);
-        FrameLayout.LayoutParams loading_p = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,FrameLayout.LayoutParams.WRAP_CONTENT);
-        loading_p.gravity = Gravity.CENTER;
-        mainLayout.addView(mLoadingView, loading_p);
+//        mLoadingView = new SkyWithBGLoadingView(mContext);
+//        FrameLayout.LayoutParams loading_p = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,FrameLayout.LayoutParams.WRAP_CONTENT);
+//        loading_p.gravity = Gravity.CENTER;
+//        mainLayout.addView(mLoadingView, loading_p);
         
         this.addView(mainLayout,new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.MATCH_PARENT));
     }
-    
 
-    
     protected CordovaWebView makeWebView() {
         return new CordovaWebViewImpl(makeWebViewEngine());
     }
@@ -447,7 +446,8 @@ public class CordovaExtWebView extends FrameLayout
 			LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mJsBC);
 	}
 
-	public void setThemeBg(boolean value) {
+	public void setNeedThemeBg(boolean value) {
+		Log.i("WebViewSDK","call setNeedThemeBg value :" + value);
     	isNeedThemeBg = value;
     }
     
@@ -507,7 +507,7 @@ public class CordovaExtWebView extends FrameLayout
 		return false;
 	}
 
-	//    protected boolean initErrorPage(int errorType) {
+//    protected boolean initErrorPage(int errorType) {
 //
 //    	boolean isInitThis = false;
 //
@@ -597,11 +597,5 @@ public class CordovaExtWebView extends FrameLayout
 //		if(mErrorPageLayout!=null)
 //			mErrorPageLayout.setVisibility(View.INVISIBLE);
 //	}
-    
-    
-    
-    
-    
-
 
 }
