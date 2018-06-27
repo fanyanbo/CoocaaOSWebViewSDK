@@ -48,7 +48,7 @@ public class CordovaExtWebView extends FrameLayout
     protected CordovaInterfaceImpl cordovaInterface;
     
     protected boolean keepRunning = true;
-    protected boolean isNeedThemeBg = false;
+    protected boolean mNeedThemeBg = false;
     protected FrameLayout mainLayout = null;
     protected BlurBgLayout mThemeBgLayout = null;
 
@@ -295,18 +295,23 @@ public class CordovaExtWebView extends FrameLayout
     /**
      * Load the url into the webview.
      */
-    public void loadUrl(String url) {
-        if (appView == null) {
-            init();
-        }
+	public void loadUrl(String url) {
+		if (appView == null) {
+			init();
+		}
 		mStatus = STATUS_NO_LOADING;
-        // If keepRunning
-        this.keepRunning = preferences.getBoolean("KeepRunning", true);
+		// If keepRunning
+		this.keepRunning = preferences.getBoolean("KeepRunning", true);
 
-        appView.loadUrlIntoView(url, true);
-    }
+		appView.loadUrlIntoView(url, true);
+	}
 
-	public void loadUrl(String url, Map<String,String> header) {
+	public void loadUrl(String url, boolean isNeedThemeBg) {
+		this.mNeedThemeBg = isNeedThemeBg;
+		loadUrl(url);
+	}
+
+	public void loadUrl(String url, Map<String, String> header) {
 
 		if (appView == null) {
 			init();
@@ -315,10 +320,15 @@ public class CordovaExtWebView extends FrameLayout
 		// If keepRunning
 		this.keepRunning = preferences.getBoolean("KeepRunning", true);
 
-		if(header != null)
-			appView.loadUrlIntoView(url,header,true);
+		if (header != null)
+			appView.loadUrlIntoView(url, header, true);
 		else
-			appView.loadUrlIntoView(url,true);
+			appView.loadUrlIntoView(url, true);
+	}
+
+	public void loadUrl(String url, boolean isNeedThemeBg, Map<String, String> header) {
+		this.mNeedThemeBg = isNeedThemeBg;
+		loadUrl(url, header);
 	}
 
     protected CordovaInterfaceImpl makeCordovaInterface() {    	
@@ -348,8 +358,8 @@ public class CordovaExtWebView extends FrameLayout
     protected void createViews() {
     	
     	mainLayout = new FrameLayout(mContext);
-		Log.i("WebViewSDK","createViews isNeedThemeBg = " + isNeedThemeBg);
-		if (isNeedThemeBg) {
+		Log.i("WebViewSDK","createViews isNeedThemeBg = " + mNeedThemeBg);
+		if (mNeedThemeBg) {
 			mThemeBgLayout = new BlurBgLayout(mContext);
 			mThemeBgLayout.setPageType(BlurBgLayout.PAGETYPE.SECONDE_PAGE);
 			mThemeBgLayout.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -447,8 +457,7 @@ public class CordovaExtWebView extends FrameLayout
 	}
 
 	public void setNeedThemeBg(boolean value) {
-		Log.i("WebViewSDK","call setNeedThemeBg value :" + value);
-    	isNeedThemeBg = value;
+    	this.mNeedThemeBg = value;
     }
     
     public int getStatus() {
@@ -506,96 +515,5 @@ public class CordovaExtWebView extends FrameLayout
 		}
 		return false;
 	}
-
-//    protected boolean initErrorPage(int errorType) {
-//
-//    	boolean isInitThis = false;
-//
-//    	if(mErrorPageBgLayout == null) {
-//            mErrorPageLayout = new FrameLayout(mContext);
-//            mErrorPageBgLayout = new BlurBgLayout(mContext);
-//            mErrorPageBgLayout.setPageType(BlurBgLayout.PAGETYPE.SECONDE_PAGE);
-//            mErrorPageBgLayout.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-//    		mErrorPageLayout.addView(mErrorPageBgLayout);
-//
-//    		double heightRate = getHeight() / 1080.0;
-//    		Log.i(TAG, "width = " + getWidth() + ", height = " +getHeight() + ",heightRate = " + heightRate);
-//
-//    		mErrorPageImageView = new ImageView(mContext);
-//			FrameLayout.LayoutParams imgViewLp = new FrameLayout.LayoutParams(
-//					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-//			imgViewLp.gravity = Gravity.CENTER_HORIZONTAL;
-//			imgViewLp.topMargin = SkyScreenParams.getInstence(mContext).getResolutionValue((int)(300*heightRate));
-//
-//			mErrorPageTextView = new TextView(mContext);
-//			mErrorPageTextView.setTextSize(SkyScreenParams.getInstence(mContext).getTextDpiValue(36));
-//			mErrorPageTextView.setTextColor(getResources().getColor(R.color.c_4));
-//			FrameLayout.LayoutParams txtViewLp = new FrameLayout.LayoutParams(
-//					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-//			txtViewLp.gravity = Gravity.CENTER_HORIZONTAL;
-//			txtViewLp.topMargin = SkyScreenParams.getInstence(mContext).getResolutionValue((int)(552*heightRate));
-//
-//			mErrorPageBtnView = new Button(mContext);
-//			mErrorPageBtnView.setFocusable(true);
-//			mErrorPageBtnView.setFocusableInTouchMode(true);
-//			mErrorPageBtnView.setTextSize(SkyScreenParams.getInstence(mContext).getTextDpiValue(30));
-//			mErrorPageBtnView.setTextColor(Color.BLACK);
-//			mErrorPageBtnView.setOnClickListener(clickListener);
-//			mErrorPageBtnView.setBackgroundResource(R.drawable.ui_sdk_btn_focus_shadow_bg);
-//			mErrorPageBtnView.requestFocus();
-//			FrameLayout.LayoutParams btnViewLp = new FrameLayout.LayoutParams(
-//					SkyScreenParams.getInstence(mContext).getResolutionValue(410), SkyScreenParams.getInstence(mContext).getResolutionValue(238));
-//			btnViewLp.gravity = Gravity.CENTER_HORIZONTAL;
-//			btnViewLp.topMargin = SkyScreenParams.getInstence(mContext).getResolutionValue((int)(575*heightRate));
-//
-//			mErrorPageLayout.addView(mErrorPageImageView,imgViewLp);
-//			mErrorPageLayout.addView(mErrorPageTextView,txtViewLp);
-//			mErrorPageLayout.addView(mErrorPageBtnView,btnViewLp);
-//
-//			if(mErrorPageBtnView != null && !isNeedErrorPageBtn)
-//				mErrorPageBtnView.setVisibility(View.GONE);
-//
-//			isInitThis = true;
-//		}
-//
-//		switch(errorType){
-//		case 1:
-//			mErrorPageTextView.setText(R.string.error_webview_netdisconnect);
-//			mErrorPageImageView.setImageResource(R.drawable.new_disconnect);
-//			mErrorPageBtnView.setText(R.string.error_webview_reset);
-//			mErrorPageBtnView.setTag("1");
-//			break;
-//		case 2:
-//		default:
-//			mErrorPageTextView.setText(R.string.error_webview_neterror);
-//			mErrorPageImageView.setImageResource(R.drawable.new_refresh);
-//			mErrorPageBtnView.setText(R.string.error_webview_refresh);
-//			mErrorPageBtnView.setTag("2");
-//			break;
-//		}
-//
-//		return isInitThis;
-//    }
-//
-//    protected void showErrorPage(int errorType) {
-//
-//    	boolean isInit = initErrorPage(errorType);
-//    	if(isInit) {
-//			FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-//					LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-//			mainLayout.addView(mErrorPageLayout, lp);
-//		}
-//		else {
-//			mErrorPageLayout.setVisibility(View.VISIBLE);
-//		}
-//
-//    	mErrorPageBtnView.requestFocus();
-//    }
-//
-//	protected void hideErrorPage() {
-//
-//		if(mErrorPageLayout!=null)
-//			mErrorPageLayout.setVisibility(View.INVISIBLE);
-//	}
 
 }
