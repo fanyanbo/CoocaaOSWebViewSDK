@@ -1,4 +1,4 @@
-# CoocaaOSWebViewSDK【feature-20180309分支】
+# CoocaaOSWebViewSDK【封装View功能】
 
 - **概述**
  > 该SDK是基于Apache Cordova WebApp开源框架进行的一层封装，并扩展了若干个功能插件深度对接酷开系统，将酷开系统的能力提供给Web使用，它是基于酷开系统Web前端开发的核心支撑组件。
@@ -88,14 +88,14 @@ public class MainApplication extends SkyApplication{
   <tr>
     <td bgcolor=#eeeeee> loadUrl </td>
     <td> 加载链接地址url  </td>
-    <td> 网络和本地url均支持，可在线程中调用  </td>
+    <td> 网络和本地url均支持，可在线程中调用，参数url, isNeedThemeBg, header</td>
   </tr>
   <tr>
     <td bgcolor=#00FF00> setCoocaaOSConnecter </td>
     <td> 调用该方法后，web前端才能获取酷开系统能力，可自己实现接口，也可使用默认实现 </td>
     <td> 在调用loadUrl前进行设置  </td>
   <tr>
-    <td bgcolor=rgb(0,10,0)>setThemeBg </td>
+    <td bgcolor=rgb(0,10,0)>setNeedThemeBg </td>
     <td> view是否显示主题背景 </td>
     <td>  在loadUrl前进行设置 </td>
   </tr>
@@ -197,7 +197,11 @@ public class MainApplication extends SkyApplication{
             @Override
             public void onPageStarted(String url) {
             }
-
+	    
+	    @Override
+            public void onPageExit() {
+            }
+	    
             @Override
             public void onPageFinished(String url) {
             }
