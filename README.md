@@ -34,7 +34,7 @@
 
 ## Android App集成文档
 
-### 无论是以继承Activity的方式还是用View的方式，Android App一定要集成酷开系统IPC通讯框架，否则该SDK无法正常加载需要与酷开系统进行通信的页面
+### 无论是以继承Activity的方式还是用View的方式，Android App一定要集成酷开系统IPC通讯框架，否则该SDK无法正常加载需要与酷开系统进行通信的Web页面
 - **继承Activity的方式**
 * `项目工程依赖SkySDK` 
 * `继承SkyApplication` <br/>
