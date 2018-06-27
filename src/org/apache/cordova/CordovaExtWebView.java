@@ -85,7 +85,7 @@ public class CordovaExtWebView extends FrameLayout
     public interface CordovaExtWebViewListener
     {
     	public void onPageStarted(String url);
-		public void onPageExit();
+		public void onPageExit(); //在Activity方式中不需要该接口回调
     	public void onPageFinished(String url);
     	public void onPageError(int errorCode, String description, String failingUrl);
         public void onPageSslError(int errorCode, String failingUrl);
@@ -369,7 +369,7 @@ public class CordovaExtWebView extends FrameLayout
         appView.getView().setId(100);
         appView.getView().setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));       
+                ViewGroup.LayoutParams.MATCH_PARENT));
         mainLayout.addView(appView.getView());
 
         appView.getView().setBackgroundColor(Color.BLACK);
@@ -514,6 +514,14 @@ public class CordovaExtWebView extends FrameLayout
 			return appView.backHistory();
 		}
 		return false;
+	}
+
+	public void stopLoading() {
+		if (appView != null) {
+			appView.clearHistory();
+			appView.clearCache();
+			appView.stopLoading();
+		}
 	}
 
 }
