@@ -85,7 +85,7 @@ public class CordovaExtWebView extends FrameLayout
     public interface CordovaExtWebViewListener
     {
     	public void onPageStarted(String url);
-		public void onPageExit(); //在Activity方式中不需要该接口回调
+		public void onPageExit();
     	public void onPageFinished(String url);
     	public void onPageError(int errorCode, String description, String failingUrl);
         public void onPageSslError(int errorCode, String failingUrl);
