@@ -12,10 +12,7 @@ import org.json.JSONObject;
 
 import com.coocaa.cordova.plugin.BusinessDataListener;
 import com.coocaa.cordova.plugin.CoocaaOSApi;
-import com.coocaa.systemwebview.R;
-import com.skyworth.ui.api.SkyWithBGLoadingView;
 import com.skyworth.ui.blurbg.BlurBgLayout;
-import com.skyworth.util.SkyScreenParams;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -26,14 +23,9 @@ import android.graphics.Color;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 public class CordovaExtWebView extends FrameLayout
 {
@@ -169,6 +161,8 @@ public class CordovaExtWebView extends FrameLayout
 		mContext = context;
 		
 		loadConfig();
+
+        registerJsDataReceiver();
 
 		cordovaInterface = makeCordovaInterface();
 		cordovaInterface
@@ -398,10 +392,7 @@ public class CordovaExtWebView extends FrameLayout
     }
 
 	public void onPause() {
-		if (mJsBC != null) {
-			LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mJsBC);
-			mJsBC = null;
-		}
+
 		if (mVoiceBC != null) {
 			mContext.unregisterReceiver(mVoiceBC);
 			mVoiceBC = null;
@@ -416,14 +407,6 @@ public class CordovaExtWebView extends FrameLayout
 	}
 
 	public void onResume() {
-		if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
-		mLocalBroadcastManager = LocalBroadcastManager.getInstance(mContext);
-		IntentFilter filter = new IntentFilter();
-		filter.addAction("notify.js.message");
-		filter.addAction("notify.js.log");
-		filter.addAction("notify.js.log.resume");
-		filter.addAction("notify.js.log.pause");
-		mLocalBroadcastManager.registerReceiver(mJsBC, filter);
 
 		if (mVoiceBC == null) mVoiceBC = new VoiceBroadcastReceiver();
 		IntentFilter voicefilter = new IntentFilter();
@@ -457,9 +440,7 @@ public class CordovaExtWebView extends FrameLayout
 		if (this.appView != null) {
 			appView.handleDestroy();
 		}
-
-		if (mJsBC != null)
-			LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mJsBC);
+		unregisterJsDataReceiver();
 	}
 
 	public void setNeedThemeBg(boolean value) {
@@ -530,4 +511,21 @@ public class CordovaExtWebView extends FrameLayout
 		}
 	}
 
+	private void registerJsDataReceiver() {
+        if (mJsBC == null) mJsBC = new JsBroadcastReceiver();
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(mContext);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("notify.js.message");
+        filter.addAction("notify.js.log");
+        filter.addAction("notify.js.log.resume");
+        filter.addAction("notify.js.log.pause");
+        mLocalBroadcastManager.registerReceiver(mJsBC, filter);
+    }
+
+    private void unregisterJsDataReceiver() {
+        if (mJsBC != null) {
+            LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mJsBC);
+            mJsBC = null;
+        }
+    }
 }
