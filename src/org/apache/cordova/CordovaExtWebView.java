@@ -331,6 +331,12 @@ public class CordovaExtWebView extends FrameLayout
 		loadUrl(url, header);
 	}
 
+	public void loadUrlIntoView(String url, boolean recreatePlugins) {
+		if (appView != null) {
+			appView.loadUrlIntoView(url, recreatePlugins);
+		}
+	}
+
     protected CordovaInterfaceImpl makeCordovaInterface() {    	
         return new CordovaInterfaceImpl(mContext);
     }
