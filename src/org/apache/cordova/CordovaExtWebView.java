@@ -490,7 +490,7 @@ public class CordovaExtWebView extends FrameLayout
 				keyCode = 40;
 			}
 			if(keyCode > 0 && mMachineName != null && ( mMachineName.equals("rtd299x_tv010_4k") || mMachineName.equals("h25ref"))){
-				Log.i(TAG,"CordovaExtActivity dispatchKeyEvent keyCode = " + keyCode);
+				Log.i(TAG,"CordovaExtWebView dispatchKeyEvent keyCode = " + keyCode);
 				appView.loadUrlIntoView(
 						"javascript:(function(){var ev=document.createEvent('HTMLEvents');ev.which=ev.keyCode=" +
 								keyCode + ";ev.initEvent('" + "keydown" +
