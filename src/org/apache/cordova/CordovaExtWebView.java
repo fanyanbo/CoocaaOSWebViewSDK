@@ -12,6 +12,8 @@ import org.json.JSONObject;
 
 import com.coocaa.cordova.plugin.BusinessDataListener;
 import com.coocaa.cordova.plugin.CoocaaOSApi;
+import com.coocaa.webviewsdk.version.SystemWebViewSDK;
+import com.skyworth.framework.skysdk.properties.SkySystemProperties;
 import com.skyworth.ui.blurbg.BlurBgLayout;
 
 import android.content.BroadcastReceiver;
@@ -23,6 +25,7 @@ import android.graphics.Color;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -67,6 +70,7 @@ public class CordovaExtWebView extends FrameLayout
 	protected int mCacheMode = 1;//0:no-cache,1:default,2:cache_only,3:cache_else_network
 	protected int mUserAgentMode = 0;//0:Android,1:IE9,2:IPad
 	protected int mDisplayPolicy = 0;//0:100%-display,1:always-display
+	protected String mMachineName = null;
     
     private CordovaExtWebViewListener mWebViewListener = null;
 	private CordovaExtWebViewDataListener mWebViewDataListener = null;
@@ -163,6 +167,9 @@ public class CordovaExtWebView extends FrameLayout
 		loadConfig();
 
         registerJsDataReceiver();
+
+		mMachineName = SkySystemProperties.getProperty("ro.product.name");
+		Log.i(TAG,"CordovaExtWebView constructor WebviewSDK version = " + SystemWebViewSDK.getVersionName() + ",mMachineName = " + mMachineName);
 
 		cordovaInterface = makeCordovaInterface();
 		cordovaInterface
@@ -322,7 +329,7 @@ public class CordovaExtWebView extends FrameLayout
 
 	public void loadUrl(String url, boolean isNeedThemeBg, Map<String, String> header) {
 		this.mNeedThemeBg = isNeedThemeBg;
-		loadUrl(url, header);
+		this.loadUrl(url, header);
 	}
 
 	public void loadUrlIntoView(String url, boolean recreatePlugins) {
@@ -473,14 +480,26 @@ public class CordovaExtWebView extends FrameLayout
 		mDisplayPolicy = value;
 	}
 
-	public boolean dispatchKeyEvent(int keyCode) {
-		Log.i(TAG,"CordovaExtWebView dispatchKeyEvent keyCode = " + keyCode);
-		if (appView != null)
-			appView.loadUrlIntoView(
-				"javascript:(function(){var ev=document.createEvent('HTMLEvents');ev.which=ev.keyCode=" +
-						keyCode + ";ev.initEvent('" + "keydown" +
-						"',true, true);document.body.dispatchEvent(ev);})()", false);
-		return true;
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		if (appView != null && event.getAction() == KeyEvent.ACTION_DOWN){
+			int keyCode = 0;
+			if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP){
+				keyCode = 38;
+			}else if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN){
+				keyCode = 40;
+			}
+			if(keyCode > 0 && mMachineName != null && ( mMachineName.equals("rtd299x_tv010_4k") || mMachineName.equals("h25ref"))){
+				Log.i(TAG,"CordovaExtActivity dispatchKeyEvent keyCode = " + keyCode);
+				appView.loadUrlIntoView(
+						"javascript:(function(){var ev=document.createEvent('HTMLEvents');ev.which=ev.keyCode=" +
+								keyCode + ";ev.initEvent('" + "keydown" +
+								"',true, true);document.body.dispatchEvent(ev);})()", false);
+				return true;
+			}
+		}
+
+		return super.dispatchKeyEvent(event);
 	}
 
 	public void clearHistory() {
