@@ -202,6 +202,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 					return jsonObject.toString();
 				} catch (JSONException e) {
 					e.printStackTrace();
+					Log.e(TAG,e.getMessage());
 				}
 			}
 		}

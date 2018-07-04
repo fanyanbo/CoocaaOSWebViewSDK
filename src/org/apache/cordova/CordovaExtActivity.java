@@ -342,13 +342,13 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 					Log.v(TAG, "onPageStarted url == " +url);
 					
 					mLoadingUrl = url;
-					
-					if(mWebViewListener != null)
-						mWebViewListener.onPageStarted(url);
-					
+
 					mEndTime = SystemClock.uptimeMillis();
 					Log.i(TAG,"onPageStarted (mEndTime - mStartTime)="+(mEndTime - mStartTime));
 					if((mEndTime - mStartTime) < 500l) return;
+					
+					if(mWebViewListener != null)
+						mWebViewListener.onPageStarted(url);
 					
 					runOnUiThread(new Runnable() {
 						
@@ -374,13 +374,13 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 				@Override
 				public void onPageLoadingFinished(String url) {
 					Log.v(TAG, "onPageLoadingFinished url == " +url);
-										
-					if(mWebViewListener != null)
-						mWebViewListener.onPageFinished(url);
-					
+
 					mEndTime = SystemClock.uptimeMillis();
 					Log.i(TAG,"onPageLoadingFinished (mEndTime - mStartTime)="+(mEndTime - mStartTime));
 					if((mEndTime - mStartTime) < 520l) return;
+
+					if(mWebViewListener != null)
+						mWebViewListener.onPageFinished(url);
 
 					runOnUiThread(new Runnable() {
 						

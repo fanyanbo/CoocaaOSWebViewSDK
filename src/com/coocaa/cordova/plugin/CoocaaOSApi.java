@@ -687,8 +687,8 @@ public class CoocaaOSApi extends CordovaPlugin
         else if (GET_DEVICE_INFO.equals(action))
         {
             if (mCoocaaOSConnecter != null) {
-                Log.v("WebViewSDK", "getDeviceInfo myTid() = " + android.os.Process.myTid());
                 String result = mCoocaaOSConnecter.getDeviceInfo();
+                Log.v("WebViewSDK", "getDeviceInfo result = " + result);
                 if (result == null) {
                     callbackContext.error("error occurs when called getDeviceInfo");
                 } else {
