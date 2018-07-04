@@ -3,6 +3,7 @@ package org.coocaa.webview;
 import java.net.URISyntaxException;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,6 +13,7 @@ import android.util.Log;
 
 import com.coocaa.cordova.plugin.CoocaaOSApi;
 import com.coocaa.cordova.plugin.CoocaaUserInfoParser;
+import com.coocaa.push.api.PushApi;
 import com.skyworth.framework.skysdk.ipc.SkyApplication;
 import com.skyworth.framework.skysdk.ipc.SkyCmdURI;
 import com.skyworth.framework.skysdk.util.SkyJSONUtil;
@@ -36,6 +38,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
     private TCSystemService systemApi;
     private NetApiForCommon netApi;
     private SkyUserApi userApi;
+	private PushApi pushApi;
 	private SkyMediaApi mediaApi;
 	SkyApplication.SkyCmdConnectorListener mListener;
 	public static final String TAG = "WebViewSDK";
@@ -52,6 +55,7 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 			userApi = new SkyUserApi(listener);
 			mediaApi = new SkyMediaApi(listener);
 			mediaApi.setContext(context);
+			pushApi = new PushApi();
 		}
 	}
 
@@ -209,7 +213,37 @@ public class CoocaaOSConnecterDefaultImpl implements CoocaaOSConnecter{
 		return null;
 	}
 
-	@Override
+    @Override
+    public String getPushInfo(String pkgList) {
+        JSONObject jsonParams = null;
+        JSONObject resultObject = new JSONObject();
+        try {
+            jsonParams = new JSONObject(pkgList);
+            JSONArray params = jsonParams.getJSONArray("pkgList");
+            if (params.length() > 0) {
+                for (int i = 0; i < params.length(); i++) {
+                    String pkgName = params.getString(i);
+                    Log.i("WebViewSDK", "get pushid pkgName = " + pkgName);
+                    JSONObject valueObject = new JSONObject();
+                    String pushId = pushApi.getPushIdByPackageName(SkyApplication.getApplication(), mListener, pkgName);
+                    if (pushId != null && pushId.length() > 0) {
+                        valueObject.put("status", "0");
+                        valueObject.put("pushId", pushId);
+                    } else {
+                        valueObject.put("status", "-1");
+                        valueObject.put("pushId", "");
+                    }
+                    resultObject.put(pkgName, valueObject);
+                }
+                return resultObject.toString();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
 	public String isNetConnected() {
 
         Log.i(TAG,"CoocaaOSConnecterDefaultImpl isNetConnected");

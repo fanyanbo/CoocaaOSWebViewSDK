@@ -84,6 +84,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String GET_DEVICE_LOCATION = "getDeviceLocation";//获取当前设备的城市地址
     private static final String GET_USER_ACCESS_TOKEN = "getUserAccessToken";//获取用户的登录token
     private static final String GET_APP_INFO = "getAppInfo";
+    private static final String GET_PUSH_INFO = "getPushInfo";
     private static final String GET_PROPERTY_VALUE = "getPropertiesValue";
     private static final String GET_WEBVIEWSDK_INFO = "getWebViewSDKInfo";
     private static final String GET_CURRENT_THEME = "getCurTheme";
@@ -136,7 +137,7 @@ public class CoocaaOSApi extends CordovaPlugin
         mContext = cordova.getActivity();
         mWebView = webView;
         mCoocaaOSConnecter = cordova.getCoocaaOSConnecter();
-        if(mCoocaaOSConnecter != null) isCmdBindSuccess = true;
+        if (mCoocaaOSConnecter != null) isCmdBindSuccess = true;
         Log.v("WebViewSDK", "CoocaaOSApi initialization CoocaaOSConnecter:" + mCoocaaOSConnecter);
         mBusinessListener = cordova.getCordovaBusinessDataListener();
 
@@ -148,88 +149,78 @@ public class CoocaaOSApi extends CordovaPlugin
 
     private class CallbackBroadcastReceiver extends BroadcastReceiver {
 
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			
-			Log.i("WebViewSDK","onReceive getAction = " + intent.getAction());
-			if(PAY_ACTION.equals(intent.getAction())){
-	            int resultstatus = intent.getIntExtra("resultstatus", -1);
-	            String tradeId = intent.getStringExtra("tradeId");
-	            String resultmsg = intent.getStringExtra("resultmsg");
-	            String purchWay = intent.getStringExtra("purchWay");
+        @Override
+        public void onReceive(Context context, Intent intent) {
 
-				JSONObject jsonObject = new JSONObject();
-	             try {
-	                 jsonObject.put("presultstatus", resultstatus);
-	                 jsonObject.put("ptradeid", tradeId);
-	                 jsonObject.put("presultmsg", resultmsg);
-	                 jsonObject.put("ppurchWay", purchWay);
-	                 broadCastPurchase(mContext, jsonObject);
-	             } catch (JSONException e) {
-	                 e.printStackTrace();
-	                 Log.e(TAG, "WebPurchaseCallBack error:"+ e.toString());
-	             }
-			}
-		}
+            Log.i("WebViewSDK", "onReceive getAction = " + intent.getAction());
+            if (PAY_ACTION.equals(intent.getAction())) {
+                int resultstatus = intent.getIntExtra("resultstatus", -1);
+                String tradeId = intent.getStringExtra("tradeId");
+                String resultmsg = intent.getStringExtra("resultmsg");
+                String purchWay = intent.getStringExtra("purchWay");
+
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("presultstatus", resultstatus);
+                    jsonObject.put("ptradeid", tradeId);
+                    jsonObject.put("presultmsg", resultmsg);
+                    jsonObject.put("ppurchWay", purchWay);
+                    broadCastPurchase(mContext, jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "WebPurchaseCallBack error:" + e.toString());
+                }
+            }
+        }
     }
 
-    private class MyTableMoniteDownloadListener implements TableDownloadMonitor
-    {
-		@Override
-		public void onDownloading(TableDownload t) {
-			if(mDownloadListenrer!=null)
-			{
-				mDownloadListenrer.onProcess(t);
-			}
-		}  	
+    private class MyTableMoniteDownloadListener implements TableDownloadMonitor {
+        @Override
+        public void onDownloading(TableDownload t) {
+            if (mDownloadListenrer != null) {
+                mDownloadListenrer.onProcess(t);
+            }
+        }
     }
-      
-    private class MyTableDownloadListener implements TableDownload.TableDownloadListener
-    {
-        private HashMap<Long,TableDownload> mTaskMaps = new HashMap<Long,TableDownload>();
+
+    private class MyTableDownloadListener implements TableDownload.TableDownloadListener {
+        private HashMap<Long, TableDownload> mTaskMaps = new HashMap<Long, TableDownload>();
         private final ReadWriteLock rwl = new ReentrantReadWriteLock();
         private final Lock readLock = rwl.readLock();
         private final Lock writeLock = rwl.writeLock();
-        public MyTableDownloadListener()
-        {
+
+        public MyTableDownloadListener() {
             super();
         }
 
-        public boolean pauseTaskId(long taskID)
-        {
+        public boolean pauseTaskId(long taskID) {
             TableDownload loader = get(Long.valueOf(taskID));
 
-            if(loader!=null)
-            {
-               return  loader._pause(taskID);
+            if (loader != null) {
+                return loader._pause(taskID);
             }
             return false;
         }
 
-        public boolean resumeTaskId(long taskID)
-        {
+        public boolean resumeTaskId(long taskID) {
             TableDownload loader = get(Long.valueOf(taskID));
 
-            if(loader!=null)
-            {
-                return  loader._startNow(taskID);
+            if (loader != null) {
+                return loader._startNow(taskID);
             }
             return false;
         }
 
-        public boolean deleteTaskId(long taskID)
-        {
+        public boolean deleteTaskId(long taskID) {
             TableDownload loader = get(Long.valueOf(taskID));
 
-            if(loader!=null)
-            {
-                return  loader._remove(taskID);
+            if (loader != null) {
+                return loader._remove(taskID);
             }
             return false;
         }
 
-        public void addDownloadTask(TableDownload downloadTask)
-        {
+        public void addDownloadTask(TableDownload downloadTask) {
             put(downloadTask.getId(), downloadTask);
         }
 
@@ -269,18 +260,16 @@ public class CoocaaOSApi extends CordovaPlugin
             }
         }
 
-        private JSONObject getCallBackJson(long id,int code,String extra,TableDownload.DOWNLOAD_STATUS status)
-        {
+        private JSONObject getCallBackJson(long id, int code, String extra, TableDownload.DOWNLOAD_STATUS status) {
             TableDownload loader = get(Long.valueOf(id));
-            if (loader!=null)
-            {
+            if (loader != null) {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("taskid", id);
                     jsonObject.put("status", status.name());
                     jsonObject.put("name", loader.getName());
                     jsonObject.put("url", loader.getUrl());
-                    jsonObject.put("progress", loader.getLength()>0?loader.getProgress():0);
+                    jsonObject.put("progress", loader.getLength() > 0 ? loader.getProgress() : 0);
                     jsonObject.put("createtime", loader.getCreatetime());
                     jsonObject.put("code", code);
                     jsonObject.put("extra", extra);
@@ -291,19 +280,17 @@ public class CoocaaOSApi extends CordovaPlugin
             }
             return null;
         }
-        
-        private JSONObject getCallBackJson(long id,int code,String extra,TableDownload.DOWNLOAD_STATUS status,int process)
-        {
+
+        private JSONObject getCallBackJson(long id, int code, String extra, TableDownload.DOWNLOAD_STATUS status, int process) {
             TableDownload loader = get(Long.valueOf(id));
-            if (loader!=null)
-            {
+            if (loader != null) {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("taskid", id);
                     jsonObject.put("status", status.name());
                     jsonObject.put("name", loader.getName());
                     jsonObject.put("url", loader.getUrl());
-                    jsonObject.put("progress",process>0?process:0);
+                    jsonObject.put("progress", process > 0 ? process : 0);
                     jsonObject.put("createtime", loader.getCreatetime());
                     jsonObject.put("code", code);
                     jsonObject.put("extra", extra);
@@ -317,12 +304,12 @@ public class CoocaaOSApi extends CordovaPlugin
 
         @Override
         public void onEnqueued(long id) {
-          
+
         }
 
         @Override
         public void onStarting(long id, int code, String extra) {
-            JSONObject jsonObject = getCallBackJson(id,code,extra, TableDownload.DOWNLOAD_STATUS.ON_STARTING);
+            JSONObject jsonObject = getCallBackJson(id, code, extra, TableDownload.DOWNLOAD_STATUS.ON_STARTING);
             broadCastAppDownloadTaskChangged(mContext, jsonObject);
         }
 
@@ -359,18 +346,16 @@ public class CoocaaOSApi extends CordovaPlugin
 
         @Override
         public void onDownloading(TableDownload t) {
-            if(t!=null)
-            {
-                put(Long.valueOf(t.getId()),t);
+            if (t != null) {
+                put(Long.valueOf(t.getId()), t);
                 JSONObject jsonObject = getCallBackJson(t.getId(), t.getOncode(), t.getOnextra(), TableDownload.DOWNLOAD_STATUS.ON_DOWNLOADING);
                 broadCastAppDownloadTaskChangged(mContext, jsonObject);
             }
         }
-        
+
         public void onProcess(TableDownload t) {
-            if(t!=null)
-            {
-                JSONObject jsonObject = getCallBackJson(t.getId(), t.getOncode(), t.getOnextra(), t.getStatus(),t.getProgress());
+            if (t != null) {
+                JSONObject jsonObject = getCallBackJson(t.getId(), t.getOncode(), t.getOnextra(), t.getStatus(), t.getProgress());
                 broadCastAppDownloadTaskChangged(mContext, jsonObject);
             }
         }
@@ -420,20 +405,18 @@ public class CoocaaOSApi extends CordovaPlugin
      */
     @Override
     public boolean execute(final String action, final CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
-    	Log.i("WebViewSDK","CoocaaOSApi execute action = " + action);
-        if(WAIT_OS_READY.equals(action))
-        {
+        Log.i("WebViewSDK", "CoocaaOSApi execute action = " + action);
+        if (WAIT_OS_READY.equals(action)) {
             this.cordova.getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
-                	Log.i("WebViewSDK","WAIT_OS_READY isCmdBindSuccess:" + isCmdBindSuccess + ",tid = " + android.os.Process.myTid());
-                    while(!isCmdBindSuccess/* && mRef <= 1*/)
-                    {
+                    Log.i("WebViewSDK", "WAIT_OS_READY isCmdBindSuccess:" + isCmdBindSuccess + ",tid = " + android.os.Process.myTid());
+                    while (!isCmdBindSuccess/* && mRef <= 1*/) {
                         try {
                             Thread.sleep(200);
                             mCoocaaOSConnecter = cordova.getCoocaaOSConnecter();
-                            if(mCoocaaOSConnecter != null) isCmdBindSuccess = true;
-                            Log.i("WebViewSDK","WAIT_OS_READY isCmdBindSuccess:" + isCmdBindSuccess + ",tid = " + android.os.Process.myTid());
+                            if (mCoocaaOSConnecter != null) isCmdBindSuccess = true;
+                            Log.i("WebViewSDK", "WAIT_OS_READY isCmdBindSuccess:" + isCmdBindSuccess + ",tid = " + android.os.Process.myTid());
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -442,17 +425,13 @@ public class CoocaaOSApi extends CordovaPlugin
                 }
             });
             return true;
-        }
-        else if(LAUNCH_SOURCE_LIST.equals(action))
-        {
+        } else if (LAUNCH_SOURCE_LIST.equals(action)) {
             Intent intent = new Intent("startSourceList");
             intent.putExtra("specialKey", SkyworthBroadcastKey.SKY_BROADCAST_KEY_SIGNAL);
             cordova.getActivity().sendBroadcast(intent);
             callbackContext.success();
             return true;
-        }
-        else if(SET_FOCUS_POSITION.equals(action))
-        {
+        } else if (SET_FOCUS_POSITION.equals(action)) {
             JSONObject paramObj = args.getJSONObject(0);
             if (paramObj != null) {
                 String strPos = paramObj.getString("focusposition");
@@ -466,26 +445,22 @@ public class CoocaaOSApi extends CordovaPlugin
             }
             callbackContext.success();
             return true;
-        }
-        else if(NOTIFY_JS_LOG.equals(action))
-        {
-        	String eventId = "";
-        	String params = "";
-        	JSONObject eventIdObj = args.getJSONObject(0);
-        	JSONObject paramsObj = args.getJSONObject(1);
-        	if(eventIdObj != null && paramsObj != null){
-        		eventId = eventIdObj.getString("eventId");
-        		params = paramsObj.getString("params");
-        	}
+        } else if (NOTIFY_JS_LOG.equals(action)) {
+            String eventId = "";
+            String params = "";
+            JSONObject eventIdObj = args.getJSONObject(0);
+            JSONObject paramsObj = args.getJSONObject(1);
+            if (eventIdObj != null && paramsObj != null) {
+                eventId = eventIdObj.getString("eventId");
+                params = paramsObj.getString("params");
+            }
             Intent intent = new Intent("notify.js.log");
             intent.putExtra("eventId", eventId);
             intent.putExtra("params", params);
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-        	callbackContext.success();
-        	return true;
-        }
-        else if(NOTIFY_JS_LOG_EXTRA.equals(action))
-        {
+            callbackContext.success();
+            return true;
+        } else if (NOTIFY_JS_LOG_EXTRA.equals(action)) {
             String eventId = "", params = "", type = "";
             JSONObject eventIdObj = args.getJSONObject(0);
             JSONObject paramsObj = args.getJSONObject(1);
@@ -507,9 +482,7 @@ public class CoocaaOSApi extends CordovaPlugin
             }
             callbackContext.success();
             return true;
-        }
-        else if(NOTIFY_JS_MESSAGE.equals(action))
-        {
+        } else if (NOTIFY_JS_MESSAGE.equals(action)) {
             JSONObject paramObj = args.getJSONObject(0);
             String data = "";
             if (paramObj != null) {
@@ -520,26 +493,24 @@ public class CoocaaOSApi extends CordovaPlugin
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
             callbackContext.success();
             return true;
-        }
-        else if(SET_BUSINESS_DATA.equals(action))
-        {
+        } else if (SET_BUSINESS_DATA.equals(action)) {
             JSONObject dataObj = args.getJSONObject(0);
             JSONObject typeObj = args.getJSONObject(1);
             String cc_data = "", cc_type = "";
-            if(dataObj != null){
+            if (dataObj != null) {
                 cc_data = dataObj.getString("cc_data");
                 cc_type = typeObj.getString("cc_type");
             }
-            Log.i("WebViewSDK","SET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
-            if("sync".equals(cc_type)) {
-                if(mBusinessListener != null) {
+            Log.i("WebViewSDK", "SET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
+            if ("sync".equals(cc_type)) {
+                if (mBusinessListener != null) {
                     boolean ret = mBusinessListener.setBusinessData(cc_data, new BusinessDataListener.BussinessCallback() {
                         @Override
                         public void onResult(String value) {
-                            Log.i("WebViewSDK","setBusinessData onResule = " + value);
+                            Log.i("WebViewSDK", "setBusinessData onResule = " + value);
                             if ("success".equals(value))
                                 callbackContext.success();
-                            else{
+                            else {
                                 callbackContext.error("error occurs when called setBusinessData");
                             }
                         }
@@ -547,7 +518,7 @@ public class CoocaaOSApi extends CordovaPlugin
                     if (ret) {
                         callbackContext.success();
                     }
-                }else{
+                } else {
                     callbackContext.error("no implement");
                 }
             } else {
@@ -561,10 +532,10 @@ public class CoocaaOSApi extends CordovaPlugin
                             boolean ret = mBusinessListener.setBusinessData(finalData, new BusinessDataListener.BussinessCallback() {
                                 @Override
                                 public void onResult(String value) {
-                                    Log.i("WebViewSDK","setBusinessData onResule = " + value);
+                                    Log.i("WebViewSDK", "setBusinessData onResule = " + value);
                                     if ("success".equals(value))
                                         callbackContext.success();
-                                    else{
+                                    else {
                                         callbackContext.error("error occurs when called setBusinessData");
                                     }
                                 }
@@ -579,59 +550,55 @@ public class CoocaaOSApi extends CordovaPlugin
                 });
             }
             return true;
-        }
-        else if(GET_BUSINESS_DATA.equals(action))
-        {
+        } else if (GET_BUSINESS_DATA.equals(action)) {
             JSONObject dataObj = args.getJSONObject(0);
             JSONObject typeObj = args.getJSONObject(1);
-            String cc_data = "",cc_type = "";
-            if(dataObj != null){
+            String cc_data = "", cc_type = "";
+            if (dataObj != null) {
                 cc_data = dataObj.getString("cc_data");
                 cc_type = typeObj.getString("cc_type");
             }
-            Log.i("WebViewSDK","GET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
-            if("sync".equals(cc_type)) {
-                if(mBusinessListener != null) {
+            Log.i("WebViewSDK", "GET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
+            if ("sync".equals(cc_type)) {
+                if (mBusinessListener != null) {
                     String ret = mBusinessListener.getBusinessData(cc_data, new BusinessDataListener.BussinessCallback() {
                         @Override
                         public void onResult(String value) {
-                            Log.i("WebViewSDK","getBusinessData onResule = " + value);
+                            Log.i("WebViewSDK", "getBusinessData onResule = " + value);
                             callbackContext.success(value);
                         }
                     });
-                    if(ret != null && !"".equals(ret)) {
+                    if (ret != null && !"".equals(ret)) {
                         callbackContext.success(ret);
                     }
-                }else{
+                } else {
                     callbackContext.error("no implement");
                 }
-            } else{
+            } else {
                 final String finalData = cc_data;
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
                     public void run() {
 
-                        if(mBusinessListener != null){
+                        if (mBusinessListener != null) {
                             String ret = mBusinessListener.getBusinessData(finalData, new BusinessDataListener.BussinessCallback() {
                                 @Override
                                 public void onResult(String value) {
-                                    Log.i("WebViewSDK","getBusinessData onResule = " + value);
+                                    Log.i("WebViewSDK", "getBusinessData onResule = " + value);
                                     callbackContext.success(value);
                                 }
                             });
-                            if(ret != null && !"".equals(ret)) {
+                            if (ret != null && !"".equals(ret)) {
                                 callbackContext.success(ret);
                             }
-                        }else{
+                        } else {
                             callbackContext.error("no implement");
                         }
                     }
                 });
             }
             return true;
-        }
-        else if(LAUNCH_ONLINE_MOVIE_PLAYER.equals(action))
-        {
+        } else if (LAUNCH_ONLINE_MOVIE_PLAYER.equals(action)) {
             if (mCoocaaOSConnecter != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
@@ -648,7 +615,7 @@ public class CoocaaOSApi extends CordovaPlugin
                                 needParseStr = needParseObj.getString("needparse");
                             }
                             String urlTypeStr = urlTypeObj.getString("urlType");
-                            mCoocaaOSConnecter.startOnlinePlayer(urlStr,nameStr,needParseStr,urlTypeStr);
+                            mCoocaaOSConnecter.startOnlinePlayer(urlStr, nameStr, needParseStr, urlTypeStr);
                             callbackContext.success();
                         } catch (JSONException e) {
                             callbackContext.error(e.toString());
@@ -659,9 +626,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if (GET_USER_INFO.equals(action))
-        {
+        } else if (GET_USER_INFO.equals(action)) {
             if (mCoocaaOSConnecter != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
@@ -683,9 +648,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("mCoocaaOSConnecter is not ready!");
             }
             return true;
-        }
-        else if (GET_DEVICE_INFO.equals(action))
-        {
+        } else if (GET_DEVICE_INFO.equals(action)) {
             if (mCoocaaOSConnecter != null) {
                 String result = mCoocaaOSConnecter.getDeviceInfo();
                 Log.v("WebViewSDK", "getDeviceInfo result = " + result);
@@ -695,7 +658,6 @@ public class CoocaaOSApi extends CordovaPlugin
                     try {
                         callbackContext.success(new JSONObject(result));
                     } catch (JSONException e) {
-                        // TODO Auto-generated catch block
                         callbackContext.error(e.toString());
                     }
                 }
@@ -703,14 +665,25 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("mCoocaaOSConnecter is not ready!");
             }
             return true;
-        }
-        else if (GET_SHOWN_STATUS.equals(action)){
+        } else if (GET_PUSH_INFO.equals(action)) {
+            if (mCoocaaOSConnecter != null) {
+                JSONObject pkgListObj = args.getJSONObject(0);
+                String pkgListStr = pkgListObj.getString("pkgList");
+                String result = mCoocaaOSConnecter.getPushInfo(pkgListStr);
+                if (result == null) {
+                    callbackContext.error("error occurs when called getPushInfo");
+                } else {
+                    callbackContext.success(result);
+                }
+            } else {
+                callbackContext.error("mCoocaaOSConnecter is not ready!");
+            }
+            return true;
+        } else if (GET_SHOWN_STATUS.equals(action)) {
             Log.v("WebViewSDK", "webview isShown = " + mWebView.getView().isShown());
             callbackContext.error("no implement");
             return true;
-        }
-        else if(GET_APP_INFO.equals(action))
-        {
+        } else if (GET_APP_INFO.equals(action)) {
             PackageManager pm = this.cordova.getActivity().getPackageManager();
             JSONObject resultObject = new JSONObject();
             try {
@@ -718,26 +691,26 @@ public class CoocaaOSApi extends CordovaPlugin
                 String pkgListStr = pkgListObj.getString("pkgList");
                 JSONObject jsonParams = new JSONObject(pkgListStr);
                 JSONArray params = jsonParams.getJSONArray("pkgList");
-                Log.i("WebViewSDK" , "length = " + params.length());
+                Log.i("WebViewSDK", "length = " + params.length());
                 if (params.length() > 0) {
-                    for(int i=0; i<params.length(); i++){
+                    for (int i = 0; i < params.length(); i++) {
                         String pkgName = params.getString(i);
-                        Log.i("WebViewSDK" , "pkgName = " + pkgName);
+                        Log.i("WebViewSDK", "pkgName = " + pkgName);
                         JSONObject valueObject = new JSONObject();
                         PackageInfo info = null;
-                        try{
+                        try {
                             info = pm.getPackageInfo(pkgName, 0);
                             if (info != null) {
                                 valueObject.put("status", "0");
                                 valueObject.put("versionName", info.versionName);
                                 valueObject.put("versionCode", info.versionCode);
                             }
-                        }catch (NameNotFoundException e){
+                        } catch (NameNotFoundException e) {
                             valueObject.put("status", "-1");
                             valueObject.put("versionName", "-1");
                             valueObject.put("versionCode", -1);
                         }
-                        Log.i("WebViewSDK" , "valueObject = " + valueObject);
+                        Log.i("WebViewSDK", "valueObject = " + valueObject);
                         resultObject.put(pkgName, valueObject);
                     }
                     callbackContext.success(resultObject.toString());
@@ -750,31 +723,26 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("error occurs when called getAppInfo");
             }
             return true;
-        }
-        else if(GET_CURRENT_THEME.equals(action))
-        {
-        	String theme = "";
-        	try {
-    	        if(SkyThemeEngine.getInstance().getThemeColorSeries() == ThemeColorSeriesEnum.E_THEME_COLOR_SERIES_DARK){
-    	        	theme = "dark";
-    	        }else{
-    	        	theme = "light";
-    	        }
-        		JSONObject result = new JSONObject();
-        		result.put("theme", theme);
+        } else if (GET_CURRENT_THEME.equals(action)) {
+            String theme = "";
+            try {
+                if (SkyThemeEngine.getInstance().getThemeColorSeries() == ThemeColorSeriesEnum.E_THEME_COLOR_SERIES_DARK) {
+                    theme = "dark";
+                } else {
+                    theme = "light";
+                }
+                JSONObject result = new JSONObject();
+                result.put("theme", theme);
                 callbackContext.success(result);
 
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				callbackContext.error(e.toString());
-			}
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                callbackContext.error(e.toString());
+            }
             return true;
-        }
-        else if(GET_WEBVIEWSDK_INFO.equals(action))
-        {
+        } else if (GET_WEBVIEWSDK_INFO.equals(action)) {
             String versionName = "";
-            int versionCode  = 0;
-
+            int versionCode = 0;
             try {
                 versionName = SystemWebViewSDK.getVersionName();
                 versionCode = SystemWebViewSDK.getVersionCode();
@@ -782,40 +750,33 @@ public class CoocaaOSApi extends CordovaPlugin
                 result.put("versionName", versionName);
                 result.put("versionCode", versionCode);
                 callbackContext.success(result);
-
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
                 callbackContext.error("error occurs when called getWebViewSDKInfo");
             }
             return true;
-        }
-        else if(CREATE_APP_TASK.equals(action))
-        {
-        	try
-        	{
-        		//appstore 5.x support!
-        		if(mDownloadListenrer == null)
-            	{
-            		SuperXFinder.setContext(mContext);
+        } else if (CREATE_APP_TASK.equals(action)) {
+            try {
+                //appstore 5.x support!
+                if (mDownloadListenrer == null) {
+                    SuperXFinder.setContext(mContext);
                     mDownloadListenrer = new MyTableDownloadListener();
                     TableDownload._createTableDownloadListener(mContext, mDownloadListenrer);
-                    if(mProcessListener == null)
-            		{
-            			mProcessListener = new MyTableMoniteDownloadListener();
-            			TableDownload._addTableDownloadMonitor(mProcessListener);
-            		}
-            	}
-        		
-        	}catch (Exception e)
-        	{
-        		e.printStackTrace();
-        	}
+                    if (mProcessListener == null) {
+                        mProcessListener = new MyTableMoniteDownloadListener();
+                        TableDownload._addTableDownloadMonitor(mProcessListener);
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             this.cordova.getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
-                    try{
-                    	
+                    try {
+
                         JSONObject urlObj = args.getJSONObject(0);
                         JSONObject md5Obj = args.getJSONObject(1);
                         JSONObject titleObj = args.getJSONObject(2);
@@ -829,14 +790,11 @@ public class CoocaaOSApi extends CordovaPlugin
                         String appid = appidObj.getString("appid");
                         String icon = iconObj.getString("icon");
                         TableDownload checkdownloader = TableDownload._queryDownloadByUrl(url);
-                        if (checkdownloader==null)
-                        {
+                        if (checkdownloader == null) {
                             checkdownloader = TableDownload._createAppDownload(url, md5, title, pkgname, appid, icon);
                         }
-                        if (checkdownloader!=null)
-                        {
-                            if(mDownloadListenrer!=null)
-                            {
+                        if (checkdownloader != null) {
+                            if (mDownloadListenrer != null) {
                                 mDownloadListenrer.addDownloadTask(checkdownloader);
                             }
                             TableDownload._start(checkdownloader.getId());
@@ -846,7 +804,7 @@ public class CoocaaOSApi extends CordovaPlugin
                                 jsonObject.put("status", checkdownloader.getStatus());
                                 jsonObject.put("name", checkdownloader.getName());
                                 jsonObject.put("url", checkdownloader.getUrl());
-                                jsonObject.put("progress", checkdownloader.getLength()>0?checkdownloader.getProgress():0);
+                                jsonObject.put("progress", checkdownloader.getLength() > 0 ? checkdownloader.getProgress() : 0);
                                 jsonObject.put("createtime", checkdownloader.getCreatetime());
                                 jsonObject.put("code", checkdownloader.getOncode());
                                 jsonObject.put("extra", checkdownloader.getOnextra());
@@ -854,50 +812,37 @@ public class CoocaaOSApi extends CordovaPlugin
                                 e.printStackTrace();
                             }
                             callbackContext.success(jsonObject);
-                        }
-                        else
-                        {
+                        } else {
                             callbackContext.error("error occurs when called createDownloadTask");
                         }
-                    }catch(JSONException e)
-                    {
+                    } catch (JSONException e) {
                         callbackContext.error(e.toString());
                     }
                 }
             });
             return true;
-        }
-        else if(RESUME_APP_TASK.equals(action))
-        {
+        } else if (RESUME_APP_TASK.equals(action)) {
             JSONObject taskIdObj = args.getJSONObject(0);
             String taskId = taskIdObj.getString("taskid");
-            if(mDownloadListenrer!=null)
-            {
+            if (mDownloadListenrer != null) {
                 mDownloadListenrer.resumeTaskId(Long.valueOf(taskId));
             }
             return true;
-        }
-        else if(DELETE_APP_TASK.equals(action))
-        {
+        } else if (DELETE_APP_TASK.equals(action)) {
             JSONObject taskIdObj = args.getJSONObject(0);
             String taskId = taskIdObj.getString("taskid");
-            if(mDownloadListenrer!=null)
-            {
+            if (mDownloadListenrer != null) {
                 mDownloadListenrer.deleteTaskId(Long.valueOf(taskId));
             }
             return true;
-        }
-        else if(PAUSE_APP_TASK.equals(action))
-        {
+        } else if (PAUSE_APP_TASK.equals(action)) {
             JSONObject taskIdObj = args.getJSONObject(0);
             String taskId = taskIdObj.getString("taskid");
-            if(mDownloadListenrer!=null)
-            {
+            if (mDownloadListenrer != null) {
                 mDownloadListenrer.pauseTaskId(Long.valueOf(taskId));
             }
             return true;
-        }
-        else if(IS_NET_CONNECTED.equals(action)) {
+        } else if (IS_NET_CONNECTED.equals(action)) {
             if (mCoocaaOSConnecter != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
@@ -919,8 +864,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(GET_NET_TYPE.equals(action)) {
+        } else if (GET_NET_TYPE.equals(action)) {
             if (mCoocaaOSConnecter != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
@@ -942,8 +886,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(GET_DEVICE_LOCATION.equals(action)) {
+        } else if (GET_DEVICE_LOCATION.equals(action)) {
             if (mCoocaaOSConnecter != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
@@ -965,8 +908,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(GET_IP_INFO.equals(action)) {
+        } else if (GET_IP_INFO.equals(action)) {
             if (mCoocaaOSConnecter != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
@@ -988,8 +930,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if (HAS_USER_LOGIN.equals(action)) {
+        } else if (HAS_USER_LOGIN.equals(action)) {
             if (mCoocaaOSConnecter != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
@@ -1011,8 +952,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(START_QQ_ACOUNT.equals(action)) {
+        } else if (START_QQ_ACOUNT.equals(action)) {
             if (mCoocaaOSConnecter != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
@@ -1025,8 +965,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if (SET_USER_LOGINOUT.equals(action)) {
+        } else if (SET_USER_LOGINOUT.equals(action)) {
             if (mCoocaaOSConnecter != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
@@ -1039,8 +978,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(GET_USER_ACCESS_TOKEN.equals(action)) {
+        } else if (GET_USER_ACCESS_TOKEN.equals(action)) {
             if (mCoocaaOSConnecter != null) {
                 this.cordova.getThreadPool().execute(new Runnable() {
                     @Override
@@ -1062,31 +1000,27 @@ public class CoocaaOSApi extends CordovaPlugin
                 callbackContext.error("mCoocaaListener is not ready!");
             }
             return true;
-        }
-        else if(GET_PROPERTY_VALUE.equals(action))
-        {
-        	try {
-        		String propertiesValue  = "";
-        		JSONObject pkgNameObj = args.getJSONObject(0);
-        		String propertiesKey = pkgNameObj.getString("propertiesKey");
-        		if(propertiesKey != null)
-        			propertiesValue = SystemProperties.get(propertiesKey);
-            	JSONObject result = new JSONObject();
-            	result.put("propertiesValue", propertiesValue);
+        } else if (GET_PROPERTY_VALUE.equals(action)) {
+            try {
+                String propertiesValue = "";
+                JSONObject pkgNameObj = args.getJSONObject(0);
+                String propertiesKey = pkgNameObj.getString("propertiesKey");
+                if (propertiesKey != null)
+                    propertiesValue = SystemProperties.get(propertiesKey);
+                JSONObject result = new JSONObject();
+                result.put("propertiesValue", propertiesValue);
                 callbackContext.success(result);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				callbackContext.error("error occurs when called getPropertiesValue");
-			}
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                callbackContext.error("error occurs when called getPropertiesValue");
+            }
             return true;
-        }
-        else if(PURCHASE_ORDER.equals(action))
-        {
+        } else if (PURCHASE_ORDER.equals(action)) {
             this.cordova.getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
-                   	try{
+                    try {
                         JSONObject appCodeObj = args.getJSONObject(0);//商户编号ID,由酷开发布给第三方
                         JSONObject tradeidObj = args.getJSONObject(1);//订单编号ID
                         JSONObject productNameObj = args.getJSONObject(2);//商品名称，例如“影视包年”
@@ -1097,7 +1031,7 @@ public class CoocaaOSApi extends CordovaPlugin
                         JSONObject cmdObj = args.getJSONObject(7);
                         JSONObject tokenObj = args.getJSONObject(8);
                         JSONObject phoneNumObj = args.getJSONObject(9);
-                        
+
                         String appcode = appCodeObj.getString("appcode");
                         String Tradeid = tradeidObj.getString("Tradeid");
                         String ProductName = productNameObj.getString("ProductName");
@@ -1108,13 +1042,13 @@ public class CoocaaOSApi extends CordovaPlugin
                         double amount = amountObj.getDouble("amount");
                         String token = tokenObj.getString("token");
                         String phoneNum = phoneNumObj.getString("tel");
-                        
+
                         Intent mIntent = new Intent("coocaa.intent.movie.pay");
                         String pkgName = mContext.getPackageName();
-                        if(pkgName != null)
-                        	mIntent.setPackage(pkgName);
+                        if (pkgName != null)
+                            mIntent.setPackage(pkgName);
                         else
-                        	mIntent.setPackage("com.tianci.movieplatform");
+                            mIntent.setPackage("com.tianci.movieplatform");
                         mIntent.putExtra("appcode", appcode);
                         mIntent.putExtra("ProductName", ProductName);
                         mIntent.putExtra("Tradeid", Tradeid);
@@ -1125,23 +1059,20 @@ public class CoocaaOSApi extends CordovaPlugin
                         mIntent.putExtra("cmd", cmd);
                         mIntent.putExtra("token", token);
                         mIntent.putExtra("tel", phoneNum);
-                        
+
                         mContext.startActivity(mIntent);
                         callbackContext.success();
-                        
-                	}catch(Exception e)
-                    {
+
+                    } catch (Exception e) {
                         callbackContext.error(e.toString());
                     }
                 }
             });
-        	return true;
-        }
-        else if(GET_BASE_INFO.equals(action))
-        {
+            return true;
+        } else if (GET_BASE_INFO.equals(action)) {
             try {
                 long totalMem = 0, leftMem = 0;
-                ActivityManager activityManager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
+                ActivityManager activityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
                 ActivityManager.MemoryInfo outInfo = new ActivityManager.MemoryInfo();
                 activityManager.getMemoryInfo(outInfo);
                 totalMem = outInfo.totalMem;
@@ -1162,7 +1093,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 result.put("leftMem", leftMem);
                 result.put("totalSpace", totalSpace);
                 result.put("freeSpace", freeSpace);
-                Log.i("WebViewSDK",result.toString());
+                Log.i("WebViewSDK", result.toString());
                 callbackContext.success(result);
             } catch (Exception e) {
                 // TODO Auto-generated catch block

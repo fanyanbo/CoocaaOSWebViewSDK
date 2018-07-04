@@ -24,6 +24,13 @@ public interface CoocaaOSConnecter {
      */
     String getDeviceInfo();
 
+    /**
+     * 获取酷开Push信息
+     *
+     * @return 如果无或错误则返回null
+     */
+    String getPushInfo(String pkgList);
+
 	/**
      * 获取当前网路连接状态
      *

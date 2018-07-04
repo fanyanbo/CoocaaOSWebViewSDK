@@ -109,12 +109,15 @@ package com.coocaa.webviewsdk.version;
 /*version 2.4.4
  * 1.重构view的封装
  */
+/*version 2.4.5
+ * 1.增加获取pushid的接口
+ */
 
 public class SystemWebViewSDK {
 
-	private static final String versionName = "2.4.4";
+	private static final String versionName = "2.4.5";
 
-	private static final int versionCode = 2040004;
+	private static final int versionCode = 2040005;
 	
 	private static int focusPosition = -1;
 	
