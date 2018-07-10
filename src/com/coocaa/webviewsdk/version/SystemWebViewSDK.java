@@ -112,12 +112,15 @@ package com.coocaa.webviewsdk.version;
 /*version 2.4.5
  * 1.增加获取pushid的接口
  */
+/*version 2.4.6
+ * 1.对接酷开系统支付功能
+ */
 
 public class SystemWebViewSDK {
 
-	private static final String versionName = "2.4.5";
+	private static final String versionName = "2.4.6";
 
-	private static final int versionCode = 2040005;
+	private static final int versionCode = 2040006;
 	
 	private static int focusPosition = -1;
 	
