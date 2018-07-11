@@ -34,6 +34,7 @@ import android.os.SystemProperties;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.coocaa.push.api.PushApi;
 import com.coocaa.webviewsdk.version.SystemWebViewSDK;
 import com.coocaa.x.xforothersdk.app.SuperXFinder;
 import com.coocaa.x.xforothersdk.provider.db.table.download.TableDownload;
@@ -86,6 +87,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class CoocaaOSApi extends CordovaPlugin
 {
     private String TAG = getClass().getSimpleName();
+    private static final String Tag = "WebViewSDK";
 
     private static final String WAIT_OS_READY = "waitForOSReady";//判断酷开系统是否bind成功。
     private static final String LAUNCH_SOURCE_LIST = "launchSourceList";//启动信号源
@@ -98,6 +100,7 @@ public class CoocaaOSApi extends CordovaPlugin
     private static final String GET_USER_INFO = "getUserInfo";//获取用户信息;
     private static final String START_QQ_ACOUNT = "startQQAccount";//启动qq登录
     private static final String GET_DEVICE_INFO = "getDeviceInfo";//获取当前设备信息
+    private static final String GET_PUSH_INFO = "getPushInfo";
     private static final String IS_NET_CONNECTED = "isNetConnected";//获取当前网路连接状态
     private static final String GET_NET_TYPE = "getNetType";//获取当前网络类型//有线、无线
     private static final String GET_IP_INFO = "getIpInfo";//获取当前网络的ip地址//内网
@@ -156,7 +159,7 @@ public class CoocaaOSApi extends CordovaPlugin
         super.initialize(cordova, webView);
         mContext = cordova.getActivity();
 
-        Log.v("WebViewSDK", TAG + "CoocaaOSApi initialization");
+        Log.v(Tag, TAG + "CoocaaOSApi initialization");
         cordova.setPluginImlListener(this);
         mBusinessListener = cordova.getCordovaBusinessDataListener();
              
@@ -174,7 +177,7 @@ public class CoocaaOSApi extends CordovaPlugin
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			
-			Log.i("WebViewSDK","onReceive getAction = " + intent.getAction());
+			Log.i(Tag,"onReceive getAction = " + intent.getAction());
 			if(PAY_ACTION.equals(intent.getAction())){
 	            int resultstatus = intent.getIntExtra("resultstatus", -1);
 	            String tradeId = intent.getStringExtra("tradeId");
@@ -401,10 +404,10 @@ public class CoocaaOSApi extends CordovaPlugin
     
     public void onCmdInit()
     {
-    	Log.i("WebViewSDK","CoocaaOSApi onCmdInit");
+    	Log.i(Tag,"CoocaaOSApi onCmdInit");
     	isCmdBindSuccess = true;
     	if(mCoocaaListener == null){
-    		Log.i("WebViewSDK","CoocaaOSApi onCmdInit CordovaBaseActivity.getCmdConnectorListener()="+CordovaBaseActivity.getCmdConnectorListener());
+    		Log.i(Tag,"CoocaaOSApi onCmdInit CordovaBaseActivity.getCmdConnectorListener()="+CordovaBaseActivity.getCmdConnectorListener());
     		mCoocaaListener = new CoocaaOSApiListener(CordovaBaseActivity.getCmdConnectorListener());
     	}
     }
@@ -412,25 +415,25 @@ public class CoocaaOSApi extends CordovaPlugin
     public byte[] onHandler(String fromtarget, String cmd, byte[] body) {
     	return mCoocaaListener.onHandler(fromtarget, cmd, body);
     }
-    
-    public class CoocaaOSApiListener /*implements SkyCmdProcessInstance.SkyCmdProcessInstanceListener*/
-    {
+
+    public class CoocaaOSApiListener /*implements SkyCmdProcessInstance.SkyCmdProcessInstanceListener*/ {
         private TCSystemService systemApi;
         private NetApiForCommon netApi;
         private SkyUserApi userApi;
+        private PushApi pushApi;
         private SkyApplication.SkyCmdConnectorListener mListener;
-        public CoocaaOSApiListener(SkyCmdConnectorListener listener)
-        {
+
+        public CoocaaOSApiListener(SkyCmdConnectorListener listener) {
             mListener = listener;
             systemApi = new TCSystemService(listener);
             netApi = new NetApiForCommon(listener);
             userApi = new SkyUserApi(listener);
             mediaApi = new SkyMediaApi(listener);
             mediaApi.setContext(mContext);
+            pushApi = new PushApi();
         }
 
-        public JSONObject isNetConnected()
-        {
+        public JSONObject isNetConnected() {
             if (netApi != null && isCmdBindSuccess) {
                 boolean isConnect = netApi.isConnect();
                 JSONObject jsonObject = new JSONObject();
@@ -443,23 +446,20 @@ public class CoocaaOSApi extends CordovaPlugin
             }
             return null;
         }
-        
-        public void startQQAcount()
-        {
+
+        public void startQQAcount() {
             if (userApi != null && isCmdBindSuccess) {
                 userApi.loginByType(AccountType.qq);
             }
         }
 
-        public void setUserLogout()
-        {
+        public void setUserLogout() {
             if (isCmdBindSuccess) {
                 logoutSync();
             }
         }
-        
-        public JSONObject getUserAccessToken()
-        {
+
+        public JSONObject getUserAccessToken() {
             if (userApi != null && isCmdBindSuccess) {
                 String token = userApi.getToken("ACCESS");
                 if (token != null) {
@@ -475,8 +475,7 @@ public class CoocaaOSApi extends CordovaPlugin
             return null;
         }
 
-        public JSONObject getNetType()
-        {
+        public JSONObject getNetType() {
             if (netApi != null && isCmdBindSuccess) {
                 String netType = netApi.getNetType();
                 if (netType != null) {
@@ -492,8 +491,7 @@ public class CoocaaOSApi extends CordovaPlugin
             return null;
         }
 
-        public JSONObject getIpInfo()
-        {
+        public JSONObject getIpInfo() {
             if (netApi != null && isCmdBindSuccess) {
                 SkyIpInfo ipInfo = netApi.getIpInfo();
                 if (ipInfo != null) {
@@ -514,8 +512,7 @@ public class CoocaaOSApi extends CordovaPlugin
             return null;
         }
 
-        public JSONObject getLocation()
-        {
+        public JSONObject getLocation() {
             if (systemApi != null && isCmdBindSuccess) {
                 TCSetData locationData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_LOCATION);
                 if (locationData != null) {
@@ -537,134 +534,146 @@ public class CoocaaOSApi extends CordovaPlugin
             return null;
         }
 
-        public JSONObject getDeviceInfo()
-        {
-            if(systemApi!=null && isCmdBindSuccess)
-            {
+        public JSONObject getDeviceInfo() {
+            if (systemApi != null && isCmdBindSuccess) {
                 //屏幕尺寸
                 TCSetData pannelSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_PANEL_SIZE);
                 String pannelString = "";
-                if(pannelSetData != null)
-                {
+                if (pannelSetData != null) {
 
                     TCInfoSetData pannelInfoData = (TCInfoSetData) pannelSetData;
                     pannelString = pannelInfoData.getCurrent();
                 }
 
                 //酷开版本号
-                TCSetData verSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_TIANCI_VER );
+                TCSetData verSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_TIANCI_VER);
                 String verString = "";
-                if(verSetData!=null)
-                {
+                if (verSetData != null) {
                     TCInfoSetData verInfoData = (TCInfoSetData) verSetData;
                     verString = verInfoData.getCurrent();
                 }
 
                 // 机芯
-                TCSetData modelSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_MODEL );
+                TCSetData modelSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_MODEL);
                 String modelString = "";
-                if(modelSetData!=null)
-                {
-                	 TCInfoSetData modelInfoData = (TCInfoSetData) modelSetData;
-                     modelString = modelInfoData.getCurrent();
+                if (modelSetData != null) {
+                    TCInfoSetData modelInfoData = (TCInfoSetData) modelSetData;
+                    modelString = modelInfoData.getCurrent();
                 }
 
                 // 机型
-                TCSetData typeSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_TYPE  );
+                TCSetData typeSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_TYPE);
                 String typeString = "";
-                if(typeSetData!=null)
-                {
+                if (typeSetData != null) {
                     TCInfoSetData typeInfoData = (TCInfoSetData) typeSetData;
                     typeString = typeInfoData.getCurrent();
                 }
 
                 //MAC
-                TCSetData macSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_MAC );
+                TCSetData macSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_MAC);
                 String macString = "";
-                if(macSetData!=null)
-                {
+                if (macSetData != null) {
                     TCInfoSetData macInfoData = (TCInfoSetData) macSetData;
                     macString = macInfoData.getCurrent();
                 }
 
                 //chip id
-                TCSetData chipSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_CHIPID );
+                TCSetData chipSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_CHIPID);
                 String chipString = "";
-                if(chipSetData!=null)
-                {
+                if (chipSetData != null) {
                     TCInfoSetData chipInfoData = (TCInfoSetData) chipSetData;
                     chipString = chipInfoData.getCurrent();
                 }
 
                 //设备id
-                TCSetData devidSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_MACHINE_CODE );
+                TCSetData devidSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_MACHINE_CODE);
                 TCInfoSetData devidInfoData = null;
-                if(devidSetData!=null)
-                {
-                	devidInfoData = (TCInfoSetData) devidSetData;
+                if (devidSetData != null) {
+                    devidInfoData = (TCInfoSetData) devidSetData;
                 }
                 String devidString = null;
-                if(devidInfoData!=null)
-                {
+                if (devidInfoData != null) {
                     devidString = devidInfoData.getCurrent();
                 }
 
                 //激活id
-                TCSetData activeidSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_ACTIVE_ID );
-                TCInfoSetData activeidInfoData  = null;
-                if(activeidSetData!=null)
-                {
-                	activeidInfoData = (TCInfoSetData) activeidSetData;
+                TCSetData activeidSetData = systemApi.getSetData(TCEnvKey.SKY_SYSTEM_ENV_ACTIVE_ID);
+                TCInfoSetData activeidInfoData = null;
+                if (activeidSetData != null) {
+                    activeidInfoData = (TCInfoSetData) activeidSetData;
                 }
-                String  activeidString = null;
-                if(activeidInfoData!=null)
-                {
+                String activeidString = null;
+                if (activeidInfoData != null) {
                     activeidString = activeidInfoData.getCurrent();
-                    if(activeidString == null || "".equals(activeidString)){
+                    if (activeidString == null || "".equals(activeidString)) {
                         activeidString = SystemProperties.get("persist.sys.active_id");
                     }
                 }
-                
+
                 TCSetData emmcidSetData = systemApi.getSetData(SkyConfigDefs.SKY_CFG_EMMC_CID);
-                TCInfoSetData emmcidInfoData  = null;
-                if(emmcidSetData != null)
-                {
-                	emmcidInfoData = (TCInfoSetData) emmcidSetData;
+                TCInfoSetData emmcidInfoData = null;
+                if (emmcidSetData != null) {
+                    emmcidInfoData = (TCInfoSetData) emmcidSetData;
                 }
                 String emmcidString = "";
-                if(emmcidInfoData != null)
-                {
-                	emmcidString = emmcidInfoData.getCurrent();
+                if (emmcidInfoData != null) {
+                    emmcidString = emmcidInfoData.getCurrent();
                 }
-                
-                if(verString !=null && verString.length()>0 && typeString!=null && typeString.length()>0)
-                {
-                	  JSONObject jsonObject = new JSONObject();
-                      try {
-                          jsonObject.put("panel", pannelString);
-                          jsonObject.put("version", verString);
-                          jsonObject.put("model", typeString);
-                          jsonObject.put("chipid", chipString);
-                          jsonObject.put("mac", macString);
-                          jsonObject.put("chip", modelString);
-                          jsonObject.put("androidsdk",android.os.Build.VERSION.SDK_INT);
-                          jsonObject.put("devid",devidString);
-                          jsonObject.put("activeid",activeidString);
-                          jsonObject.put("emmcid", emmcidString);
-                          jsonObject.put("brand", SystemProperties.get("ro.product.brand"));
-                          return jsonObject;
-                      } catch (JSONException e) {
-                          e.printStackTrace();
-                      }
+
+                if (verString != null && verString.length() > 0 && typeString != null && typeString.length() > 0) {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("panel", pannelString);
+                        jsonObject.put("version", verString);
+                        jsonObject.put("model", typeString);
+                        jsonObject.put("chipid", chipString);
+                        jsonObject.put("mac", macString);
+                        jsonObject.put("chip", modelString);
+                        jsonObject.put("androidsdk", android.os.Build.VERSION.SDK_INT);
+                        jsonObject.put("devid", devidString);
+                        jsonObject.put("activeid", activeidString);
+                        jsonObject.put("emmcid", emmcidString);
+                        jsonObject.put("brand", SystemProperties.get("ro.product.brand"));
+                        return jsonObject;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             return null;
         }
 
-        public JSONObject hasUserLogin()
-        {
-            if(userApi!=null && isCmdBindSuccess)
-            {
+        public String getPushInfo(String pkgList) {
+            JSONObject jsonParams = null;
+            JSONObject resultObject = new JSONObject();
+            try {
+                jsonParams = new JSONObject(pkgList);
+                JSONArray params = jsonParams.getJSONArray("pkgList");
+                if (params.length() > 0) {
+                    for (int i = 0; i < params.length(); i++) {
+                        String pkgName = params.getString(i);
+                        Log.i(Tag, "get pushid pkgName = " + pkgName);
+                        JSONObject valueObject = new JSONObject();
+                        String pushId = pushApi.getPushIdByPackageName(SkyApplication.getApplication(), mListener, pkgName);
+                        if (pushId != null && pushId.length() > 0) {
+                            valueObject.put("status", "0");
+                            valueObject.put("pushId", pushId);
+                        } else {
+                            valueObject.put("status", "-1");
+                            valueObject.put("pushId", "");
+                        }
+                        resultObject.put(pkgName, valueObject);
+                    }
+                    return resultObject.toString();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        public JSONObject hasUserLogin() {
+            if (userApi != null && isCmdBindSuccess) {
                 boolean isLogin = userApi.hasLogin();
                 JSONObject jsonObject = new JSONObject();
                 try {
@@ -677,19 +686,16 @@ public class CoocaaOSApi extends CordovaPlugin
             return null;
         }
 
-        public JSONObject getLoginUserInfo()
-        {
-            if(userApi!=null && isCmdBindSuccess)
-            {
-                Map<String, Object> userInfo= userApi.getAccoutInfo();
+        public JSONObject getLoginUserInfo() {
+            if (userApi != null && isCmdBindSuccess) {
+                Map<String, Object> userInfo = userApi.getAccoutInfo();
                 JSONObject jsonObject = CoocaaUserInfoParser.parseUserInfo(userInfo);
                 return jsonObject;
             }
             return null;
         }
 
-        private JSONObject getEthEventString(String type,NetworkDefs.EthEvent event)
-        {
+        private JSONObject getEthEventString(String type, NetworkDefs.EthEvent event) {
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("nettype", type);
@@ -700,8 +706,7 @@ public class CoocaaOSApi extends CordovaPlugin
             return jsonObject;
         }
 
-        private JSONObject getWifiEventString(String type,NetworkDefs.WifiEvent event)
-        {
+        private JSONObject getWifiEventString(String type, NetworkDefs.WifiEvent event) {
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("nettype", type);
@@ -713,53 +718,40 @@ public class CoocaaOSApi extends CordovaPlugin
         }
 
         public byte[] onHandler(String fromtarget, String cmd, byte[] body) {
-        	
-            if(TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_MOUNTED //外接设备接入
-                    .toString().equals(cmd))
-            {
-                String path = SkyObjectByteSerialzie.toObject(body,String.class);
-                broadCastUsbChangged(true,path==null?"":path);
-            }
-            else if(TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_REMOVED //外接设备拔出
-                    .toString().equals(cmd))
-            {
-               String path = SkyObjectByteSerialzie.toObject(body,String.class);
-                broadCastUsbChangged(false,path==null?"":path);
-            }
-            else if(TCNetworkBroadcast.TC_NETWORK_BROADCAST_NET_ETH_EVENT
-                    .toString().equals(cmd))
-            {
-                NetworkDefs.EthEvent ethEvnet = SkyObjectByteSerialzie.toObject(body,NetworkDefs.EthEvent.class);
-                if(ethEvnet!=null)
-                {
-                    JSONObject mJson = getEthEventString("ethnet",ethEvnet);
-                    if(mJson!=null)
-                    {
+
+            if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_MOUNTED //外接设备接入
+                    .toString().equals(cmd)) {
+                String path = SkyObjectByteSerialzie.toObject(body, String.class);
+                broadCastUsbChangged(true, path == null ? "" : path);
+            } else if (TCSystemDefs.TCSystemBroadcast.TC_SYSTEM_BROADCAST_MEDIA_REMOVED //外接设备拔出
+                    .toString().equals(cmd)) {
+                String path = SkyObjectByteSerialzie.toObject(body, String.class);
+                broadCastUsbChangged(false, path == null ? "" : path);
+            } else if (TCNetworkBroadcast.TC_NETWORK_BROADCAST_NET_ETH_EVENT
+                    .toString().equals(cmd)) {
+                NetworkDefs.EthEvent ethEvnet = SkyObjectByteSerialzie.toObject(body, NetworkDefs.EthEvent.class);
+                if (ethEvnet != null) {
+                    JSONObject mJson = getEthEventString("ethnet", ethEvnet);
+                    if (mJson != null) {
                         broadCastNetChangged(mJson);
                     }
                 }
-            }
-            else if(TCNetworkBroadcast.TC_NETWORK_BROADCAST_NET_WIFI_EVENT
-                    .toString().equals(cmd))
-            {
-                NetworkDefs.WifiEvent wifiEvent = SkyObjectByteSerialzie.toObject(body,NetworkDefs.WifiEvent.class);
-                switch(wifiEvent)
-                {
-                case EVENT_WIFI_CONNECT_SUCCEEDED:
-                case EVENT_WIFI_CONNECT_DISCONNECTED:
-                	 JSONObject mJson = getWifiEventString("wifi", wifiEvent);
-                     if(mJson!=null)
-                     {
-                         broadCastNetChangged(mJson);
-                     }
-                	break;
-                default:
-                	break;
+            } else if (TCNetworkBroadcast.TC_NETWORK_BROADCAST_NET_WIFI_EVENT
+                    .toString().equals(cmd)) {
+                NetworkDefs.WifiEvent wifiEvent = SkyObjectByteSerialzie.toObject(body, NetworkDefs.WifiEvent.class);
+                switch (wifiEvent) {
+                    case EVENT_WIFI_CONNECT_SUCCEEDED:
+                    case EVENT_WIFI_CONNECT_DISCONNECTED:
+                        JSONObject mJson = getWifiEventString("wifi", wifiEvent);
+                        if (mJson != null) {
+                            broadCastNetChangged(mJson);
+                        }
+                        break;
+                    default:
+                        break;
                 }
-            }
-            else if(UserCmdDefine.ACCOUNT_CHANGED.toString().equals(cmd))
-            {
-            	broadCastUesrChangged();
+            } else if (UserCmdDefine.ACCOUNT_CHANGED.toString().equals(cmd)) {
+                broadCastUesrChangged();
             }
 
             return new byte[0];
@@ -860,12 +852,12 @@ public class CoocaaOSApi extends CordovaPlugin
      */
     @Override
     public boolean execute(final String action, final CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
-        Log.i("WebViewSDK", "CoocaaOSApi execute action = " + action);
+        Log.i(Tag, "CoocaaOSApi execute action = " + action);
         if (WAIT_OS_READY.equals(action)) {
             this.cordova.getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i("WebViewSDK", "WAIT_OS_READY isCmdBindSuccess:" + isCmdBindSuccess);
+                    Log.i(Tag, "WAIT_OS_READY isCmdBindSuccess:" + isCmdBindSuccess);
                     while (!isCmdBindSuccess/* && mRef <= 1*/) {
                         try {
                             Thread.sleep(50);
@@ -953,13 +945,13 @@ public class CoocaaOSApi extends CordovaPlugin
                 cc_data = dataObj.getString("cc_data");
                 cc_type = typeObj.getString("cc_type");
             }
-            Log.i("WebViewSDK", "SET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
+            Log.i(Tag, "SET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
             if ("sync".equals(cc_type)) {
                 if (mBusinessListener != null) {
                     boolean ret = mBusinessListener.setBusinessData(cc_data, new CordovaExtActivity.BussinessCallback() {
                         @Override
                         public void onResult(String value) {
-                            Log.i("WebViewSDK", "setBusinessData onResule = " + value);
+                            Log.i(Tag, "setBusinessData onResule = " + value);
                             if ("success".equals(value))
                                 callbackContext.success();
                             else {
@@ -984,7 +976,7 @@ public class CoocaaOSApi extends CordovaPlugin
                             boolean ret = mBusinessListener.setBusinessData(finalData, new CordovaExtActivity.BussinessCallback() {
                                 @Override
                                 public void onResult(String value) {
-                                    Log.i("WebViewSDK", "setBusinessData onResule = " + value);
+                                    Log.i(Tag, "setBusinessData onResule = " + value);
                                     if ("success".equals(value))
                                         callbackContext.success();
                                     else {
@@ -1010,13 +1002,13 @@ public class CoocaaOSApi extends CordovaPlugin
                 cc_data = dataObj.getString("cc_data");
                 cc_type = typeObj.getString("cc_type");
             }
-            Log.i("WebViewSDK", "GET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
+            Log.i(Tag, "GET_BUSINESS_DATA cc_type = " + cc_type + ",cc_data = " + cc_data);
             if ("sync".equals(cc_type)) {
                 if (mBusinessListener != null) {
                     String ret = mBusinessListener.getBusinessData(cc_data, new CordovaExtActivity.BussinessCallback() {
                         @Override
                         public void onResult(String value) {
-                            Log.i("WebViewSDK", "getBusinessData onResule = " + value);
+                            Log.i(Tag, "getBusinessData onResule = " + value);
                             callbackContext.success(value);
                         }
                     });
@@ -1036,7 +1028,7 @@ public class CoocaaOSApi extends CordovaPlugin
                             String ret = mBusinessListener.getBusinessData(finalData, new CordovaExtActivity.BussinessCallback() {
                                 @Override
                                 public void onResult(String value) {
-                                    Log.i("WebViewSDK", "getBusinessData onResule = " + value);
+                                    Log.i(Tag, "getBusinessData onResule = " + value);
                                     callbackContext.success(value);
                                 }
                             });
@@ -1170,8 +1162,22 @@ public class CoocaaOSApi extends CordovaPlugin
             result.put("freeSpace", freeSpace);
             result.put("totalMem", totalMem);
             result.put("leftMem", leftMem);
-            Log.i("WebViewSDK", result.toString());
+            Log.i(Tag, result.toString());
             callbackContext.success(result);
+            return true;
+        } else if (GET_PUSH_INFO.equals(action)) {
+            if (mCoocaaListener != null) {
+                JSONObject pkgListObj = args.getJSONObject(0);
+                String pkgListStr = pkgListObj.getString("pkgList");
+                String result = mCoocaaListener.getPushInfo(pkgListStr);
+                if (result == null) {
+                    callbackContext.error("error occurs when called getPushInfo");
+                } else {
+                    callbackContext.success(result);
+                }
+            } else {
+                callbackContext.error("mCoocaaListener is not ready!");
+            }
             return true;
         } else if (GET_APP_INFO.equals(action)) {
             PackageManager pm = this.cordova.getActivity().getPackageManager();
@@ -1181,11 +1187,11 @@ public class CoocaaOSApi extends CordovaPlugin
                 String pkgListStr = pkgListObj.getString("pkgList");
                 JSONObject jsonParams = new JSONObject(pkgListStr);
                 JSONArray params = jsonParams.getJSONArray("pkgList");
-                Log.i("WebViewSDK", "length = " + params.length());
+                Log.i(Tag, "length = " + params.length());
                 if (params.length() > 0) {
                     for (int i = 0; i < params.length(); i++) {
                         String pkgName = params.getString(i);
-                        Log.i("WebViewSDK", "pkgName = " + pkgName);
+                        Log.i(Tag, "pkgName = " + pkgName);
                         JSONObject valueObject = new JSONObject();
                         PackageInfo info = null;
                         try {
@@ -1200,7 +1206,7 @@ public class CoocaaOSApi extends CordovaPlugin
                             valueObject.put("versionName", "-1");
                             valueObject.put("versionCode", -1);
                         }
-                        Log.i("WebViewSDK", "valueObject = " + valueObject);
+                        Log.i(Tag, "valueObject = " + valueObject);
                         resultObject.put(pkgName, valueObject);
                     }
                     callbackContext.success(resultObject.toString());
@@ -1506,7 +1512,7 @@ public class CoocaaOSApi extends CordovaPlugin
                         String token = tokenObj.getString("token");
                         String phoneNum = phoneNumObj.getString("tel");
 
-                        Intent mIntent = new Intent("coocaa.intent.movie.pay");
+                        Intent mIntent = new Intent("coocaa.intent.action.pay");
                         String pkgName = mContext.getPackageName();
                         if (pkgName != null)
                             mIntent.setPackage(pkgName);
@@ -1649,7 +1655,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 intent.putExtras(b);
                 LocalBroadcastManager.getInstance(context).sendBroadcastSync(intent);
             } catch (JSONException e) {
-                Log.e("WebViewSDK", "broadCastCommonChanged error:" + e.toString());
+                Log.e(Tag, "broadCastCommonChanged error:" + e.toString());
                 e.printStackTrace();
             }
         }
@@ -1671,7 +1677,7 @@ public class CoocaaOSApi extends CordovaPlugin
                 intent.putExtras(b);
                 LocalBroadcastManager.getInstance(context).sendBroadcastSync(intent);
             } catch (JSONException e) {
-                Log.e("WebViewSDK", "broadCastVoiceChanged error:" + e.toString());
+                Log.e(Tag, "broadCastVoiceChanged error:" + e.toString());
                 e.printStackTrace();
             }
         }

@@ -79,6 +79,8 @@ public class MActivity extends BaseActivity {
     private boolean isOver;
     private String payAction;
     private boolean isOnPause;
+    private long startTime;
+    public static String TVPAYACTION = "TVSTARTPAY";
     private PayBackListener payBackListener;
 
     public class JavaScriptInterface {
@@ -96,6 +98,12 @@ public class MActivity extends BaseActivity {
         @JavascriptInterface
         public void loadBg() {
             handler.sendEmptyMessage(1);
+        }
+
+        @JavascriptInterface
+        public void loadFinish()
+        {
+            handler.sendEmptyMessage(0);
         }
 
         @JavascriptInterface
@@ -212,7 +220,15 @@ public class MActivity extends BaseActivity {
 				{
                     wb.getSettings().setBlockNetworkImage(false);
                     loadView.setVisibility(View.INVISIBLE);
+                    Map<String, String> logMap = new HashMap<>();
+                    logMap.put("loading_time", (System.currentTimeMillis() - startTime) + "");
+                    webviewsubLog(logMap, "pay_load_time");
 				}
+            }else if(msg.what == 0)
+            {
+                Map<String, String> logMap = new HashMap<>();
+                logMap.put("load_finish_time", (System.currentTimeMillis() - startTime) + "");
+                webviewsubLog(logMap, "pay_load_time");
             }
         }
 
@@ -222,6 +238,7 @@ public class MActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startTime = System.currentTimeMillis();
         init(getIntent());
         Log.i("CCAPI", "coocaa payCenter version :" + getVersionName());
 
@@ -291,6 +308,7 @@ public class MActivity extends BaseActivity {
             if (logiInfo != null && logiInfo.loginstatus == ApiDefData.LOGINPASS && !TextUtils.isEmpty(logiInfo.token)) {
                 String tel = logiInfo.tel;
                 if (cmd.equals(DefData.CMDPAY)) {
+                    sendTvStewardship();
                     mIntent.putExtra("token", logiInfo.token);
                     mIntent.putExtra("tel", tel);
                     new WbPay(url + DefData.PAYURL, wb, mIntent);
@@ -303,11 +321,18 @@ public class MActivity extends BaseActivity {
                     onexit();
                 }
             } else {
+                sendTvStewardship();
                 Log.i("CCAPI", "no Login!");
                 pb = new PayBackData(ApiDefData.PAYERROR, null, "", null, 0, "-1", "");
                 onexit();
             }
         }
+    }
+
+    private void sendTvStewardship()
+    {
+        Intent intent = new Intent(TVPAYACTION);
+        this.sendBroadcast(intent);
     }
 
     private static String readFileByLines(String fileName) {
@@ -635,11 +660,7 @@ public class MActivity extends BaseActivity {
 
         }
         if (key == 27) {
-            if (!netIsConnect() && isOver) {
-                TCSettingApi settingApi = new TCSettingApi();
-                settingApi.connectNetworkWithConfirmUI(MActivity.this);
-                return true;
-            } else if (!isOver) {
+            if (!isOver) {
                 onexit();
             }
         }

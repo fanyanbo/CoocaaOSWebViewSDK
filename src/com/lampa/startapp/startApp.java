@@ -74,10 +74,7 @@ public class startApp extends CordovaPlugin {
 		try {
 			if (args.get(0) instanceof JSONArray) {
 				com_name = args.getJSONArray(0).getString(0);
-
-				if(args.getJSONArray(0).length() > 1) {
-					activity = args.getJSONArray(0).getString(1);
-				}
+				activity = args.getJSONArray(0).getString(1);
 				
 				if(args.getJSONArray(0).length() > 2) {
 					spackage = args.getJSONArray(0).getString(2);

@@ -3,7 +3,12 @@
 ### ``说明文档`` [请猛戳这里](https://github.com/fanyanbo/CoocaaOSWebViewSDK/blob/feature-20180309/README.md)
 
 * 如以view的方式集成，请checkout v2.4.0分支，其他分支暂不支持该功能
-  
+ 
+v2.5.7
+==================
+ * 对接酷开系统支付功能
+ * 对接获取各模块pushid的功能
+ 
 v2.5.6
 ==================
  * 解决广播发送多次的问题
