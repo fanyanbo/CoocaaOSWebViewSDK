@@ -276,6 +276,7 @@ public class MActivity extends BaseActivity {
             }
             if (!TextUtils.isEmpty(token) || !TextUtils.isEmpty(idCard)) {
                 if (cmd.equals(DefData.CMDPAY) || cmd.equals(DefData.CMDPAY_OVERSEA)) {
+                    sendTvStewardship();
                     new WbPay(url, wb, mIntent);
                 } else if (cmd.equals(DefData.CMDLOGIN_OVERSEA)) {
                     new WbLogin(url, wb, mIntent);
@@ -285,6 +286,7 @@ public class MActivity extends BaseActivity {
             } else {
                 Log.i("CCAPI", "no Loginpay!");
                 if (cmd.equals(DefData.CMDPAY)) {
+                    sendTvStewardship();
                     mIntent.putExtra("token", "");
                     mIntent.putExtra("tel", "-1");
                     new WbPay(url, wb, mIntent);
@@ -321,7 +323,6 @@ public class MActivity extends BaseActivity {
                     onexit();
                 }
             } else {
-                sendTvStewardship();
                 Log.i("CCAPI", "no Login!");
                 pb = new PayBackData(ApiDefData.PAYERROR, null, "", null, 0, "-1", "");
                 onexit();
