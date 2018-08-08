@@ -89,7 +89,7 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     }
     
     private CordovaInterfaceListener mCordovaListener;
-    private CoocaaOSConnecter mCoocaaOSConnecter = null;
+    private volatile CoocaaOSConnecter mCoocaaOSConnecter = null;
     private BusinessDataListener.CordovaBusinessDataListener mBusinessDataListener = null;
     //set Listener
     public void setCordovaInterfaceListener(CordovaInterfaceListener corListener)
