@@ -96,6 +96,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-annotations-23.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-23.4.0" level="project" />
+    <orderEntry type="library" exported="" name="classes" level="project" />
     <orderEntry type="library" exported="" name="layoutlib" level="project" />
     <orderEntry type="module" module-name="ccExJCoocaaPay" exported="" />
     <orderEntry type="module" module-name="ccSystemWebViewSDKExtra" exported="" />

@@ -805,6 +805,11 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    	
 	    	return url;
 	    }
+
+	    public void setCore(int core) {
+			if(preferences != null)
+				preferences.set("webview",((core == 0) ? "org.apache.cordova.engine.system.SystemWebViewEngine" : "org.apache.cordova.engine.crosswalk.XWalkWebViewEngine"));
+		}
 	    
 	    public void setCacheMode(int mode) {
 	    	if(mode < 0 || mode > 3)

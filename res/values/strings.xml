@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="error_webview_netdisconnect">network error!</string>
-    <string name="error_webview_neterror">connection error!</string>
-    <string name="error_webview_reset">setting network</string>
-    <string name="error_webview_refresh">refresh page</string>
-    <string name="error">load error，please exit try again!</string>
-</resources>
+<!-- Copyright (c) 2012 The Chromium Authors. All rights reserved.
+
+     Use of this source code is governed by a BSD-style license that can be
+     found in the LICENSE file.
+-->
+
+<!-- DO NOT ADD STRINGS HERE.
+
+    Android content strings now live in
+    content/public/android/java/strings/android_content_strings.grd
+
+    See http://www.chromium.org/developers/design-documents/ui-localization
+-->
+
+<resources/>
