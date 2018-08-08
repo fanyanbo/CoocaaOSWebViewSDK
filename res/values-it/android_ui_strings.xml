@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Cancella"</string>
 <string name="autofill_popup_content_description">"È mostrato il popup di Compilazione automatica"</string>
 <string name="password_generation_popup_content_description">"È mostrato il popup di generazione della password"</string>
+<string name="autofill_keyboard_accessory_content_description">"Suggerimenti disponibili"</string>
+<string name="updating_chrome">"Aggiornamento di Chrome..."</string>
 </resources>

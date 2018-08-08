@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Löschen"</string>
 <string name="autofill_popup_content_description">"Pop-up-Fenster für AutoFill-Daten wird angezeigt."</string>
 <string name="password_generation_popup_content_description">"Pop-up-Fenster zur Passwortgenerierung wird angezeigt."</string>
+<string name="autofill_keyboard_accessory_content_description">"Vorschläge verfügbar"</string>
+<string name="updating_chrome">"Chrome wird aktualisiert..."</string>
 </resources>

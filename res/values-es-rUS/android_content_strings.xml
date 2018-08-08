@@ -2,6 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 <string name="actionbar_share">"Compartir"</string>
 <string name="actionbar_web_search">"Búsqueda en la Web"</string>
+<string name="actionbar_textselection_title">"Selección de texto"</string>
 <string name="media_player_error_title">"No se puede reproducir el video."</string>
 <string name="media_player_error_text_invalid_progressive_playback">"El video no se puede transmitir a este dispositivo."</string>
 <string name="media_player_error_text_unknown">"El video no se puede reproducir."</string>

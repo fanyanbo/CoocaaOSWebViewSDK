@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"נקה"</string>
 <string name="autofill_popup_content_description">"מציג את החלון הקופץ של מילוי אוטומטי"</string>
 <string name="password_generation_popup_content_description">"מציג את החלון הקופץ של יצירת סיסמה"</string>
+<string name="autofill_keyboard_accessory_content_description">"הצעות זמינות"</string>
+<string name="updating_chrome">"‏מעדכן את Chrome..."</string>
 </resources>

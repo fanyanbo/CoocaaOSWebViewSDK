@@ -2,6 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 <string name="actionbar_share">"Paylaş"</string>
 <string name="actionbar_web_search">"Web arama"</string>
+<string name="actionbar_textselection_title">"Metin seçimi"</string>
 <string name="media_player_error_title">"Video oynatılamıyor"</string>
 <string name="media_player_error_text_invalid_progressive_playback">"Bu video maalesef bu cihaza akışla gönderilmek için uygun değil."</string>
 <string name="media_player_error_text_unknown">"Maalesef bu video oynatılamıyor."</string>

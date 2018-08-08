@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Počisti"</string>
 <string name="autofill_popup_content_description">"Prikaz pojavnega okna za samodejno izpolnjevanje"</string>
 <string name="password_generation_popup_content_description">"Prikaz pojavnega okna za ustvarjanje gesel"</string>
+<string name="autofill_keyboard_accessory_content_description">"Predlogi so na voljo"</string>
+<string name="updating_chrome">"Posodabljanje Chroma ..."</string>
 </resources>

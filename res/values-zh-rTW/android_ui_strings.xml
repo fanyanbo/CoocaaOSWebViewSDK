@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"清除"</string>
 <string name="autofill_popup_content_description">"目前顯示的是自動填入彈出式視窗"</string>
 <string name="password_generation_popup_content_description">"目前顯示的是密碼產生彈出式視窗"</string>
+<string name="autofill_keyboard_accessory_content_description">"有自動填入建議"</string>
+<string name="updating_chrome">"正在更新 Chrome..."</string>
 </resources>

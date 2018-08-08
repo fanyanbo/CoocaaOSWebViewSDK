@@ -16,11 +16,11 @@
     
 
         
-    <TextView android:ellipsize="end" android:id="@+id/dropdown_label" android:includeFontPadding="false" android:layout_height="wrap_content" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_width="wrap_content" android:singleLine="true" android:textAlignment="viewStart" android:textColor="#333" android:textSize="18sp"/>
+    <TextView android:ellipsize="end" android:id="@+id/dropdown_label" android:includeFontPadding="false" android:layout_height="wrap_content" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_width="wrap_content" android:singleLine="true" android:textAlignment="viewStart" android:textColor="@drawable/dropdown_label_color" android:textSize="18sp"/>
     
 
         
-    <TextView android:ellipsize="end" android:id="@+id/dropdown_sublabel" android:includeFontPadding="false" android:layout_height="wrap_content" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_width="wrap_content" android:singleLine="true" android:textAlignment="viewStart" android:textColor="#8b8b8b" android:textSize="14sp"/>
+    <TextView android:ellipsize="end" android:id="@+id/dropdown_sublabel" android:includeFontPadding="false" android:layout_height="wrap_content" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_width="wrap_content" android:singleLine="true" android:textAlignment="viewStart" android:textColor="#646464" android:textSize="14sp"/>
     
     
   </LinearLayout>

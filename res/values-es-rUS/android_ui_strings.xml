@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Borrar"</string>
 <string name="autofill_popup_content_description">"Mostrando mensaje emergente de Autocompletar"</string>
 <string name="password_generation_popup_content_description">"Mostrando mensaje emergente de generación de contraseña"</string>
+<string name="autofill_keyboard_accessory_content_description">"Sugerencias disponibles"</string>
+<string name="updating_chrome">"Actualizando Chrome..."</string>
 </resources>

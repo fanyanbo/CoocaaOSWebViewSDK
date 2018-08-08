@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"クリア"</string>
 <string name="autofill_popup_content_description">"自動入力のポップアップを表示しています"</string>
 <string name="password_generation_popup_content_description">"パスワード作成のポップアップを表示しています"</string>
+<string name="autofill_keyboard_accessory_content_description">"候補があります"</string>
+<string name="updating_chrome">"Chrome を更新しています..."</string>
 </resources>

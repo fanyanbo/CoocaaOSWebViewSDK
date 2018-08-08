@@ -17,7 +17,7 @@
 <string name="color_picker_button_yellow">"زرد"</string>
 <string name="color_picker_button_black">"سیاه"</string>
 <string name="color_picker_button_white">"سفید"</string>
-<string name="copy_to_clipboard_failure_message">"کپی در کلیپ بورد ناموفق بود"</string>
+<string name="copy_to_clipboard_failure_message">"کپی در بریده‌دان ناموفق بود"</string>
 <string name="accessibility_date_picker_month">"ماه"</string>
 <string name="accessibility_date_picker_year">"سال"</string>
 <string name="date_picker_dialog_set">"تنظیم"</string>
@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"پاک کردن"</string>
 <string name="autofill_popup_content_description">"نمایش پنجره تکمیل خودکار"</string>
 <string name="password_generation_popup_content_description">"نمایش پنجره تولید گذرواژه"</string>
+<string name="autofill_keyboard_accessory_content_description">"پیشنهادهایی در دسترس هستند"</string>
+<string name="updating_chrome">"‏درحال به‌روزرسانی Chrome..."</string>
 </resources>

@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Διαγραφή"</string>
 <string name="autofill_popup_content_description">"Εμφάνιση αναδυόμενου παραθύρου αυτόματης συμπλήρωσης"</string>
 <string name="password_generation_popup_content_description">"Εμφάνιση αναδυόμενου παραθύρου δημιουργίας κωδικού πρόσβασης"</string>
+<string name="autofill_keyboard_accessory_content_description">"Διαθέσιμες προτάσεις"</string>
+<string name="updating_chrome">"Ενημέρωση του Chrome…"</string>
 </resources>

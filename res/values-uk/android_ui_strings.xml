@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Очистити"</string>
 <string name="autofill_popup_content_description">"Показ спливаючих вікон автозаповнення"</string>
 <string name="password_generation_popup_content_description">"Показ спливаючих вікон для створення пароля"</string>
+<string name="autofill_keyboard_accessory_content_description">"Є пропозиції"</string>
+<string name="updating_chrome">"Оновлення Chrome…"</string>
 </resources>

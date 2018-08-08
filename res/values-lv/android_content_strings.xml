@@ -2,6 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 <string name="actionbar_share">"Kopīgot"</string>
 <string name="actionbar_web_search">"Meklēšana tīmeklī"</string>
+<string name="actionbar_textselection_title">"Teksta atlase"</string>
 <string name="media_player_error_title">"Nevar atskaņot videoklipu."</string>
 <string name="media_player_error_text_invalid_progressive_playback">"Diemžēl šo videoklipu nevar straumēt šajā ierīcē."</string>
 <string name="media_player_error_text_unknown">"Diemžēl šo videoklipu nevar atskaņot."</string>

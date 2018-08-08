@@ -2,6 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 <string name="actionbar_share">"Delen"</string>
 <string name="actionbar_web_search">"Zoeken op internet"</string>
+<string name="actionbar_textselection_title">"Tekstselectie"</string>
 <string name="media_player_error_title">"Kan video niet afspelen"</string>
 <string name="media_player_error_text_invalid_progressive_playback">"Kan deze video niet streamen naar dit apparaat."</string>
 <string name="media_player_error_text_unknown">"Deze video kan niet worden afgespeeld."</string>

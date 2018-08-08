@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Limpar"</string>
 <string name="autofill_popup_content_description">"A mostrar pop-up de preenchimento automático"</string>
 <string name="password_generation_popup_content_description">"A mostrar pop-up de geração de palavra-passe"</string>
+<string name="autofill_keyboard_accessory_content_description">"Sugestões disponíveis"</string>
+<string name="updating_chrome">"A atualizar o Chrome..."</string>
 </resources>

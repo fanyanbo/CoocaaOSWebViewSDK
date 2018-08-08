@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Wyczyść"</string>
 <string name="autofill_popup_content_description">"Pokazuję wyskakujące okienko autouzupełniania"</string>
 <string name="password_generation_popup_content_description">"Pokazuję wyskakujące okienko generowania hasła"</string>
+<string name="autofill_keyboard_accessory_content_description">"Dostępne są sugestie"</string>
+<string name="updating_chrome">"Aktualizuję Chrome..."</string>
 </resources>

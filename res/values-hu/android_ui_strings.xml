@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Törlés"</string>
 <string name="autofill_popup_content_description">"Automatikus kitöltés előugró ablakának megjelenítése"</string>
 <string name="password_generation_popup_content_description">"Jelszógenerálás előugró ablakának megjelenítése"</string>
+<string name="autofill_keyboard_accessory_content_description">"Javaslatok állnak rendelkezésre"</string>
+<string name="updating_chrome">"A Chrome frissítése…"</string>
 </resources>

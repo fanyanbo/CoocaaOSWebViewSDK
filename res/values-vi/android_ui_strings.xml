@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Xóa"</string>
 <string name="autofill_popup_content_description">"Hiển thị cửa sổ bật lên tự động điền"</string>
 <string name="password_generation_popup_content_description">"Hiển thị cửa sổ bật lên tạo mật khẩu"</string>
+<string name="autofill_keyboard_accessory_content_description">"Có đề xuất"</string>
+<string name="updating_chrome">"Đang cập nhật Chrome..."</string>
 </resources>

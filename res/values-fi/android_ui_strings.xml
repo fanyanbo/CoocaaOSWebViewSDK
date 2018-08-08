@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Tyhjennä"</string>
 <string name="autofill_popup_content_description">"Automaattisen täytön ponnahdusikkuna on näkyvissä."</string>
 <string name="password_generation_popup_content_description">"Salasanojen luomisen ponnahdusikkuna on näkyvissä."</string>
+<string name="autofill_keyboard_accessory_content_description">"Ehdotuksia on saatavilla."</string>
+<string name="updating_chrome">"Päivitetään Chromea…"</string>
 </resources>

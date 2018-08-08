@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Vymazať"</string>
 <string name="autofill_popup_content_description">"Zobrazuje sa okno automatického dopĺňania"</string>
 <string name="password_generation_popup_content_description">"Zobrazuje sa okno generovania hesiel"</string>
+<string name="autofill_keyboard_accessory_content_description">"Sú k dispozícii návrhy"</string>
+<string name="updating_chrome">"Prebieha aktualizácia Chromu…"</string>
 </resources>

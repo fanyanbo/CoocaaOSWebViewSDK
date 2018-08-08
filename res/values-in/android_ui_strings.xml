@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Hapus"</string>
 <string name="autofill_popup_content_description">"Menampilkan munculan isi otomatis"</string>
 <string name="password_generation_popup_content_description">"Menampilkan munculan pembuatan sandi"</string>
+<string name="autofill_keyboard_accessory_content_description">"Saran yang tersedia"</string>
+<string name="updating_chrome">"Memperbarui Chrome..."</string>
 </resources>

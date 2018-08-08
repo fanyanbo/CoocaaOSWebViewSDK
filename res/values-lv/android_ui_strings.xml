@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Notīrīt"</string>
 <string name="autofill_popup_content_description">"Tiek rādīts automātiskās aizpildes uznirstošais logs"</string>
 <string name="password_generation_popup_content_description">"Tiek rādīts paroles ģenerēšanas uznirstošais logs"</string>
+<string name="autofill_keyboard_accessory_content_description">"Pieejami ieteikumi"</string>
+<string name="updating_chrome">"Notiek Chrome atjaunināšana..."</string>
 </resources>

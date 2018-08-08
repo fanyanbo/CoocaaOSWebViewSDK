@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Rensa"</string>
 <string name="autofill_popup_content_description">"Visar popupfönster för Autofyll"</string>
 <string name="password_generation_popup_content_description">"Visar popupfönster för lösenordsgenerering"</string>
+<string name="autofill_keyboard_accessory_content_description">"Förslag tillgängliga"</string>
+<string name="updating_chrome">"Chrome uppdateras …"</string>
 </resources>

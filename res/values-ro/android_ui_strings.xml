@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Ștergeți"</string>
 <string name="autofill_popup_content_description">"Fereastra pop-up pentru completarea automată este afișată"</string>
 <string name="password_generation_popup_content_description">"Fereastra pop-up pentru generarea parolelor este afișată"</string>
+<string name="autofill_keyboard_accessory_content_description">"Sugestii disponibile"</string>
+<string name="updating_chrome">"Se actualizează Chrome..."</string>
 </resources>

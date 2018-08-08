@@ -21,12 +21,23 @@ package org.apache.cordova.engine.crosswalk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.Manifest;
 import android.util.Log;
 import android.view.View;
+import android.webkit.ValueCallback;
+import android.webkit.WebSettings;
 
-import junit.framework.Assert;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.cordova.CordovaBridge;
 import org.apache.cordova.CordovaInterface;
@@ -42,8 +53,7 @@ import org.apache.cordova.PluginManager;
 import org.xwalk.core.XWalkActivityDelegate;
 import org.xwalk.core.XWalkNavigationHistory;
 import org.xwalk.core.XWalkView;
-
-import java.util.Map;
+import org.xwalk.core.XWalkGetBitmapCallback;
 
 /**
  * Glue class between CordovaWebView (main Cordova logic) and XWalkCordovaView (the actual View).
@@ -53,6 +63,10 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
     public static final String TAG = "XWalkWebViewEngine";
     public static final String XWALK_USER_AGENT = "xwalkUserAgent";
     public static final String XWALK_Z_ORDER_ON_TOP = "xwalkZOrderOnTop";
+
+    private static final String XWALK_EXTENSIONS_FOLDER = "xwalk-extensions";
+
+    private static final int PERMISSION_REQUEST_CODE = 100;
 
     protected final XWalkCordovaView webView;
     protected XWalkCordovaCookieManager cookieManager;
@@ -68,13 +82,15 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
     protected CordovaPreferences preferences;
     protected int loadUrlCacheMode = 0;
 
+    private String ua;
+
     /** Used when created via reflection. */
     public XWalkWebViewEngine(Context context, CordovaPreferences preferences) {
-        Log.i("WebViewSDK","XWalkWebViewEngine 111");
         this.preferences = preferences;
         Runnable cancelCommand = new Runnable() {
             @Override
             public void run() {
+
                 //modified by fyb
                 Context context = cordova.getActivity();
                 if (context instanceof Activity){
@@ -91,6 +107,37 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
 
                 initWebViewSettings();
                 exposeJsInterface(webView, bridge);
+                loadExtensions();
+
+                CordovaPlugin notifPlugin = new CordovaPlugin() {
+                    @Override
+                    public void onNewIntent(Intent intent) {
+                        Log.i(TAG, "notifPlugin route onNewIntent() to XWalkView: " + intent.toString());
+                        XWalkWebViewEngine.this.webView.onNewIntent(intent);
+                    }
+
+                    @Override
+                    public Object onMessage(String id, Object data) {
+                        if (id.equals("captureXWalkBitmap")) {
+                            // Capture bitmap on UI thread.
+                            XWalkWebViewEngine.this.cordova.getActivity().runOnUiThread(new Runnable() {
+                                public void run() {
+                                    XWalkWebViewEngine.this.webView.captureBitmapAsync(
+                                            new XWalkGetBitmapCallback() {
+                                        @Override
+                                        public void onFinishGetBitmap(Bitmap bitmap,
+                                                int response) {
+                                            pluginManager.postMessage(
+                                                    "onGotXWalkBitmap", bitmap);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        return null;
+                    }
+                };
+                pluginManager.addService(new PluginEntry("XWalkNotif", notifPlugin));
 
                 // Send the massage of xwalk's ready to plugin.
                 if (pluginManager != null) {
@@ -104,7 +151,6 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
         };
         activityDelegate = new XWalkActivityDelegate((Activity) context, cancelCommand, completeCommand);
 
-        Log.i("WebViewSDK","XWalkWebViewEngine 2222");
         webView = new XWalkCordovaView(context, preferences);
     }
 
@@ -146,6 +192,8 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
                 XWalkWebViewEngine.this.cordova.getActivity().runOnUiThread(r);
             }
         }));
+        //modified by fyb
+//        nativeToJsMessageQueue.addBridgeMode(new NativeToJsMessageQueue.EvalBridgeMode(this, cordova));
         bridge = new CordovaBridge(pluginManager, nativeToJsMessageQueue);
     }
 
@@ -170,15 +218,48 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
         if (!xwalkUserAgent.isEmpty()) {
             webView.setUserAgentString(xwalkUserAgent);
         }
+        
+        String appendUserAgent = preferences.getString("AppendUserAgent", "");
+        if (!appendUserAgent.isEmpty()) {
+            webView.setUserAgentString(webView.getUserAgentString() + " " + appendUserAgent);
+        }
+
+        webView.setUserAgentString(this.ua);
+        
         if (preferences.contains("BackgroundColor")) {
             int backgroundColor = preferences.getInteger("BackgroundColor", Color.BLACK);
             webView.setBackgroundColor(backgroundColor);
         }
+
+        //modified by fyb
+        Log.i("fyb","-------->webView.getSettings().setUseWideViewPort(true)");
+        webView.setBackgroundColor(0);
+        webView.getSettings().setUseWideViewPort(true);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
     }
 
     private static void exposeJsInterface(XWalkView webView, CordovaBridge bridge) {
         XWalkExposedJsApi exposedJsApi = new XWalkExposedJsApi(bridge);
         webView.addJavascriptInterface(exposedJsApi, "_cordovaNative");
+    }
+
+    private void loadExtensions() {
+        AssetManager assetManager = cordova.getActivity().getAssets();
+        String[] extList;
+        try {
+            Log.i(TAG, "Iterate assets/xwalk-extensions folder");
+            extList = assetManager.list(XWALK_EXTENSIONS_FOLDER);
+        } catch (IOException e) {
+            Log.w(TAG, "Failed to iterate assets/xwalk-extensions folder");
+            return;
+        }
+
+        for (String path : extList) {
+            // Load the extension.
+            Log.i(TAG, "Start to load extension: " + path);
+            webView.getExtensionManager().loadExtension(XWALK_EXTENSIONS_FOLDER + File.separator + path);
+        }
     }
 
     @Override
@@ -244,34 +325,84 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
 
     @Override
     public void loadUrl(String url, boolean clearNavigationStack) {
+        Log.i("fyb","------------>XWalkWebViewEngine loadUrlIntoView");
         if (!activityDelegate.isXWalkReady()) {
-            Assert.assertNull(startUrl);
             startUrl = url;
             return;
         }
-        Log.i("fyb","XWalkWebViewEngine loadUrl url = " + url);
         webView.load(url, null);
+    }
+
+    /**
+     * This API is used in Cordova-Android 6.0.0 override from
+     *
+     * CordovaWebViewEngine.java
+     * @since Cordova 6.0
+     */
+    public void evaluateJavascript(String js, ValueCallback<String> callback) {
+        webView.evaluateJavascript(js, callback);
+    }
+
+    @Override
+    public void setUserAgentString(String ua) {
+        this.ua = ua;
     }
 
     public boolean isXWalkReady() {
         return activityDelegate.isXWalkReady();
     }
 
+    public interface PermissionRequestListener {
+        public void onRequestPermissionResult(int requestCode, String[] permissions,
+                int[] grantResults);
+    }
+
+    public boolean requestPermissionsForFileChooser(final PermissionRequestListener listener) {
+        ArrayList<String> dangerous_permissions = new ArrayList<String>();
+        try {
+            PackageManager packageManager = cordova.getActivity().getPackageManager();
+            PackageInfo packageInfo = packageManager.getPackageInfo(
+                    cordova.getActivity().getPackageName(), PackageManager.GET_PERMISSIONS);
+            for (String permission : packageInfo.requestedPermissions) {
+                if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        || permission.equals(Manifest.permission.CAMERA)) {
+                    dangerous_permissions.add(permission);
+                }
+            }
+        } catch (NameNotFoundException e) {
+        }
+
+        if (dangerous_permissions.isEmpty()) {
+            return false;
+        }
+
+        CordovaPlugin permissionRequestPlugin = new CordovaPlugin() {
+            @Override
+            public void onRequestPermissionResult(int requestCode, String[] permissions,
+                    int[] grantResults) {
+                if (requestCode != PERMISSION_REQUEST_CODE) return;
+                listener.onRequestPermissionResult(requestCode, permissions, grantResults);
+            }
+        };
+        try {
+            cordova.requestPermissions(permissionRequestPlugin, PERMISSION_REQUEST_CODE,
+                    dangerous_permissions.toArray(new String[dangerous_permissions.size()]));
+        } catch (NoSuchMethodError e) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public void loadUrl(final String url, Map<String,String> header, boolean clearNavigationStack) {
-        //// TODO: 2018/8/8  
-       // webView.loadUrl(url, header);
+        //// TODO: 2018/8/8
+        // webView.loadUrl(url, header);
         Log.i("WebViewSDK","no implement");
     }
 
     @Override
     public void reload() {
         webView.reload(0);
-    }
-
-    @Override
-    public void setUserAgentString(String ua) {
-        webView.setUserAgentString(ua);
     }
 
     @Override

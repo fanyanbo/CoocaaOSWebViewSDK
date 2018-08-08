@@ -1,20 +1,28 @@
 package org.apache.cordova.engine.crosswalk;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.util.AttributeSet;
-import android.view.KeyEvent;
-
 import org.apache.cordova.CordovaPreferences;
-import org.apache.cordova.CordovaWebView;
-import org.apache.cordova.CordovaWebViewEngine;
 import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.KeyEvent;
+
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.CordovaWebViewEngine;
+
 public class XWalkCordovaView extends XWalkView implements CordovaWebViewEngine.EngineView {
+
+    public static final String TAG = "XWalkCordovaView";
+
     protected XWalkCordovaResourceClient resourceClient;
     protected XWalkCordovaUiClient uiClient;
     protected XWalkWebViewEngine parentEngine;
@@ -77,6 +85,21 @@ public class XWalkCordovaView extends XWalkView implements CordovaWebViewEngine.
             this.uiClient = (XWalkCordovaUiClient)client;
         }
         super.setUIClient(client);
+    }
+
+    // Call CordovaInterface to start activity for result to make sure
+    // onActivityResult() callback will be triggered from CordovaActivity correctly.
+    // Todo(leonhsl) How to handle |options|?
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
+        parentEngine.cordova.startActivityForResult(new CordovaPlugin() {
+            @Override
+            public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+                // Route to XWalkView.
+                Log.i(TAG, "Route onActivityResult() to XWalkView");
+                XWalkCordovaView.this.onActivityResult(requestCode, resultCode, intent);
+            }
+        }, intent, requestCode);
     }
 
     @Override

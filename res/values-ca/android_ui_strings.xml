@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Esborra"</string>
 <string name="autofill_popup_content_description">"Es mostra la finestra emergent d\'emplenament automàtic"</string>
 <string name="password_generation_popup_content_description">"Es mostra la finestra emergent de generació de contrasenyes"</string>
+<string name="autofill_keyboard_accessory_content_description">"Suggeriments disponibles"</string>
+<string name="updating_chrome">"S\'està actualitzant Chrome…"</string>
 </resources>

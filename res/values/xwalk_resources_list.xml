@@ -2,5 +2,7 @@
 <resources>
 <string-array name="xwalk_resources_list">
 <item>xwalk.pak</item>
+<item>xwalk_100_percent.pak</item>
+<item>icudtl.dat</item>
 </string-array>
 </resources>

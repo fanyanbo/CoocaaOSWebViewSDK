@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"I-clear"</string>
 <string name="autofill_popup_content_description">"Ipinapakita ang popup na autofill"</string>
 <string name="password_generation_popup_content_description">"Ipinapakita ang popup para sa pagbuo ng password"</string>
+<string name="autofill_keyboard_accessory_content_description">"May available na mga suhestyon"</string>
+<string name="updating_chrome">"Ina-update ang Chrome..."</string>
 </resources>

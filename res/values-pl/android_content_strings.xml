@@ -2,6 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 <string name="actionbar_share">"Udostępnij"</string>
 <string name="actionbar_web_search">"Wyszukaj w Google"</string>
+<string name="actionbar_textselection_title">"Zaznaczanie tekstu"</string>
 <string name="media_player_error_title">"Nie można odtworzyć filmu"</string>
 <string name="media_player_error_text_invalid_progressive_playback">"Tego filmu nie można przesłać na to urządzenie."</string>
 <string name="media_player_error_text_unknown">"Tego filmu nie można odtworzyć."</string>

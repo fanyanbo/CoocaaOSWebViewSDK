@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Wissen"</string>
 <string name="autofill_popup_content_description">"Pop-upvenster van automatisch aanvullen wordt weergegeven"</string>
 <string name="password_generation_popup_content_description">"Pop-upvenster voor wachtwoord genereren wordt weergegeven"</string>
+<string name="autofill_keyboard_accessory_content_description">"Beschikbare suggesties"</string>
+<string name="updating_chrome">"Chrome updaten..."</string>
 </resources>

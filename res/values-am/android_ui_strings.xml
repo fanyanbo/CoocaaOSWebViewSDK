@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"አጽዳ"</string>
 <string name="autofill_popup_content_description">"ራስ-ሙላ ብቅባይ በማሳየት ላይ"</string>
 <string name="password_generation_popup_content_description">"የይለፍ ቃል ማመንጨት ብቅ ይን በማሳየት ላይ"</string>
+<string name="autofill_keyboard_accessory_content_description">"የሚገኙ የአስተያየት ጥቆማዎች"</string>
+<string name="updating_chrome">"Chromeን በማዘመን ላይ..."</string>
 </resources>

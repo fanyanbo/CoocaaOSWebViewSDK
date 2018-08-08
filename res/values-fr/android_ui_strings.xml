@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Effacer"</string>
 <string name="autofill_popup_content_description">"Affichage de la fenêtre contextuelle de saisie automatique"</string>
 <string name="password_generation_popup_content_description">"Affichage de la fenêtre contextuelle de génération de mot de passe"</string>
+<string name="autofill_keyboard_accessory_content_description">"Suggestions disponibles"</string>
+<string name="updating_chrome">"Mise à jour de Chrome…"</string>
 </resources>

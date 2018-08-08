@@ -2,6 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 <string name="actionbar_share">"שתף"</string>
 <string name="actionbar_web_search">"‏חיפוש Google"</string>
+<string name="actionbar_textselection_title">"בחירת טקסט"</string>
 <string name="media_player_error_title">"לא ניתן להפעיל את הסרטון"</string>
 <string name="media_player_error_text_invalid_progressive_playback">"מצטערים. הזרמת הסרטון הזה למכשיר הזה אינה חוקית."</string>
 <string name="media_player_error_text_unknown">"מצטערים. לא ניתן להפעיל את הסרטון הזה."</string>

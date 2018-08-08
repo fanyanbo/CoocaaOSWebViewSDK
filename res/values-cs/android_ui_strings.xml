@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Vymazat"</string>
 <string name="autofill_popup_content_description">"Je zobrazeno vyskakovací okno automatického vyplňování"</string>
 <string name="password_generation_popup_content_description">"Je zobrazeno vyskakovací okno generování hesla"</string>
+<string name="autofill_keyboard_accessory_content_description">"Jsou k dispozici návrhy"</string>
+<string name="updating_chrome">"Aktualizace Chromu..."</string>
 </resources>

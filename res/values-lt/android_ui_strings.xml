@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Išvalyti"</string>
 <string name="autofill_popup_content_description">"Rodomas automatinio pildymo iššokantysis langas"</string>
 <string name="password_generation_popup_content_description">"Rodomas slaptažodžio generavimo iššokantysis langas"</string>
+<string name="autofill_keyboard_accessory_content_description">"Pasiekiami pasiūlymai"</string>
+<string name="updating_chrome">"Atnaujinama „Chrome“..."</string>
 </resources>

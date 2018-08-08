@@ -22,12 +22,16 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.http.SslError;
+import android.util.Log;
 import android.webkit.ValueCallback;
 import android.webkit.WebResourceResponse;
 
 import org.apache.cordova.CordovaResourceApi;
 import org.apache.cordova.CordovaResourceApi.OpenForReadResult;
 import org.apache.cordova.LOG;
+import org.apache.cordova.PluginManager;
+import org.xwalk.core.ClientCertRequest;
+import org.xwalk.core.XWalkHttpAuthHandler;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkView;
 
@@ -55,8 +59,10 @@ public class XWalkCordovaResourceClient extends XWalkResourceClient {
     */
     @Override
     public void onReceivedLoadError(XWalkView view, int errorCode, String description,
-                                    String failingUrl) {
+           String failingUrl) {
         LOG.d(TAG, "CordovaWebViewClient.onReceivedError: Error code=%s Description=%s URL=%s", errorCode, description, failingUrl);
+
+        Log.i("fyb", "CordovaWebViewClient.onReceivedError: Error code=" + errorCode + " Description= " + description + "URL="+failingUrl);
 
         parentEngine.client.onReceivedError(errorCode, description, failingUrl);
     }
@@ -109,6 +115,8 @@ public class XWalkCordovaResourceClient extends XWalkResourceClient {
         final String packageName = parentEngine.cordova.getActivity().getPackageName();
         final PackageManager pm = parentEngine.cordova.getActivity().getPackageManager();
 
+        Log.i("fyb", "onReceivedSslError");
+
         ApplicationInfo appInfo;
         try {
             appInfo = pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
@@ -123,5 +131,44 @@ public class XWalkCordovaResourceClient extends XWalkResourceClient {
             // When it doubt, lock it out!
             callback.onReceiveValue(false);
         }
+    }
+
+    @Override
+    public void onReceivedHttpAuthRequest(XWalkView view, XWalkHttpAuthHandler handler,
+            String host, String realm) {
+        // Check if there is some plugin which can resolve this auth challenge
+        Log.i("fyb", "onReceivedHttpAuthRequest");
+
+        PluginManager pluginManager = parentEngine.pluginManager;
+        if (pluginManager != null && pluginManager.onReceivedHttpAuthRequest(
+                parentEngine.parentWebView,
+                new XWalkCordovaHttpAuthHandler(handler), host, realm)) {
+            parentEngine.client.clearLoadTimeoutTimer();
+            return;
+        }
+
+        // By default handle 401 like we'd normally do!
+        super.onReceivedHttpAuthRequest(view, handler, host, realm);
+    }
+
+    @Override
+    public void onReceivedClientCertRequest(XWalkView view, ClientCertRequest request) {
+        // Check if there is some plugin which can resolve this certificate request
+        PluginManager pluginManager = parentEngine.pluginManager;
+        if (pluginManager != null && pluginManager.onReceivedClientCertRequest(
+                parentEngine.parentWebView, new XWalkCordovaClientCertRequest(request))) {
+            parentEngine.client.clearLoadTimeoutTimer();
+            return;
+        }
+
+        super.onReceivedClientCertRequest(view, request);
+    }
+
+    //modified by fyb
+    @Override
+    public void onProgressChanged(XWalkView view, int progressInPercent) {
+
+        parentEngine.client.onProgressChanged(progressInPercent);
+     //  super.onProgressChanged(view, progressInPercent);
     }
 }

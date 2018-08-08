@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"محو"</string>
 <string name="autofill_popup_content_description">"عرض نافذة الملء التلقائي المنبثقة"</string>
 <string name="password_generation_popup_content_description">"عرض نافذة إنشاء كلمة المرور المنبثقة"</string>
+<string name="autofill_keyboard_accessory_content_description">"الاقتراحات المتاحة"</string>
+<string name="updating_chrome">"‏جارٍ تحديث Chrome..."</string>
 </resources>

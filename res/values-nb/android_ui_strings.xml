@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Tøm"</string>
 <string name="autofill_popup_content_description">"Viser forgrunnsvinduet for autofyll"</string>
 <string name="password_generation_popup_content_description">"Viser forgrunnsvinduet for passordgenerering"</string>
+<string name="autofill_keyboard_accessory_content_description">"Det finnes tilgjengelige forslag"</string>
+<string name="updating_chrome">"Oppdaterer Chrome ..."</string>
 </resources>

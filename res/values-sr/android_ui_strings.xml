@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Обриши"</string>
 <string name="autofill_popup_content_description">"Приказивање искачућег прозора за аутоматско попуњавање"</string>
 <string name="password_generation_popup_content_description">"Приказивање искачућег прозора за генерисање лозинке"</string>
+<string name="autofill_keyboard_accessory_content_description">"Доступни су предлози"</string>
+<string name="updating_chrome">"Ажурирамо Chrome…"</string>
 </resources>

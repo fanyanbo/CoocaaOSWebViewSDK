@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"삭제"</string>
 <string name="autofill_popup_content_description">"자동완성 팝업 표시"</string>
 <string name="password_generation_popup_content_description">"비밀번호 생성 팝업 표시"</string>
+<string name="autofill_keyboard_accessory_content_description">"제안 사용 가능"</string>
+<string name="updating_chrome">"Chrome 업데이트 중..."</string>
 </resources>

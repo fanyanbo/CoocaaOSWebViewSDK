@@ -43,4 +43,6 @@
 <string name="date_picker_dialog_clear">"Izbriši"</string>
 <string name="autofill_popup_content_description">"Prikazuje se skočni prozor automatskog popunjavanja"</string>
 <string name="password_generation_popup_content_description">"Prikazuje se skočni prozor generiranja zaporke"</string>
+<string name="autofill_keyboard_accessory_content_description">"Dostupni su prijedlozi"</string>
+<string name="updating_chrome">"Ažuriranje Chromea..."</string>
 </resources>
