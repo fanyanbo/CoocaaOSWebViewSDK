@@ -46,6 +46,8 @@ public interface CordovaWebView {
 
     void stopLoading();
 
+    void pauseLoading();
+
     boolean canGoBack();
 
     void clearCache();

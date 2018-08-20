@@ -134,7 +134,7 @@ public class CordovaWebViewImpl implements CordovaWebView {
         
         recreatePlugins = recreatePlugins || (loadedUrl == null);
 
-        Log.i("WebViewSDK", "loadUrlIntoView recreatePlugins = " + recreatePlugins + ",loadedUrl = " + loadedUrl + ",isInitialized() = " + isInitialized());
+        Log.i("WebViewSDK", "loadUrlIntoView recreatePlugins = " + recreatePlugins + ",url = " + url + ",loadedUrl = " + loadedUrl + ",isInitialized() = " + isInitialized());
 
         if (recreatePlugins) {
             // Don't re-initialize on first load.
@@ -403,6 +403,11 @@ public class CordovaWebViewImpl implements CordovaWebView {
     public void stopLoading() {
         // Clear timeout flag
         loadUrlTimeout++;
+    }
+
+    @Override
+    public void pauseLoading() {
+        engine.stopLoading();
     }
 
     @Override

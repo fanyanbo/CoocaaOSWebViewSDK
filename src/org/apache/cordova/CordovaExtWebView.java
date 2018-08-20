@@ -524,9 +524,9 @@ public class CordovaExtWebView extends FrameLayout
 
 	public void stopLoading() {
 		if (appView != null) {
+			appView.pauseLoading();
 			appView.clearHistory();
 			appView.clearCache();
-			appView.stopLoading();
 		}
 	}
 
