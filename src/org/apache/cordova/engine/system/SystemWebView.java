@@ -17,7 +17,7 @@
        under the License.
 */
 
-package org.apache.cordova.engine;
+package org.apache.cordova.engine.system;
 
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaWebView;

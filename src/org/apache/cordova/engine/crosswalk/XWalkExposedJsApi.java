@@ -16,28 +16,27 @@
        specific language governing permissions and limitations
        under the License.
 */
-package org.apache.cordova.engine;
+package org.apache.cordova.engine.crosswalk;
 
-import android.webkit.JavascriptInterface;
+import android.os.Looper;
 
 import org.apache.cordova.CordovaBridge;
 import org.apache.cordova.ExposedJsApi;
 import org.json.JSONException;
+import org.xwalk.core.JavascriptInterface;
 
-/**
- * Contains APIs that the JS can call. All functions in here should also have
- * an equivalent entry in CordovaChromeClient.java, and be added to
- * cordova-js/lib/android/plugin/android/promptbasednativeapi.js
- */
-class SystemExposedJsApi implements ExposedJsApi {
+class XWalkExposedJsApi implements ExposedJsApi {
     private final CordovaBridge bridge;
 
-    SystemExposedJsApi(CordovaBridge bridge) {
+    XWalkExposedJsApi(CordovaBridge bridge) {
         this.bridge = bridge;
     }
 
     @JavascriptInterface
     public String exec(int bridgeSecret, String service, String action, String callbackId, String arguments) throws JSONException, IllegalAccessException {
+        if (Looper.myLooper() == null) {
+            Looper.prepare();
+        }
         return bridge.jsExec(bridgeSecret, service, action, callbackId, arguments);
     }
 

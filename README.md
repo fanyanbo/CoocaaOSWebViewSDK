@@ -2,8 +2,14 @@
 
 ### ``说明文档`` [请猛戳这里](https://github.com/fanyanbo/CoocaaOSWebViewSDK/blob/feature-20180309/README.md)
 
-* 如以view的方式集成，请checkout v2.4.X的分支，master分支和其他分支都暂不支持该功能
+* 如以view的方式集成，请checkout本分支
+* 可以使用预加载策略，App_browser依赖的本分支
+* master分支和其他分支都不支持预加载，只能集成CordovaExtActivity使用
 
+v2.4.7 
+==================
+ * 修复IPC绑定时序导致的问题
+ 
 v2.4.6 
 ==================
  * 对接酷开系统支付功能

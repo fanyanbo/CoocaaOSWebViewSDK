@@ -16,7 +16,7 @@
        specific language governing permissions and limitations
        under the License.
 */
-package org.apache.cordova.engine;
+package org.apache.cordova.engine.system;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

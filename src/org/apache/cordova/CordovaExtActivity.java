@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.cordova.CordovaInterfaceImpl.CordovaInterfaceListener;
 import org.apache.cordova.CordovaMainLayout.OnThemeChangedListener;
+import org.coocaa.webview.CoocaaOSConnecter;
 import org.coocaa.webview.CoocaaOSConnecterDefaultImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -125,6 +126,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 		private BusinessDataListener.CordovaBusinessDataListener mBusinessListener = null;
 	    private JsBroadcastReceiver mJsBC = null;
 		private VoiceBroadcastReceiver mVoiceBC = null;
+		private CoocaaOSConnecter mCoocaaOSConnecter = null;
 
 	    LocalBroadcastManager mLocalBroadcastManager;
 
@@ -593,7 +595,12 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        cordovaInterface.onCordovaInit(appView.getPluginManager());
 	        
 	        //set IPC Connecter
-	        cordovaInterface.setCoocaaOSConnecter(new CoocaaOSConnecterDefaultImpl(this, getCmdConnectorListener()));
+			if (getCmdConnectorListener() != null) {
+				if (mCoocaaOSConnecter == null) {
+					mCoocaaOSConnecter = new CoocaaOSConnecterDefaultImpl(this, getCmdConnectorListener());
+					cordovaInterface.setCoocaaOSConnecter(mCoocaaOSConnecter);
+				}
+			}
 
 	        // Wire the hardware volume controls to control media if desired.
 	        String volumePref = preferences.getString("DefaultVolumeStream", "");
@@ -602,7 +609,17 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        }
 	    }
 
-	    @SuppressWarnings("deprecation")
+	@Override
+	public void onSuperCmdInit() {
+		super.onSuperCmdInit();
+		Log.i(TAG,"onSuperCmdInit CoocaaOSConnecter:" + mCoocaaOSConnecter);
+		if (mCoocaaOSConnecter == null) {
+			mCoocaaOSConnecter = new CoocaaOSConnecterDefaultImpl(this, getCmdConnectorListener());
+			cordovaInterface.setCoocaaOSConnecter(mCoocaaOSConnecter);
+		}
+	}
+
+	@SuppressWarnings("deprecation")
 	    protected void loadConfig() {
 	        ConfigXmlParser parser = new ConfigXmlParser();
 	        parser.parse(this);
@@ -788,6 +805,11 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    	
 	    	return url;
 	    }
+
+	    public void setCore(int core) {
+			if(preferences != null)
+				preferences.set("webview",((core == 0) ? "org.apache.cordova.engine.system.SystemWebViewEngine" : "org.apache.cordova.engine.crosswalk.XWalkWebViewEngine"));
+		}
 	    
 	    public void setCacheMode(int mode) {
 	    	if(mode < 0 || mode > 3)

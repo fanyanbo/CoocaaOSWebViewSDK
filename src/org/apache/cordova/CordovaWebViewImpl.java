@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.cordova.engine.SystemWebViewEngine;
+import org.apache.cordova.engine.system.SystemWebViewEngine;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -75,6 +75,7 @@ public class CordovaWebViewImpl implements CordovaWebView {
 
     public static CordovaWebViewEngine createEngine(Context context, CordovaPreferences preferences) {
         String className = preferences.getString("webview", SystemWebViewEngine.class.getCanonicalName());
+        Log.i("WebViewSDK","createEngine className = " + className);
         try {
             Class<?> webViewClass = Class.forName(className);
             Constructor<?> constructor = webViewClass.getConstructor(Context.class, CordovaPreferences.class);

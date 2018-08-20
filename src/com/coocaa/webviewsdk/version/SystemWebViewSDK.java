@@ -115,12 +115,15 @@ package com.coocaa.webviewsdk.version;
 /*version 2.4.6
  * 1.对接酷开系统支付功能
  */
+/*version 2.4.7
+ * 1.修复IPC绑定时序导致的问题
+ */
 
 public class SystemWebViewSDK {
 
-	private static final String versionName = "2.4.6";
+	private static final String versionName = "2.4.7";
 
-	private static final int versionCode = 2040006;
+	private static final int versionCode = 2040007;
 	
 	private static int focusPosition = -1;
 	
