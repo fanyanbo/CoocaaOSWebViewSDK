@@ -111,6 +111,7 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    protected String mLoadingUrl = null;
 	    protected boolean isNeedThemeBg = false;
 	    protected boolean isNeedErrorPageBtn = true;
+	    protected boolean isPerformanceMonitor = false;
 //	    protected boolean isPageHref = true;
 	    protected boolean isLoading = false;
 	    protected int cacheMode = 0;//0:no-cache,1:default,2:cache_only,3:cache_else_network
@@ -383,21 +384,20 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 						mWebViewListener.onPageFinished(url);
 
 					runOnUiThread(new Runnable() {
-						
+
 						@Override
 						public void run() {
-							
+
 							stopLoading();
-							if(mErrorPageIsShown)
-							{
-								if(mErrorView != null)
-								{
-									if(mBtnView != null)
+							if (mErrorPageIsShown) {
+								if (mErrorView != null) {
+									if (mBtnView != null)
 										mBtnView.requestFocus();
 								}
-							}else{
+							} else {
 								appView.getView().setVisibility(View.VISIBLE);
 							}
+							if (isPerformanceMonitor) getPerformanceInfo();
 						}
 					});
 				}
@@ -806,6 +806,20 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    		displayPolicy = 0;
 	    	displayPolicy = value;
 	    }
+
+	    public void setPerformanceMonitor(boolean flag) {
+			this.isPerformanceMonitor = flag;
+		}
+
+		private void getPerformanceInfo() {
+			Log.i(TAG,"getPerformanceInfo");
+			String format = "javascript:%s.sendNavigationTiming(JSON.stringify(window.performance.timing));";
+			String injectedJs = String.format(format, "_monitor");
+			this.appView.loadUrl(injectedJs);
+			String format2 = "javascript:%s.sendResourceTiming(JSON.stringify(window.performance.getEntriesByType('resource')));";
+			String injectedJs2 = String.format(format2, "_monitor");
+			this.appView.loadUrl(injectedJs2);
+		}
 	    
 	    public int getWebViewFocusPosition(){
 	    	return SystemWebViewSDK.getFocusPosition();

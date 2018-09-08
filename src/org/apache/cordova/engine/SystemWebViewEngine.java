@@ -43,6 +43,7 @@ import org.apache.cordova.CordovaWebViewEngine;
 import org.apache.cordova.ICordovaCookieManager;
 import org.apache.cordova.NativeToJsMessageQueue;
 import org.apache.cordova.PluginManager;
+import org.apache.cordova.SystemExposedJsMonitorApi;
 
 import com.skyworth.systemwebview.extra.SysWebviewCompatLayer;
 
@@ -299,6 +300,8 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         }
         SystemExposedJsApi exposedJsApi = new SystemExposedJsApi(bridge);
         webView.addJavascriptInterface(exposedJsApi, "_cordovaNative");
+        SystemExposedJsMonitorApi exposedJsMonitorApi = new SystemExposedJsMonitorApi();
+        webView.addJavascriptInterface(exposedJsMonitorApi, "_monitor");
     }
 
 
