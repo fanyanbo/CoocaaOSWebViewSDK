@@ -44,6 +44,11 @@ public class XWalkCordovaResourceClient extends XWalkResourceClient {
         this.parentEngine = parentEngine;
     }
 
+    @Override
+    public void onProgressChanged(XWalkView view, int progressInPercent) {
+        super.onProgressChanged(view, progressInPercent);
+    }
+
     /**
     * Report an error to the host application. These errors are unrecoverable (i.e. the main resource is unavailable).
     * The errorCode parameter corresponds to one of the ERROR_* constants.
