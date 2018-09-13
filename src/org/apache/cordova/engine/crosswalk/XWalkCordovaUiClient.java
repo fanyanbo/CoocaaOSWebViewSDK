@@ -18,11 +18,7 @@
 */
 package org.apache.cordova.engine.crosswalk;
 
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.webkit.ValueCallback;
 
 import org.apache.cordova.CordovaDialogsHelper;
@@ -31,6 +27,7 @@ import org.apache.cordova.LOG;
 import org.xwalk.core.XWalkJavascriptResult;
 import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
+
 
 public class XWalkCordovaUiClient extends XWalkUIClient {
     private static final String TAG = "XWalkCordovaUiClient";
