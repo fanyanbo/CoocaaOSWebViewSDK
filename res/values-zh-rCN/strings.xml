@@ -1,8 +1,0 @@
-<resources>
-    
-   <string name="error_webview_netdisconnect">网络未连接，连网更精彩</string>
-    <string name="error_webview_neterror">获取内容失败，请检查网络</string>
-    <string name="error_webview_reset">去连网</string>
-    <string name="error_webview_refresh">刷新试试</string>
-    <string name="error">页面加载异常，请退出重试!</string>
-</resources>
