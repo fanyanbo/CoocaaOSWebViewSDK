@@ -1,0 +1,9 @@
+File getProjectDir(String dir) {
+    return new File("${buildscript.sourceFile.getParent()}/${dir}")
+}
+
+include ':ccSystemWebViewSDK'
+project(':ccSystemWebViewSDK').projectDir = getProjectDir("")
+
+
+
