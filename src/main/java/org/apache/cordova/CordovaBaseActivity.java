@@ -12,8 +12,9 @@ import com.tianci.net.define.NetworkDefs;
 import com.tianci.system.command.TCSystemDefs;
 import com.tianci.user.data.UserCmdDefine;
 
-import org.apache.cordova.plugin.api.CoocaaOSApi;
 import org.json.JSONObject;
+
+import coocaa.plugin.api.CoocaaOSApi;
 
 public class CordovaBaseActivity extends SkyActivity{
 	

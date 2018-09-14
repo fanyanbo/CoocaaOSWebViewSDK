@@ -135,6 +135,7 @@
     <orderEntry type="library" exported="" name="Gradle: com.android.support:support-vector-drawable-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:support-core-utils-25.3.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: net.sf.kxml:kxml2:2.3.0@jar" level="project" />
+    <orderEntry type="module" module-name="skylogsdk_java" exported="" />
     <orderEntry type="module" module-name="ccUserServiceSDK" exported="" />
     <orderEntry type="module" module-name="ccExACommonUISDK" exported="" />
     <orderEntry type="module" module-name="ccSystemServiceSDK" exported="" />

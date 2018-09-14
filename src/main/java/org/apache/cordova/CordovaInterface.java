@@ -22,10 +22,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-import org.apache.cordova.plugin.api.BusinessDataListener;
-import org.apache.cordova.plugin.api.CoocaaOSConnecter;
-
 import java.util.concurrent.ExecutorService;
+
+import coocaa.plugin.api.BusinessDataListener;
+import coocaa.plugin.api.CoocaaOSConnecter;
 
 /**
  * The Activity interface that is implemented by CordovaActivity.

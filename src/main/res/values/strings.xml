@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">SystemWebViewSDK</string>
+    <string name="error_webview_netdisconnect">network error!</string>
+    <string name="error_webview_neterror">connection error!</string>
+    <string name="error_webview_reset">setting network</string>
+    <string name="error_webview_refresh">refresh page</string>
+    <string name="error">load error£¬please exit try again!</string>
 </resources>

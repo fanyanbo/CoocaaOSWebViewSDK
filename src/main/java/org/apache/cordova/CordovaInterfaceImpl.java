@@ -29,13 +29,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Pair;
 
-import org.apache.cordova.plugin.api.BusinessDataListener;
-import org.apache.cordova.plugin.api.CoocaaOSConnecter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import coocaa.plugin.api.BusinessDataListener;
+import coocaa.plugin.api.CoocaaOSConnecter;
 
 /**
  * Default implementation of CordovaInterface.

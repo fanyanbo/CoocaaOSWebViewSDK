@@ -1,2 +1,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="coocaa.systemwebviewsdk" />
+    package="com.coocaa.systemwebview" >
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:hardwareAccelerated="true">
+
+        <activity
+            android:name="coocaa.plugin.api.pay.sky.api.MActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden|locale|touchscreen|navigation|screenLayout|uiMode|screenSize|locale"
+            android:launchMode="singleTask"
+            android:theme="@style/AppBaseTheme3" >
+            <intent-filter>
+                <action android:name="coocaa.intent.action.pay" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>

@@ -27,12 +27,12 @@
     <allow-intent href="market:*" />
     <preference name="loglevel" value="DEBUG" />
     <feature name="CoocaaOSApi">
-        <param name="android-package" value="org.apache.cordova.plugin.api.CoocaaOSApi" />
+        <param name="android-package" value="coocaa.plugin.api.CoocaaOSApi" />
     </feature>
     <feature name="startApp">
-        <param name="android-package" value="org.apache.cordova.plugin.start.startApp" />
+        <param name="android-package" value="coocaa.plugin.start.startApp" />
     </feature>
     <feature name="broadcaster">
-        <param name="android-package" value="org.apache.cordova.plugin.broadcast.CDVBroadcaster" />
+        <param name="android-package" value="coocaa.plugin.broadcast.CDVBroadcaster" />
     </feature>
 </widget>

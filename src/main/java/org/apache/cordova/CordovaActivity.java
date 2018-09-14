@@ -41,13 +41,14 @@ import android.widget.FrameLayout;
 
 import com.skyworth.ui.api.SkyWithBGLoadingView;
 
-import org.apache.cordova.plugin.api.CoocaaOSConnecter;
-import org.apache.cordova.plugin.api.CoocaaOSConnecterDefaultImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
+import coocaa.plugin.api.CoocaaOSConnecter;
+import coocaa.plugin.api.CoocaaOSConnecterDefaultImpl;
 
 /**
  * This class is the main Android activity that represents the Cordova

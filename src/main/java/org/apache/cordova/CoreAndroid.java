@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import org.json.JSONArray;
@@ -72,6 +73,8 @@ public class CoreAndroid extends CordovaPlugin {
      * @return                  A PluginResult object with a status and message.
      */
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+
+        Log.i("WebViewSDK","CoreAndroid action = " + action);
         PluginResult.Status status = PluginResult.Status.OK;
         String result = "";
 
