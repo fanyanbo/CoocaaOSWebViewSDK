@@ -18,6 +18,7 @@ package org.apache.cordova;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.view.View;
 import android.webkit.WebChromeClient.CustomViewCallback;
 
@@ -40,6 +41,8 @@ public interface CordovaWebView {
     View getView();
 
     void loadUrlIntoView(String url, boolean recreatePlugins);
+
+    void loadUrlIntoView(String url, Map<String,String> header, boolean recreatePlugins);
 
     void stopLoading();
 
@@ -139,4 +142,15 @@ public interface CordovaWebView {
     Context getContext();
     void loadUrl(String url);
     Object postMessage(String id, Object data);
+
+    // add interface for browser by fyb
+    void reload();
+
+    boolean goForward();
+
+    void setUserAgent(String ua);
+
+    String getTitle();
+
+    Bitmap getFavicon();
 }

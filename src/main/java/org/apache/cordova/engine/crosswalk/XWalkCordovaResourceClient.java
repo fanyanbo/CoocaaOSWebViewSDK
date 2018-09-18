@@ -64,8 +64,9 @@ public class XWalkCordovaResourceClient extends XWalkResourceClient {
 
     @Override
     public void onProgressChanged(XWalkView view, int progressInPercent) {
-        super.onProgressChanged(view, progressInPercent);
-        Log.i("WebViewSDK","onProgressChanged XWalkView value = " + progressInPercent);
+//        super.onProgressChanged(view, progressInPercent);
+//        Log.i("WebViewSDK","onProgressChanged XWalkView value = " + progressInPercent);
+        parentEngine.client.onProgressChanged(progressInPercent);
     }
 
     @Override

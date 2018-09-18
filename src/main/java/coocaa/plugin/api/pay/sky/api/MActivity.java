@@ -249,13 +249,13 @@ public class MActivity extends BaseActivity {
         return "https://beta-gpay.coocaa.com";
     }
 
-    protected String getServer() {
-        return "https://pay.coocaa.com";
-    }
-
 //    protected String getServer() {
-//        return "http://beta.pay.coocaatv.com";
+//        return "https://pay.coocaa.com";
 //    }
+
+    protected String getServer() {
+        return "http://beta.pay.coocaatv.com";
+    }
 
     private void init(Intent intent) {
         this.mIntent = intent;

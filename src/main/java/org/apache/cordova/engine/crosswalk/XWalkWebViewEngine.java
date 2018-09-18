@@ -21,6 +21,7 @@ package org.apache.cordova.engine.crosswalk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
@@ -165,7 +166,8 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
         webView.setBackgroundColor(0);
         XWalkSettings settings = webView.getSettings();
         settings.setUseWideViewPort(true);
-//        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+
+//        settings.setCacheMode(XWalkSettings.LOAD_DEFAULT);
         boolean zOrderOnTop = preferences == null ? false : preferences.getBoolean(XWALK_Z_ORDER_ON_TOP, false);
         webView.setZOrderOnTop(zOrderOnTop);
 
@@ -271,4 +273,43 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
         return activityDelegate.isXWalkReady();
     }
 
+    @Override
+    public void reload() {
+        if (!activityDelegate.isXWalkReady()) return;
+        webView.reload(0);
+    }
+
+    @Override
+    public boolean goForward() {
+        if (!activityDelegate.isXWalkReady()) return false;
+        if (this.webView.getNavigationHistory().canGoForward()) {
+            this.webView.getNavigationHistory().navigate(XWalkNavigationHistory.Direction.FORWARD, 1);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void setUserAgent(String ua) {
+        if (!activityDelegate.isXWalkReady()) return;
+        this.webView.setUserAgentString(ua);
+    }
+
+    @Override
+    public String getTitle() {
+        if (!activityDelegate.isXWalkReady()) return null;
+        return webView.getTitle();
+    }
+
+    @Override
+    public Bitmap getFavicon() {
+        if (!activityDelegate.isXWalkReady()) return null;
+        return null;
+    }
+
+    @Override
+    public void loadUrl(String url, Map<String, String> header, boolean clearNavigationStack) {
+        //webView.loadUrl(url, header);
+        Log.i("WebViewSDK","XWalkWebViewEngine LoadUrl no implement");
+    }
 }

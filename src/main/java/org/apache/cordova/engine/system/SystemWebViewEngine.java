@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.view.View;
 import android.webkit.ValueCallback;
@@ -46,6 +47,7 @@ import org.apache.cordova.PluginManager;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 
 /**
@@ -279,6 +281,11 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
     }
 
     @Override
+    public void loadUrl(String url, Map<String, String> header, boolean clearNavigationStack) {
+        webView.loadUrl(url, header);
+    }
+
+    @Override
     public String getUrl() {
         return webView.getUrl();
     }
@@ -353,5 +360,31 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         {
             LOG.d(TAG, "This webview is using the old bridge");
         }
+    }
+
+    @Override
+    public void reload() {
+        webView.reload();
+    }
+
+    @Override
+    public boolean goForward() {
+        webView.goForward();
+        return true;
+    }
+
+    @Override
+    public void setUserAgent(String ua) {
+        webView.getSettings().setUserAgentString(ua);
+    }
+
+    @Override
+    public String getTitle() {
+        return webView.getTitle();
+    }
+
+    @Override
+    public Bitmap getFavicon() {
+        return webView.getFavicon();
     }
 }

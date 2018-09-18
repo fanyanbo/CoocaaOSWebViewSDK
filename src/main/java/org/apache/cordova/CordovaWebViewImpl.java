@@ -21,6 +21,7 @@ package org.apache.cordova;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 import android.view.Gravity;
@@ -128,7 +129,7 @@ public class CordovaWebViewImpl implements CordovaWebView {
     }
 
     @Override
-    public void loadUrlIntoView(final String url, boolean recreatePlugins) {
+    public void loadUrlIntoView(final String url, final Map<String, String> header, boolean recreatePlugins) {
         LOG.d(TAG, ">>> loadUrl(" + url + ")");
         if (url.equals("about:blank") || url.startsWith("javascript:")) {
             engine.loadUrl(url, false);
@@ -194,11 +195,18 @@ public class CordovaWebViewImpl implements CordovaWebView {
                     cordova.getThreadPool().execute(timeoutCheck);
                 }
                 Log.i("WebViewSDK","2222 url = " + url);
-                engine.loadUrl(url, _recreatePlugins);
+                if (header != null)
+                    engine.loadUrl(url, header, _recreatePlugins);
+                else
+                    engine.loadUrl(url, _recreatePlugins);
             }
         });
     }
 
+    @Override
+    public void loadUrlIntoView(String url, boolean recreatePlugins) {
+        this.loadUrlIntoView(url, null, recreatePlugins);
+    }
 
     @Override
     public void loadUrl(String url) {
@@ -622,5 +630,45 @@ public class CordovaWebViewImpl implements CordovaWebView {
             LOG.w(TAG, "Blocked (possibly sub-frame) navigation to non-allowed URL: " + url);
             return true;
         }
+
+        @Override
+        public void onReceivedTitle(String title) {
+            pluginManager.postMessage("onReceivedTitle", title);
+        }
+
+        @Override
+        public void onReceivedIcon(Bitmap icon) {
+            pluginManager.postMessage("onReceivedIcon", icon);
+        }
+
+        @Override
+        public void onProgressChanged(int newProcess) {
+            pluginManager.postMessage("onProgressChanged",newProcess);
+        }
+    }
+
+    @Override
+    public void reload() {
+        engine.reload();
+    }
+
+    @Override
+    public boolean goForward() {
+        return engine.goForward();
+    }
+
+    @Override
+    public void setUserAgent(String ua) {
+        engine.setUserAgent(ua);
+    }
+
+    @Override
+    public String getTitle() {
+        return engine.getTitle();
+    }
+
+    @Override
+    public Bitmap getFavicon() {
+        return engine.getFavicon();
     }
 }

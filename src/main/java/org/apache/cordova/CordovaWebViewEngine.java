@@ -18,9 +18,12 @@
 */
 package org.apache.cordova;
 
+import android.graphics.Bitmap;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.ValueCallback;
+
+import java.util.Map;
 
 /**
  * Interface for all Cordova engines.
@@ -37,6 +40,8 @@ public interface CordovaWebViewEngine {
     View getView();
 
     void loadUrl(String url, boolean clearNavigationStack);
+
+    void loadUrl(String url, Map<String,String> header, boolean clearNavigationStack);
 
     void stopLoading();
 
@@ -62,6 +67,17 @@ public interface CordovaWebViewEngine {
     /** Add the evaulate Javascript method **/
     void evaluateJavascript(String js, ValueCallback<String> callback);
 
+    // add interface for browser by fyb
+    void reload();
+
+    boolean goForward();
+
+    void setUserAgent(String ua);
+
+    String getTitle();
+
+    Bitmap getFavicon();
+
     /**
      * Used to retrieve the associated CordovaWebView given a View without knowing the type of Engine.
      * E.g. ((CordovaWebView.EngineView)activity.findViewById(android.R.id.webView)).getCordovaWebView();
@@ -81,5 +97,10 @@ public interface CordovaWebViewEngine {
         void onReceivedError(int errorCode, String description, String failingUrl);
         void onPageFinishedLoading(String url);
         boolean onNavigationAttempt(String url);
+
+        // add interface for app listening
+        void onReceivedTitle(String title);
+        void onReceivedIcon(Bitmap icon);
+        void onProgressChanged(int newProcess);
     }
 }
