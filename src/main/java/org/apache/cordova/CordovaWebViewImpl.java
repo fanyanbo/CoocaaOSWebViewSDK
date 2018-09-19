@@ -94,12 +94,12 @@ public class CordovaWebViewImpl implements CordovaWebView {
 
     // Convenience method for when creating programmatically (not from Config.xml).
     public void init(CordovaInterface cordova) {
-        init(cordova, new ArrayList<PluginEntry>(), new CordovaPreferences());
+        init(cordova, new ArrayList<PluginEntry>(), new CordovaPreferences(),0);
     }
 
     @SuppressLint("Assert")
     @Override
-    public void init(CordovaInterface cordova, List<PluginEntry> pluginEntries, CordovaPreferences preferences) {
+    public void init(CordovaInterface cordova, List<PluginEntry> pluginEntries, CordovaPreferences preferences, int loadUrlCacheMode) {
         if (this.cordova != null) {
             throw new IllegalStateException();
         }
@@ -114,7 +114,7 @@ public class CordovaWebViewImpl implements CordovaWebView {
         if (preferences.getBoolean("DisallowOverscroll", false)) {
             engine.getView().setOverScrollMode(View.OVER_SCROLL_NEVER);
         }
-        engine.init(this, cordova, engineClient, resourceApi, pluginManager, nativeToJsMessageQueue);
+        engine.init(this, cordova, engineClient, resourceApi, pluginManager, nativeToJsMessageQueue, loadUrlCacheMode);
         // This isn't enforced by the compiler, so assert here.
         assert engine.getView() instanceof CordovaWebViewEngine.EngineView;
 
@@ -138,10 +138,11 @@ public class CordovaWebViewImpl implements CordovaWebView {
 
         recreatePlugins = recreatePlugins || (loadedUrl == null);
 
+        Log.i("WebViewSDK", "loadUrlIntoView recreatePlugins = " + recreatePlugins + ",url = " + url + ",loadedUrl = " + loadedUrl + ",isInitialized() = " + isInitialized());
+
         if (recreatePlugins) {
             // Don't re-initialize on first load.
-            if (loadedUrl != null) {
-                appPlugin = null;
+            if (loadedUrl != null && !isInitialized()) {
                 pluginManager.init();
             }
             loadedUrl = url;
@@ -149,7 +150,7 @@ public class CordovaWebViewImpl implements CordovaWebView {
 
         // Create a timeout timer for loadUrl
         final int currentLoadUrlTimeout = loadUrlTimeout;
-        final int loadUrlTimeoutValue = preferences.getInteger("LoadUrlTimeoutValue", 20000);
+        final int loadUrlTimeoutValue = preferences.getInteger("LoadUrlTimeoutValue", 40000);
 
         // Timeout error method
         final Runnable loadError = new Runnable() {
@@ -161,7 +162,7 @@ public class CordovaWebViewImpl implements CordovaWebView {
                 JSONObject data = new JSONObject();
                 try {
                     data.put("errorCode", -6);
-                    data.put("description", "The connection to the server was unsuccessful.");
+                    data.put("description", "The connection to the server was unsuccessful[timeout].");
                     data.put("url", url);
                 } catch (JSONException e) {
                     // Will never happen.
@@ -187,7 +188,7 @@ public class CordovaWebViewImpl implements CordovaWebView {
                 }
             }
         };
-
+        
         final boolean _recreatePlugins = recreatePlugins;
         cordova.getActivity().runOnUiThread(new Runnable() {
             public void run() {
@@ -673,5 +674,10 @@ public class CordovaWebViewImpl implements CordovaWebView {
     @Override
     public Bitmap getFavicon() {
         return engine.getFavicon();
+    }
+
+    @Override
+    public void pauseLoading() {
+        engine.stopLoading();
     }
 }

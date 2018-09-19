@@ -34,17 +34,19 @@ import java.util.Map;
 public interface CordovaWebView {
     public static final String CORDOVA_VERSION = "7.0.0";
 
-    void init(CordovaInterface cordova, List<PluginEntry> pluginEntries, CordovaPreferences preferences);
+    void init(CordovaInterface cordova, List<PluginEntry> pluginEntries, CordovaPreferences preferences, int loadUrlCacheMode);
 
     boolean isInitialized();
 
     View getView();
 
     void loadUrlIntoView(String url, boolean recreatePlugins);
-
+    
     void loadUrlIntoView(String url, Map<String,String> header, boolean recreatePlugins);
 
     void stopLoading();
+
+    void pauseLoading();
 
     boolean canGoBack();
 

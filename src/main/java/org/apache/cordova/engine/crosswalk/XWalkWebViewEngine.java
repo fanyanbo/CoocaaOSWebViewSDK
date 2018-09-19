@@ -113,7 +113,7 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
     @Override
     public void init(CordovaWebView parentWebView, CordovaInterface cordova, CordovaWebViewEngine.Client client,
                      CordovaResourceApi resourceApi, PluginManager pluginManager,
-                     NativeToJsMessageQueue nativeToJsMessageQueue) {
+                     NativeToJsMessageQueue nativeToJsMessageQueue, int loadUrlCacheMode) {
         if (this.cordova != null) {
             throw new IllegalStateException();
         }

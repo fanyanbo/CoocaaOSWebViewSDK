@@ -33,7 +33,7 @@ import java.util.Map;
 public interface CordovaWebViewEngine {
     void init(CordovaWebView parentWebView, CordovaInterface cordova, Client client,
               CordovaResourceApi resourceApi, PluginManager pluginManager,
-              NativeToJsMessageQueue nativeToJsMessageQueue);
+              NativeToJsMessageQueue nativeToJsMessageQueue,int loadUrlCacheMode);
 
     CordovaWebView getCordovaWebView();
     ICordovaCookieManager getCookieManager();

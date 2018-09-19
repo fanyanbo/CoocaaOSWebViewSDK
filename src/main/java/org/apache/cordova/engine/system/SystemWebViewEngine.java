@@ -91,7 +91,7 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
     @Override
     public void init(CordovaWebView parentWebView, CordovaInterface cordova, Client client,
                      CordovaResourceApi resourceApi, PluginManager pluginManager,
-                     NativeToJsMessageQueue nativeToJsMessageQueue) {
+                     NativeToJsMessageQueue nativeToJsMessageQueue, int loadUrlCacheMode) {
         if (this.cordova != null) {
             throw new IllegalStateException();
         }

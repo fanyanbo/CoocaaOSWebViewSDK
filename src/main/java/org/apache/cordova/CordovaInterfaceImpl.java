@@ -21,12 +21,15 @@ package org.apache.cordova;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Application;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 
 import org.json.JSONException;
@@ -43,7 +46,7 @@ import coocaa.plugin.api.CoocaaOSConnecter;
  */
 public class CordovaInterfaceImpl implements CordovaInterface {
     private static final String TAG = "CordovaInterfaceImpl";
-    protected Activity activity;
+    protected Context activity;
     protected ExecutorService threadPool;
     protected PluginManager pluginManager;
 
@@ -56,11 +59,11 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     protected Bundle savedPluginState;
     private CordovaContext cordovaContext;
 
-    public CordovaInterfaceImpl(Activity activity) {
+    public CordovaInterfaceImpl(Context activity) {
         this(activity, Executors.newCachedThreadPool());
     }
 
-    public CordovaInterfaceImpl(Activity activity, ExecutorService threadPool) {
+    public CordovaInterfaceImpl(Context activity, ExecutorService threadPool) {
         this.activity = activity;
         this.threadPool = threadPool;
         cordovaContext = new CordovaContext(activity);
@@ -89,7 +92,9 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     public void startActivityForResult(CordovaPlugin command, Intent intent, int requestCode) {
         setActivityResultCallback(command);
         try {
-            activity.startActivityForResult(intent, requestCode);
+            if ( activity instanceof Activity ) {
+                ((Activity)activity).startActivityForResult(intent, requestCode);
+            }
         } catch (RuntimeException e) { // E.g.: ActivityNotFoundException
             activityResultCallback = null;
             throw e;
@@ -118,7 +123,18 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     @Override
     public Object onMessage(String id, Object data) {
         if ("exit".equals(id)) {
-            activity.finish();
+//            activity.finish();
+            if ( activity instanceof Activity ) {
+                Log.i("WebViewSDK","exit activity");
+                ((Activity)activity).finish();
+            }else if (activity instanceof Application) {
+                mCordovaListener.onPageExit();
+                Log.i("WebViewSDK","exit application");
+            }else if (activity instanceof Service) {
+                Log.i("WebViewSDK","exit service");
+            }else {
+                Log.i("WebViewSDK","exit error");
+            }
         }
         else if("onPageStarted".equals(id))
         {
