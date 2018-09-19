@@ -575,6 +575,9 @@ public class CordovaWebViewImpl implements CordovaWebView {
                 if (isBackButton && mCustomView != null) {
                     return true;
                 } else if (boundKeyCodes.contains(keyCode)) {
+                    if(keyCode == KeyEvent.KEYCODE_BACK){
+                        sendJavascriptEvent("backbuttondown"); //add by fyb
+                    }
                     return true;
                 } else if (isBackButton) {
                     return engine.canGoBack();
