@@ -54,6 +54,7 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     protected int activityResultRequestCode;
     protected boolean activityWasDestroyed = false;
     protected Bundle savedPluginState;
+    private CordovaContext cordovaContext;
 
     public CordovaInterfaceImpl(Activity activity) {
         this(activity, Executors.newCachedThreadPool());
@@ -62,7 +63,8 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     public CordovaInterfaceImpl(Activity activity, ExecutorService threadPool) {
         this.activity = activity;
         this.threadPool = threadPool;
-        this.permissionResultCallbacks = new CallbackMap();
+        cordovaContext = new CordovaContext(activity);
+//        this.permissionResultCallbacks = new CallbackMap();
     }
 
     public interface CordovaInterfaceListener
@@ -104,14 +106,14 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     }
 
     @Override
-    public Activity getActivity() {
-        return activity;
+    public CordovaContext getActivity() {
+        return cordovaContext;
     }
 
-    @Override
-    public Context getContext() {
-        return activity;
-    }
+//    @Override
+//    public Context getContext() {
+//        return activity;
+//    }
 
     @Override
     public Object onMessage(String id, Object data) {
@@ -320,7 +322,7 @@ public class CordovaInterfaceImpl implements CordovaInterface {
         @SuppressLint("NewApi")
     public void requestPermissions(CordovaPlugin plugin, int requestCode, String [] permissions) {
         int mappedRequestCode = permissionResultCallbacks.registerCallback(plugin, requestCode);
-        getActivity().requestPermissions(permissions, mappedRequestCode);
+//        getActivity().requestPermissions(permissions, mappedRequestCode);
     }
 
     public boolean hasPermission(String permission)

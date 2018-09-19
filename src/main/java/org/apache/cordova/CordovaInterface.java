@@ -57,14 +57,14 @@ public interface CordovaInterface {
      *
      * @return the Activity
      */
-    public abstract Activity getActivity();
+    public abstract CordovaContext getActivity();
 
     /**
      * Get the Android context.
      *
      * @return the Context
      */
-    public Context getContext();
+//    public Context getContext();
 
     /**
      * Called when a message is sent to plugin.
