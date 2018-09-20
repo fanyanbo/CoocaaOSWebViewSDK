@@ -125,7 +125,7 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         }));
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2)
             nativeToJsMessageQueue.addBridgeMode(new NativeToJsMessageQueue.EvalBridgeMode(this, cordova));
-	bridge = new CordovaBridge(pluginManager, nativeToJsMessageQueue);
+	    bridge = new CordovaBridge(pluginManager, nativeToJsMessageQueue);
         exposeJsInterface(webView, bridge);
     }
 

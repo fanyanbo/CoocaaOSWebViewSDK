@@ -340,8 +340,9 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 						public void run() {
 							
 							startLoading();
-							if(displayPolicy == 0) 
-								appView.getView().setVisibility(View.INVISIBLE);
+//							if(displayPolicy == 0)
+//								appView.getView().setVisibility(View.INVISIBLE);
+                            appView.getView().setVisibility(View.VISIBLE);
 							if(mErrorPageIsShown)
 							{
 								hideErrorPage();
@@ -613,6 +614,8 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	        appView.getView().setLayoutParams(new FrameLayout.LayoutParams(
 	                ViewGroup.LayoutParams.MATCH_PARENT,
 	                ViewGroup.LayoutParams.MATCH_PARENT));
+            appView.getView().setVisibility(View.INVISIBLE);
+
 	        if(mainLayout == null)
 	        	mainLayout = new CordovaMainLayout(this);
 
