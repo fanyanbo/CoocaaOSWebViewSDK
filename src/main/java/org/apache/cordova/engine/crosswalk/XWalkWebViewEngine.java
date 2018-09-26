@@ -229,10 +229,10 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
         webView.onDestroy();
     }
 
-    @Override
-    public void evaluateJavascript(String js, ValueCallback<String> callback) {
-
-    }
+//    @Override
+//    public void evaluateJavascript(String js, ValueCallback<String> callback) {
+//
+//    }
 
     @Override
     public void clearHistory() {
@@ -286,17 +286,15 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
     }
 
     @Override
-    public boolean goForward() {
-        if (!activityDelegate.isXWalkReady()) return false;
+    public void goForward() {
+        if (!activityDelegate.isXWalkReady()) return;
         if (this.webView.getNavigationHistory().canGoForward()) {
             this.webView.getNavigationHistory().navigate(XWalkNavigationHistory.Direction.FORWARD, 1);
-            return true;
         }
-        return false;
     }
 
     @Override
-    public void setUserAgent(String ua) {
+    public void setUserAgentString(String ua) {
         if (!activityDelegate.isXWalkReady()) return;
         this.webView.setUserAgentString(ua);
     }
@@ -320,5 +318,17 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
             return;
         }
         webView.loadUrl(url, header);
+    }
+
+    @Override
+    public boolean canGoForward() {
+        if (!activityDelegate.isXWalkReady()) return false;
+        return this.webView.getNavigationHistory().canGoForward();
+    }
+
+    @Override
+    public void clearFormData() {
+        if (!activityDelegate.isXWalkReady()) return;
+        webView.clearFormData();
     }
 }

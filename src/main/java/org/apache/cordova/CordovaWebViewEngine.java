@@ -65,18 +65,16 @@ public interface CordovaWebViewEngine {
     void destroy();
 
     /** Add the evaulate Javascript method **/
-    void evaluateJavascript(String js, ValueCallback<String> callback);
+//    void evaluateJavascript(String js, ValueCallback<String> callback);
 
     // add interface for browser by fyb
     void reload();
-
-    boolean goForward();
-
-    void setUserAgent(String ua);
-
+    boolean canGoForward();
+    void goForward();
     String getTitle();
-
     Bitmap getFavicon();
+    void clearFormData();
+    void setUserAgentString(String ua);
 
     /**
      * Used to retrieve the associated CordovaWebView given a View without knowing the type of Engine.

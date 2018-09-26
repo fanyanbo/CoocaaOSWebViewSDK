@@ -75,9 +75,8 @@ public class CordovaWebViewImpl implements CordovaWebView {
     private Set<Integer> boundKeyCodes = new HashSet<Integer>();
 
     public static CordovaWebViewEngine createEngine(Context context, CordovaPreferences preferences) {
-        Log.i("WebViewSDK","SystemWebViewEngine.class.getCanonicalName() = " + SystemWebViewEngine.class.getCanonicalName());
-//        String className = preferences.getString("webview", SystemWebViewEngine.class.getCanonicalName());
-        String className = "org.apache.cordova.engine.crosswalk.XWalkWebViewEngine";
+        String className = preferences.getString("webview", SystemWebViewEngine.class.getCanonicalName());
+//        String className = "org.apache.cordova.engine.crosswalk.XWalkWebViewEngine";
         Log.i("WebViewSDK","className = " + className);
         try {
             Class<?> webViewClass = Class.forName(className);
@@ -657,13 +656,13 @@ public class CordovaWebViewImpl implements CordovaWebView {
     }
 
     @Override
-    public boolean goForward() {
-        return engine.goForward();
+    public void goForward() {
+        engine.goForward();
     }
 
     @Override
-    public void setUserAgent(String ua) {
-        engine.setUserAgent(ua);
+    public void setUserAgentString(String ua) {
+        engine.setUserAgentString(ua);
     }
 
     @Override
@@ -679,5 +678,15 @@ public class CordovaWebViewImpl implements CordovaWebView {
     @Override
     public void pauseLoading() {
         engine.stopLoading();
+    }
+
+    @Override
+    public boolean canGoForward() {
+        return engine.canGoForward();
+    }
+
+    @Override
+    public void clearFormData() {
+        engine.clearFormData();
     }
 }

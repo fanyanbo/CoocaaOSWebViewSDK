@@ -28,6 +28,7 @@ import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
@@ -72,6 +73,8 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
     protected CordovaResourceApi resourceApi;
     protected NativeToJsMessageQueue nativeToJsMessageQueue;
     private BroadcastReceiver receiver;
+    
+    protected int loadUrlCacheMode = 0;
 
     /** Used when created via reflection. */
     public SystemWebViewEngine(Context context, CordovaPreferences preferences) {
@@ -105,6 +108,7 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         this.resourceApi = resourceApi;
         this.pluginManager = pluginManager;
         this.nativeToJsMessageQueue = nativeToJsMessageQueue;
+        this.loadUrlCacheMode = loadUrlCacheMode; //add by fyb
         webView.init(this, cordova);
 
         initWebViewSettings();
@@ -123,8 +127,8 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
                 SystemWebViewEngine.this.cordova.getActivity().runOnUiThread(r);
             }
         }));
-        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2)
-            nativeToJsMessageQueue.addBridgeMode(new NativeToJsMessageQueue.EvalBridgeMode(this, cordova));
+//        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2)
+//            nativeToJsMessageQueue.addBridgeMode(new NativeToJsMessageQueue.EvalBridgeMode(this, cordova));
 	    bridge = new CordovaBridge(pluginManager, nativeToJsMessageQueue);
         exposeJsInterface(webView, bridge);
     }
@@ -149,20 +153,28 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
     private void initWebViewSettings() {
         webView.setInitialScale(0);
         webView.setVerticalScrollBarEnabled(false);
+        webView.setHorizontalScrollBarEnabled(false);
+        webView.setBackgroundColor(0);
+
         // Enable JavaScript
         final WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
         settings.setLayoutAlgorithm(LayoutAlgorithm.NORMAL);
-
+        //add by fyb
+        if(android.os.Build.VERSION.SDK_INT >= 21/*android.os.Build.VERSION_CODES.LOLLIPOP*/)
+        {
+        	settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+        
         // Set the nav dump for HTC 2.x devices (disabling for ICS, deprecated entirely for Jellybean 4.2)
         try {
             Method gingerbread_getMethod =  WebSettings.class.getMethod("setNavDump", new Class[] { boolean.class });
-
-            String manufacturer = Build.MANUFACTURER;
-            LOG.d(TAG, "CordovaWebView is running on device made by: " + manufacturer);
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB &&
-                    Build.MANUFACTURER.contains("HTC"))
+            
+            String manufacturer = android.os.Build.MANUFACTURER;
+            Log.d(TAG, "CordovaWebView is running on device made by: " + manufacturer);
+            if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB &&
+                    android.os.Build.MANUFACTURER.contains("HTC"))
             {
                 gingerbread_getMethod.invoke(settings, true);
             }
@@ -179,13 +191,13 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         //We don't save any form data in the application
         settings.setSaveFormData(false);
         settings.setSavePassword(false);
-
+        
         // Jellybean rightfully tried to lock this down. Too bad they didn't give us a whitelist
         // while we do this
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
             settings.setAllowUniversalAccessFromFileURLs(true);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        if (android.os.Build.VERSION.SDK_INT >= 17 /*android.os.Build.VERSION_CODES.JELLY_BEAN_MR1*/) {
             settings.setMediaPlaybackRequiresUserGesture(false);
         }
         // Enable database
@@ -193,15 +205,15 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         String databasePath = webView.getContext().getApplicationContext().getDir("database", Context.MODE_PRIVATE).getPath();
         settings.setDatabaseEnabled(true);
         settings.setDatabasePath(databasePath);
-
-
+        
+        
         //Determine whether we're in debug or release mode, and turn on Debugging!
         ApplicationInfo appInfo = webView.getContext().getApplicationContext().getApplicationInfo();
         if ((appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0 &&
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            android.os.Build.VERSION.SDK_INT >= 19 /*android.os.Build.VERSION_CODES.KITKAT*/ ) {
             enableRemoteDebugging();
         }
-
+        
         settings.setGeolocationDatabasePath(databasePath);
 
         // Enable DOM storage
@@ -209,17 +221,17 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
 
         // Enable built-in geolocation
         settings.setGeolocationEnabled(true);
-
+        
         // Enable AppCache
         // Fix for CB-2282
         settings.setAppCacheMaxSize(5 * 1048576);
         settings.setAppCachePath(databasePath);
         settings.setAppCacheEnabled(true);
-
+        
         // Fix for CB-1405
         // Google issue 4641
         String defaultUserAgent = settings.getUserAgentString();
-
+        
         // Fix for CB-3360
         String overrideUserAgent = preferences.getString("OverrideUserAgent", null);
         if (overrideUserAgent != null) {
@@ -244,9 +256,34 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
             webView.getContext().registerReceiver(this.receiver, intentFilter);
         }
         // end CB-1405
+        
+        //Fix for webview net::ERR_CACHE_MISS
+        /*if (Build.VERSION.SDK_INT >= 19) {
+        	settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+	    }*/
+        
+        switch(loadUrlCacheMode){
+        	case 1:
+        		settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        		break;
+        	case 2:
+        		settings.setCacheMode(WebSettings.LOAD_CACHE_ONLY);
+        		break;
+        	case 3:
+        		settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        		break;
+        	case 0:
+        	default:
+        		settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        		break;
+        }
+        
+        //Fix COOCAA-TV
+        settings.setUseWideViewPort(true);
+        settings.setLoadWithOverviewMode(true);
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @TargetApi(19)
     private void enableRemoteDebugging() {
         try {
             WebView.setWebContentsDebuggingEnabled(true);
@@ -260,12 +297,12 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
     // below JELLYBEAN_MR1.  It'd be great if lint was just a little smarter.
     @SuppressLint("AddJavascriptInterface")
     private static void exposeJsInterface(WebView webView, CordovaBridge bridge) {
-        if ((Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1)) {
-            LOG.i(TAG, "Disabled addJavascriptInterface() bridge since Android version is old.");
+        if ((Build.VERSION.SDK_INT < 17 /*Build.VERSION_CODES.JELLY_BEAN_MR1*/)) {
+            Log.i(TAG, "Disabled addJavascriptInterface() bridge since Android version is old.");
             // Bug being that Java Strings do not get converted to JS strings automatically.
             // This isn't hard to work-around on the JS side, but it's easier to just
             // use the prompt bridge instead.
-            return;
+            return;            
         }
         SystemExposedJsApi exposedJsApi = new SystemExposedJsApi(bridge);
         webView.addJavascriptInterface(exposedJsApi, "_cordovaNative");
@@ -279,10 +316,10 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
     public void loadUrl(final String url, boolean clearNavigationStack) {
         webView.loadUrl(url);
     }
-
+    
     @Override
-    public void loadUrl(String url, Map<String, String> header, boolean clearNavigationStack) {
-        webView.loadUrl(url, header);
+    public void loadUrl(final String url, Map<String,String> header, boolean clearNavigationStack) {
+    	webView.loadUrl(url, header);
     }
 
     @Override
@@ -292,6 +329,8 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
 
     @Override
     public void stopLoading() {
+        Log.i("WebViewSDK","pauseTimers");
+        webView.pauseTimers();
         webView.stopLoading();
     }
 
@@ -351,40 +390,39 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         }
     }
 
-    @Override
-    public void evaluateJavascript(String js, ValueCallback<String> callback) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            webView.evaluateJavascript(js, callback);
-        }
-        else
-        {
-            LOG.d(TAG, "This webview is using the old bridge");
-        }
-    }
+	@Override
+	public void reload() {
+		webView.reload();
+	}
 
-    @Override
-    public void reload() {
-        webView.reload();
-    }
+	@Override
+	public boolean canGoForward() {
+		return webView.canGoForward();
+	}
 
-    @Override
-    public boolean goForward() {
-        webView.goForward();
-        return true;
-    }
+	@Override
+	public void goForward() {
+		webView.goForward();
+	}
 
-    @Override
-    public void setUserAgent(String ua) {
-        webView.getSettings().setUserAgentString(ua);
-    }
+	@Override
+	public String getTitle() {
+		return webView.getTitle();
+	}
 
-    @Override
-    public String getTitle() {
-        return webView.getTitle();
-    }
+	@Override
+	public Bitmap getFavicon() {
+		
+		return webView.getFavicon();
+	}
 
-    @Override
-    public Bitmap getFavicon() {
-        return webView.getFavicon();
-    }
+	@Override
+	public void clearFormData() {
+		webView.clearFormData();
+	}
+
+	@Override
+	public void setUserAgentString(String ua) {
+		webView.getSettings().setUserAgentString(ua);
+	}
 }

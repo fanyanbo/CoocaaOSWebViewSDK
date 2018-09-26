@@ -801,6 +801,10 @@ public class CordovaExtActivity extends CordovaBaseActivity implements OnThemeCh
 	    		displayPolicy = 0;
 	    	displayPolicy = value;
 	    }
+
+	    public void setCore(int value) {
+			if (value == 1) preferences.set("webview","org.apache.cordova.engine.crosswalk.XWalkWebViewEngine");
+		}
 	    
 	    public int getWebViewFocusPosition(){
 	    	return org.apache.cordova.plugin.api.version.SystemWebViewSDK.getFocusPosition();

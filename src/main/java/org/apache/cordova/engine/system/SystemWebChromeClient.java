@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.view.Gravity;
@@ -157,7 +158,7 @@ public class SystemWebChromeClient extends WebChromeClient {
     public void onConsoleMessage(String message, int lineNumber, String sourceID)
     {
         //This is only for Android 2.1
-        if(Build.VERSION.SDK_INT == Build.VERSION_CODES.ECLAIR_MR1)
+        if(android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.ECLAIR_MR1)
         {
             LOG.d(LOG_TAG, "%s: Line %d : %s", sourceID, lineNumber, message);
             super.onConsoleMessage(message, lineNumber, sourceID);
@@ -289,5 +290,20 @@ public class SystemWebChromeClient extends WebChromeClient {
 
     public void destroyLastDialog(){
         dialogsHelper.destroyLastDialog();
+    }
+
+    @Override
+    public void onReceivedTitle(WebView view, String title) {
+        parentEngine.client.onReceivedTitle(title);
+    }
+
+    @Override
+    public void onReceivedIcon(WebView view, Bitmap icon) {
+        parentEngine.client.onReceivedIcon(icon);
+    }
+
+    @Override
+    public void onProgressChanged(WebView view, int newProgress) {
+        parentEngine.client.onProgressChanged(newProgress);
     }
 }

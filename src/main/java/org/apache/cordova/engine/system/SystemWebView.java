@@ -19,16 +19,16 @@
 
 package org.apache.cordova.engine.system;
 
+import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.CordovaWebViewEngine;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
-import org.apache.cordova.CordovaInterface;
-import org.apache.cordova.CordovaWebView;
-import org.apache.cordova.CordovaWebViewEngine;
 
 /**
  * Custom WebView subclass that enables us to capture events needed for Cordova.

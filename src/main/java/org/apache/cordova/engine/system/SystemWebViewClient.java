@@ -26,6 +26,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.webkit.ClientCertRequest;
 import android.webkit.HttpAuthHandler;
 import android.webkit.SslErrorHandler;
@@ -187,6 +189,10 @@ public class SystemWebViewClient extends WebViewClient {
      */
     @Override
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+    	
+    	String data = "";  
+        view.loadUrl("javascript:document.body.innerHTML=\"" + data + "\""); 
+    	
         // Ignore error due to stopLoading().
         if (!isCurrentlyLoading) {
             return;
@@ -209,7 +215,23 @@ public class SystemWebViewClient extends WebViewClient {
         parentEngine.client.onReceivedError(errorCode, description, failingUrl);
     }
 
-    /**
+    @Override
+	public boolean shouldOverrideKeyEvent(WebView view, KeyEvent event) {
+		// TODO Auto-generated method stub
+    	int keyCode = event.getKeyCode();
+    	if(keyCode == 783 || keyCode == 744 || keyCode == 132 || keyCode == 133){ //voice key in bluetooth remote control
+    		return true;
+    	}else if(keyCode == 814){ //long menu key in coocaa remote control
+    		return true;
+    	}else if(keyCode == 759){ //standby
+    		return true;
+    	}else if(keyCode == 850 || keyCode == 851 || keyCode == 852){ //Red Green Blue key
+    		return true;
+    	}
+		return super.shouldOverrideKeyEvent(view, event);
+	}
+
+	/**
      * Notify the host application that an SSL error occurred while loading a resource.
      * The host application must call either handler.cancel() or handler.proceed().
      * Note that the decision may be retained for use in response to future SSL errors.
@@ -235,7 +257,10 @@ public class SystemWebViewClient extends WebViewClient {
                 return;
             } else {
                 // debug = false
-                super.onReceivedSslError(view, handler, error);
+            	// modified by fyb
+                handler.proceed();
+                return;
+                //super.onReceivedSslError(view, handler, error);
             }
         } catch (NameNotFoundException e) {
             // When it doubt, lock it out!
@@ -320,6 +345,8 @@ public class SystemWebViewClient extends WebViewClient {
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
         try {
+        	
+        	Log.i("WebViewSDK","shouldInterceptRequest url = " + url);
             // Check the against the whitelist and lock out access to the WebView directory
             // Changing this will cause problems for your application
             if (!parentEngine.pluginManager.shouldAllowRequest(url)) {
@@ -349,7 +376,7 @@ public class SystemWebViewClient extends WebViewClient {
     }
 
     private static boolean needsKitKatContentUrlFix(Uri uri) {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && "content".equals(uri.getScheme());
+        return android.os.Build.VERSION.SDK_INT >= 19 /*android.os.Build.VERSION_CODES.KITKAT*/ && "content".equals(uri.getScheme());
     }
 
     private static boolean needsSpecialsInAssetUrlFix(Uri uri) {
@@ -364,9 +391,9 @@ public class SystemWebViewClient extends WebViewClient {
             return false;
         }
 
-        switch(Build.VERSION.SDK_INT){
-            case Build.VERSION_CODES.ICE_CREAM_SANDWICH:
-            case Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1:
+        switch(android.os.Build.VERSION.SDK_INT){
+            case android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH:
+            case android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1:
                 return true;
         }
         return false;

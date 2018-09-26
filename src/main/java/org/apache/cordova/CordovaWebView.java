@@ -147,12 +147,10 @@ public interface CordovaWebView {
 
     // add interface for browser by fyb
     void reload();
-
-    boolean goForward();
-
-    void setUserAgent(String ua);
-
+    boolean canGoForward();
+    void goForward();
     String getTitle();
-
     Bitmap getFavicon();
+    void clearFormData();
+    void setUserAgentString(String ua);
 }
