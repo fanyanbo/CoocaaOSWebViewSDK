@@ -166,8 +166,14 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
         webView.setBackgroundColor(0);
         XWalkSettings settings = webView.getSettings();
         settings.setUseWideViewPort(true);
+        settings.setLoadWithOverviewMode(true);
+        settings.setCacheMode(XWalkSettings.LOAD_NO_CACHE);
 
-//        settings.setCacheMode(XWalkSettings.LOAD_DEFAULT);
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
+        {
+            settings.setMixedContentMode(XWalkSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+
         boolean zOrderOnTop = preferences == null ? false : preferences.getBoolean(XWALK_Z_ORDER_ON_TOP, false);
         webView.setZOrderOnTop(zOrderOnTop);
 
@@ -309,7 +315,10 @@ public class XWalkWebViewEngine implements CordovaWebViewEngine {
 
     @Override
     public void loadUrl(String url, Map<String, String> header, boolean clearNavigationStack) {
-        //webView.loadUrl(url, header);
-        Log.i("WebViewSDK","XWalkWebViewEngine LoadUrl no implement");
+        if (!activityDelegate.isXWalkReady()) {
+            startUrl = url;
+            return;
+        }
+        webView.loadUrl(url, header);
     }
 }
