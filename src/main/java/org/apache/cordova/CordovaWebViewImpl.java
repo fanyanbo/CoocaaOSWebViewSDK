@@ -75,8 +75,8 @@ public class CordovaWebViewImpl implements CordovaWebView {
     private Set<Integer> boundKeyCodes = new HashSet<Integer>();
 
     public static CordovaWebViewEngine createEngine(Context context, CordovaPreferences preferences) {
-        String className = preferences.getString("webview", SystemWebViewEngine.class.getCanonicalName());
-//        String className = "org.apache.cordova.engine.crosswalk.XWalkWebViewEngine";
+//        String className = preferences.getString("webview", SystemWebViewEngine.class.getCanonicalName());
+        String className = "org.apache.cordova.engine.crosswalk.XWalkWebViewEngine";
         Log.i("WebViewSDK","className = " + className);
         try {
             Class<?> webViewClass = Class.forName(className);
